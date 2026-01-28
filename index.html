@@ -2019,13 +2019,7 @@ function createSinglePDF(dataArray, subTitle, fileName, summaryText) {
     }
 
     
-    const now = new Date();
-    const timestamp = now.getFullYear() +
-        (now.getMonth() + 1).toString().padStart(2, '0') +
-        now.getDate().toString().padStart(2, '0') +
-        now.getHours().toString().padStart(2, '0') +
-        now.getMinutes().toString().padStart(2, '0') +
-        now.getSeconds().toString().padStart(2, '0');
+
 
   
 // doc എന്നതിനെ കൂടി നമ്മൾ പ്രിവ്യൂവിലേക്ക് അയക്കുന്നു
@@ -2152,8 +2146,11 @@ function downloadActualPDF() {
     if (pdfQueue.length > 0) {
         pdfQueue.forEach((item, index) => {
             setTimeout(() => {
-                const now = new Date();
-                const timeStamp = now.toISOString().replace(/[:T-]/g, "").slice(0, 14);
+// ഇത് ഇന്ത്യൻ സമയം പക്കാ ആയി തരും
+const timeStamp = new Date().toLocaleString("en-GB", {
+    timeZone: "Asia/Kolkata",
+    hour12: false
+}).replace(/[/, : ]/g, "");
                 item.doc.save(`${item.name}_${timeStamp}.pdf`);
                 if (index === pdfQueue.length - 1) {
                     closePDFModal();
