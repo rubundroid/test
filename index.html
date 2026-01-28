@@ -413,13 +413,13 @@ margin-top: 10px;
     display: block;
 } 
  
-/* മൊബൈലിൽ ടേബിൾ ഭംഗിയായി കാണാൻ ഇത് കൂടി ചേർക്കാം */
+
 #pdfPreviewContent table {
-    font-size: 13px; /* മൊബൈലിൽ അക്ഷരം അല്പം ചെറുതാക്കുന്നു */
+    font-size: 13px; 
 }
 
 .tab-btn {
-    font-size: 12px; /* ടാബ് ബട്ടണിലെ അക്ഷരം */
+    font-size: 12px; 
     outline: none;
 }
  </style>
@@ -444,7 +444,7 @@ margin-top: 10px;
                 <li><strong>Step 2:</strong> ആവശ്യമായ മരുന്നുകളുടെ എണ്ണം (Qty) രേഖപ്പെടുത്തുക.</li>
                 <li><strong>Step 3:</strong> 'AUTO FILL' ബട്ടൺ ഉപയോഗിച്ച് ബജറ്റ് തുകയിലേക്ക്‌ മരുന്നുകളുടെ എണ്ണം ക്രമീകരിക്കാം.</li>
                 <li><strong>Step 4:</strong> ആവശ്യമെങ്കിൽ 'SAVE' ബട്ടൺ വഴി വിവരങ്ങൾ സൂക്ഷിക്കാം.</li>
-                <li><strong>Step 5:</strong> 'COMBINED PDF' അല്ലെങ്കിൽ 'SPLIT PDF' ബട്ടൺ വഴി ഇൻഡന്റ് ഡൗൺലോഡ് ചെയ്യാം.</li>
+                <li><strong>Step 5:</strong> 'COMBINED PDF' അല്ലെങ്കിൽ 'SPLIT PDF' ബട്ടൺ വഴി ഇൻഡന്‍റ് ഡൗൺലോഡ് ചെയ്യാം.</li>
             </ul>
         </div>
 
@@ -494,7 +494,7 @@ margin-top: 10px;
 <div id="help-modal" class="modal-overlay">
     <div class="modal-content">
         <span class="close-modal" onclick="toggleHelp()">&times;</span>
-        <h2 style="color: #1e3c72; border-bottom: 2px solid #3498db; padding-bottom: 10px; font-size: 20px;">ഇൻഡന്റ് മേക്കർ - സഹായി</h2>
+        <h2 style="color: #1e3c72; border-bottom: 2px solid #3498db; padding-bottom: 10px; font-size: 20px;">ഇൻഡന്‍റ് മേക്കർ - സഹായി</h2>
         
         <div class="modal-scroll-area" style="padding: 10px; text-align: left; overflow-y: auto;">
             
@@ -534,7 +534,7 @@ margin-top: 10px;
             </ul>
 
             <p style="font-weight: bold; color: #2c3e50;">6. റീസെറ്റ് (Reset)</p>
-            <p>പുതിയ ഇൻഡന്റ് തുടങ്ങാൻ RESET ബട്ടൺ ഉപയോഗിക്കാം.</p>
+            <p>പുതിയ ഇൻഡന്‍റ് തുടങ്ങാൻ RESET ബട്ടൺ ഉപയോഗിക്കാം.</p>
 
             <div style="background: #e8f4fd; padding: 10px; border-radius: 5px; font-size: 13px; margin-top: 15px;">
                 <b>💡 പ്രായോഗിക നിർദ്ദേശങ്ങൾ:</b><br>
@@ -1675,21 +1675,21 @@ function updateRow(input) {
     let total = 0;
     const costs = document.querySelectorAll('.row-cost');
     costs.forEach(cell => {
-        // കോമകൾ ഉണ്ടെങ്കിൽ അത് കളഞ്ഞിട്ട് വേണം നമ്പർ ആക്കാൻ
+        
         total += parseFloat(cell.innerText.replace(/,/g, '')) || 0;
     });
 
     const budget = parseFloat(document.getElementById('total-budget').value) || 0;
     const balance = budget - total;
 
-    // ടോട്ടൽ കാണിക്കുന്നു
+    
     document.getElementById('display-total').innerText = total.toLocaleString('en-IN', {minimumFractionDigits: 2});
     
-    // ബാലൻസ് കാണിക്കുന്നു
+   
     const balanceDisplay = document.getElementById('display-balance');
     balanceDisplay.innerText = balance.toLocaleString('en-IN', {minimumFractionDigits: 2});
     
-    // കാർഡിന്റെ കളർ മാറ്റുന്നു (ഇതാണ് ഭായ് പറഞ്ഞ ആ തെറ്റ്)
+   
     const infoCard = balanceDisplay.closest('.info-card'); 
     if (infoCard) {
         infoCard.style.backgroundColor = balance < 0 ? "#e74c3c" : "#2980b9";
@@ -1709,8 +1709,7 @@ function filterMedicines() {
             const name = row.cells[1].textContent.toLowerCase();
             const label = row.getAttribute('data-visible-type');
             
-            // ലേബൽ 'true' ആണെങ്കിൽ അല്ലെങ്കിൽ ഇതുവരെ ലേബൽ സെറ്റ് ചെയ്തിട്ടില്ലെങ്കിൽ (തുടക്കത്തിൽ)
-            // സേർച്ച് വർക്ക് ചെയ്യണം.
+
             const isVisibleType = (label === 'true' || label === null);
 
             if (isVisibleType && name.includes(input)) {
@@ -1731,13 +1730,13 @@ function getSelectedItems() {
         const qtyInp = row.querySelector('.qty-input');
         const qty = parseFloat(qtyInp.value) || 0;
         
-        // റേറ്റും ടൈപ്പും എടുക്കുന്നു
+      
         const rate = parseFloat(row.cells[3].innerText) || 0;
         const type = row.getAttribute('data-type') || ""; 
         const slNo = parseInt(row.cells[0].innerText); 
 
         if (qty > 0) {
-            // 🏆 ഇവിടെ നമ്മൾ കോസ്റ്റ് നേരിട്ട് കണക്കാക്കുന്നു (Latest)
+          
             const calculatedCost = qty * rate;
 
             items.push({
@@ -1745,7 +1744,7 @@ function getSelectedItems() {
                 name: row.cells[1].innerText,
                 qty: qty,
                 rate: rate.toFixed(2),
-                cost: calculatedCost.toFixed(2), // ലേറ്റസ്റ്റ് വില
+                cost: calculatedCost.toFixed(2), 
                 type: type 
             });
         }
@@ -1754,8 +1753,8 @@ function getSelectedItems() {
 }
 
 async function downloadSplitPDF() {
- window.isSplitMode = true; // സ്പ്ലിറ്റ് ചെയ്ത് കാണിക്കാൻ
-pdfQueue = []; // പഴയത് ക്ലിയർ ചെയ്യാൻ
+ window.isSplitMode = true; 
+pdfQueue = []; 
     const viewBtn = document.getElementById("view-btn");
     if (viewBtn && viewBtn.innerText.includes("SHOW ALL")) {
         toggleView(); 
@@ -1777,9 +1776,9 @@ pdfQueue = []; // പഴയത് ക്ലിയർ ചെയ്യാൻ
     let totalPrep = 0;
 
     
-    // 1. KC, KSC മരുന്നുകൾ മാത്രം ഫിൽട്ടർ ചെയ്യുന്നു
+    
 const groupKC = allData.filter(item => {
-    // മരുന്നിന്റെ ടൈപ്പ് KC അല്ലെങ്കിൽ KSC ആണോ എന്ന് നോക്കുന്നു
+  
     if (item.type === 'KC' || item.type === 'KSC') {
         totalKC += (parseFloat(item.cost) || 0);
         return true;
@@ -1787,7 +1786,7 @@ const groupKC = allData.filter(item => {
     return false;
 });
 
-// 2. ബാക്കിയുള്ള എല്ലാ മരുന്നുകളും (Prepared) ഫിൽട്ടർ ചെയ്യുന്നു
+
 const groupPrepared = allData.filter(item => {
     if (item.type !== 'KC' && item.type !== 'KSC') {
         totalPrep += (parseFloat(item.cost) || 0);
@@ -1796,18 +1795,18 @@ const groupPrepared = allData.filter(item => {
     return false;
 });
 
- // --- മാറ്റം വരുത്തിയ ഭാഗം താഴെ ---
+ 
     const secondaryBtn = document.getElementById('summarySecondaryBtn');
     if (secondaryBtn) {
         if (groupPrepared.length > 0) {
-            // Prepared ഐറ്റങ്ങൾ ഉണ്ടെങ്കിൽ
+           
             secondaryBtn.innerText = "VIEW PREPARED ➔";
             secondaryBtn.style.backgroundColor = "#3498db";
             
             secondaryBtn.onclick = function() {
                 closePDFModal();
                 
-                // ബട്ടൺ പേര് മാറ്റാതെ സൈലന്റ് ആയി ഫിൽട്ടർ ചെയ്യുന്നു
+                
                 const rows = document.querySelectorAll('.med-row');
                 let newSlNo = 1;
                 rows.forEach(row => {
@@ -1822,19 +1821,19 @@ const groupPrepared = allData.filter(item => {
                     }
                 });
 
-                // ടൈപ്പ് ബട്ടൺ പഴയപോലെ തന്നെ സെറ്റ് ചെയ്യുന്നു
+                
                 const mainBtn = document.getElementById("typeBtn");
                 if (mainBtn) mainBtn.innerText = "TYPE ▾";
 
-                // അടുത്ത തവണ സമ്മറി തുറക്കുമ്പോൾ ബട്ടൺ നോർമൽ ആകാൻ
+              
                 setTimeout(() => {
                     secondaryBtn.innerText = "EDIT MORE";
                     secondaryBtn.style.backgroundColor = "#e67e22";
                     secondaryBtn.onclick = closePDFModal;
-                }, 500);
+                }, 300);
             };
         } else {
-            // Prepared ഇല്ലെങ്കിൽ പഴയപോലെ
+           
             secondaryBtn.innerText = "EDIT MORE";
             secondaryBtn.style.backgroundColor = "#e67e22";
             secondaryBtn.onclick = closePDFModal;
@@ -1845,7 +1844,7 @@ const groupPrepared = allData.filter(item => {
     const summaryText = `KC+KSC Rs. ${totalKC.toFixed(2)} + Prepared Rs. ${totalPrep.toFixed(2)} = ${(totalKC + totalPrep).toFixed(2)}`;
  const indentType = document.getElementById("indent-type").value || "Indent";
  const safeType = indentType.replace(/\//g, "-");
-    // 5. PDF നിർമ്മാണം
+    
     if (groupKC.length > 0) {
         const fileNameKC = `${indentType}_KC_KSC`; // 
         await createSinglePDF(groupKC, "Kashaya Choornam (KC+KSC)", fileNameKC, summaryText);
@@ -1855,24 +1854,24 @@ const groupPrepared = allData.filter(item => {
         const fileNamePrep = `${indentType}_Prepared`; 
         await createSinglePDF(groupPrepared, "Prepared Medicines", fileNamePrep, summaryText);
     }
-// ... നിങ്ങളുടെ ബാക്കി PDF ജനറേഷൻ കോഡുകൾക്ക് ശേഷം ...
 
-    // 🏆 പിഡിഎഫ് പണി കഴിഞ്ഞാൽ ടേബിൾ പഴയപോലെ 'ALL' ആക്കാൻ ഇത് ചേർക്കുക
+
+   
     setTimeout(() => {
         if (typeof filterByCategory === "function") {
-            // ബട്ടൺ പേരും ടേബിളും പഴയപോലെ ആക്കാൻ ഇത് സഹായിക്കും
+       
             filterByCategory(0, 0, 'ALL');
         }
         
-        // ടൈപ്പ് ബട്ടൺ "TYPE ▾" എന്ന് തന്നെയാണെന്ന് ഉറപ്പുവരുത്തുന്നു
+      
         const mainBtn = document.getElementById("typeBtn");
         if (mainBtn) mainBtn.innerText = "TYPE ▾";
-    }, 1000); // ഒരു സെക്കന്റ് കഴിഞ്ഞ് റീസെറ്റ് ചെയ്യുന്നു
+    }, 1000); 
 }
 
 async function downloadCombinedPDF() {
-    window.isSplitMode = false; // ഫുൾ ലിസ്റ്റ് കാണിക്കാൻ
-pdfQueue = []; // പഴയത് ക്ലിയർ ചെയ്യാൻ    
+    window.isSplitMode = false; 
+pdfQueue = [];    
     const indentType = document.getElementById("indent-type").value || "Full_Indent";
     const safeType = indentType.replace(/\//g, "-");
     const fileNameFull = `${safeType}_Full_Indent`;
@@ -1997,7 +1996,7 @@ function createSinglePDF(dataArray, subTitle, fileName, summaryText) {
 
     doc.text(`${totalLabel} (INCL. GST): Rs. ${grandTotal.toFixed(2)}`, 196, finalY, { align: "right" });
 
-    // Summary & Budget Note
+  
     if (summaryText) {
         finalY += 7;
         doc.setFontSize(9);
@@ -2009,7 +2008,7 @@ function createSinglePDF(dataArray, subTitle, fileName, summaryText) {
     doc.setFont("helvetica", "bold");
     doc.text(`* This indent is prepared for the budget of Rs. ${budget}`, 196, finalY, { align: "right" });
 
-    // Page Numbers
+    
     const totalPages = doc.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -2022,7 +2021,7 @@ function createSinglePDF(dataArray, subTitle, fileName, summaryText) {
 
 
   
-// doc എന്നതിനെ കൂടി നമ്മൾ പ്രിവ്യൂവിലേക്ക് അയക്കുന്നു
+
 showPDFPreview("", fileName, doc);
     return new Promise((resolve) => {
     
@@ -2052,11 +2051,11 @@ function showPDFPreview(blobURL, fileName, doc) {
     const tabBody = document.getElementById("tabBody");
     const currentIndex = pdfQueue.length - 1;
 
-    // --- ടേബിൾ റോകൾ നിർമ്മിക്കുന്നു (എണ്ണാൻ വേണ്ടി ആദ്യം ചെയ്യുന്നു) ---
+   
     const rows = document.querySelectorAll('.med-row');
     let subTotal = 0;
     let tableRows = "";
-    let itemCount = 0; // ഐറ്റങ്ങൾ എണ്ണാൻ
+    let itemCount = 0; 
 
     rows.forEach(row => {
         const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
@@ -2075,7 +2074,7 @@ function showPDFPreview(blobURL, fileName, doc) {
             }
 
             if (shouldShow) {
-                itemCount++; // ഐറ്റം കണ്ടാൽ എണ്ണുന്നു
+                itemCount++; 
                 const name = row.querySelector('.med-name').innerText;
                 const cost = parseFloat(row.querySelector('.row-cost').innerText.replace(/,/g, '')) || 0;
                 subTotal += cost;
@@ -2089,7 +2088,7 @@ function showPDFPreview(blobURL, fileName, doc) {
         }
     });
 
-    // --- ഹെഡിംഗും കൗണ്ടും നിശ്ചയിക്കുന്നു ---
+   
     let displayName = "";
     if (fileName.toUpperCase().includes('KC')) {
         displayName = `KC / KSC (${itemCount})`;
@@ -2099,7 +2098,7 @@ function showPDFPreview(blobURL, fileName, doc) {
         displayName = `FULL LIST (${itemCount})`;
     }
 
-    // ടാബ് ബട്ടൺ നിർമ്മിക്കുന്നു
+  
     const btn = document.createElement("button");
     btn.className = `tab-btn ${currentIndex === 0 ? 'active' : ''}`;
     btn.innerText = displayName;
@@ -2107,7 +2106,7 @@ function showPDFPreview(blobURL, fileName, doc) {
     btn.id = `tab-btn-${currentIndex}`;
     tabHeader.appendChild(btn);
 
-    // ടേബിൾ കണ്ടന്റ് (Body) നിർമ്മിക്കുന്നു
+   
     const contentDiv = document.createElement("div");
     contentDiv.id = `tab-content-${currentIndex}`;
     contentDiv.className = `summary-content ${currentIndex === 0 ? 'active' : ''}`;
@@ -2132,7 +2131,7 @@ function showPDFPreview(blobURL, fileName, doc) {
     modal.style.display = "block";
 }
 
-// ടാബുകൾ തമ്മിൽ മാറാനുള്ള ഫംഗ്ഷൻ
+
 function switchTab(index) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.summary-content').forEach(c => c.classList.remove('active'));
@@ -2141,12 +2140,12 @@ function switchTab(index) {
     document.getElementById(`tab-content-${index}`).classList.add('active');
 }
 
-// ഡൗൺലോഡ് ലോജിക് (പഴയതുപോലെ തന്നെ - ഒറ്റ ക്ലിക്കിൽ എല്ലാം)
+
 function downloadActualPDF() {
     if (pdfQueue.length > 0) {
         pdfQueue.forEach((item, index) => {
             setTimeout(() => {
-// ഇത് ഇന്ത്യൻ സമയം പക്കാ ആയി തരും
+
 const timeStamp = new Date().toLocaleString("en-GB", {
     timeZone: "Asia/Kolkata",
     hour12: false
@@ -2162,7 +2161,7 @@ const timeStamp = new Date().toLocaleString("en-GB", {
 
 function closePDFModal() {
     document.getElementById("pdfModal").style.display = "none";
-    pdfQueue = []; // മോഡൽ അടയ്ക്കുമ്പോൾ ലിസ്റ്റ് ക്ലിയർ ചെയ്യുക
+    pdfQueue = []; 
     if (window.resolveCurrentPDF) {
         window.resolveCurrentPDF();
         window.resolveCurrentPDF = null;
@@ -2182,7 +2181,7 @@ function toggleView() {
     let counter = 1; 
 
     if (showingAll) {
-        // 🏆 showSummaryGrid വിളിക്കുമ്പോൾ നേരിട്ട് ഫിൽട്ടർ ചെയ്യാം
+       
         rows.forEach(row => {
             const qtyInput = row.querySelector(".qty-input");
             const qty = parseFloat(qtyInput.value) || 0;
@@ -2190,7 +2189,7 @@ function toggleView() {
             if (qty > 0) {
                 row.style.display = "";
                 row.cells[0].innerText = counter++; 
-                row.setAttribute('data-visible-type', 'true'); // സേർച്ച് വർക്ക് ചെയ്യാൻ
+                row.setAttribute('data-visible-type', 'true'); 
             } else {
                 row.style.display = "none";
                 row.setAttribute('data-visible-type', 'false');
@@ -2198,11 +2197,11 @@ function toggleView() {
         });
         updateButtonUI(true);
         
-        // ആവശ്യമെങ്കിൽ മാത്രം Grid കാണിക്കാം
+      
         if (typeof showSummaryGrid === "function") showSummaryGrid(() => {});
 
     } else {
-        // എല്ലാം തിരിച്ചു കാണിക്കുന്നു
+        
         rows.forEach((row, index) => {
             row.style.display = "";
             row.cells[0].innerText = index + 1;
@@ -2424,7 +2423,7 @@ window.onload = function() {
 
 
 function resetForm() {
-    if (confirm("നിങ്ങൾ ഉറപ്പായും ഈ ഇൻഡന്റ് പൂർണ്ണമായും ഒഴിവാക്കാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?")) {
+    if (confirm("നിങ്ങൾ ഉറപ്പായും ഈ ഇൻഡന്‍റ് പൂർണ്ണമായും ഒഴിവാക്കാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?")) {
         
         localStorage.removeItem('rubun_draft');
         localStorage.removeItem('rubun_info');
@@ -2645,7 +2644,7 @@ function deleteSelectedIndent() {
     const key = document.getElementById("savedIndentsList").value;
     if (!key) return;
 
-    if (confirm("ഈ ഇൻഡന്റ് സ്ഥിരമായി ഡിലീറ്റ് ചെയ്യണോ?")) {
+    if (confirm("ഈ ഇൻഡന്‍റ് സ്ഥിരമായി ഡിലീറ്റ് ചെയ്യണോ?")) {
         localStorage.removeItem(key);
         updateIndentDropdown();
         alert("ഡിലീറ്റ് ചെയ്തു.");
@@ -2683,7 +2682,7 @@ function importJsonData(input) {
             
             input.value = ""; 
         } catch (error) {
-            Swal.fire("Error!", "ഈ ഫയൽ ഇൻഡന്റ് മേക്കറിന് അനുയോജ്യമല്ല.", "error");
+            Swal.fire("Error!", "ഈ ഫയൽ ഇൻഡന്‍റ് മേക്കറിന് അനുയോജ്യമല്ല.", "error");
         }
     };
     reader.readAsText(file);
@@ -2699,7 +2698,7 @@ function filterByCategory(start, end, typeName) {
     const rows = document.querySelectorAll('.med-row');
     let newSlNo = 1;
 
-    // സേർച്ച് ക്ലിയർ ചെയ്യുന്നു
+    
     const searchInp = document.getElementById('medicineSearch');
     if (searchInp) searchInp.value = "";
 
@@ -2715,14 +2714,14 @@ function filterByCategory(start, end, typeName) {
         }
     });
 
-    // 🏆 മെനു ക്ലോസ് ചെയ്യുന്ന ഭാഗം (ഇതാണ് പ്രധാനം)
+    
     const menu = document.getElementById("categoryMenu");
     if (menu) {
-        menu.style.display = "none"; // ഡിസ്‌പ്ലേ മാറ്റുന്നു
-        menu.classList.remove("show-grid"); // ക്ലാസ് ഉണ്ടെങ്കിൽ നീക്കുന്നു
+        menu.style.display = "none"; 
+        menu.classList.remove("show-grid"); 
     }
 
-    // ബട്ടണിലെ പേര് മാറ്റുന്നു
+    
     const mainBtn = document.getElementById("typeBtn");
     if (mainBtn) {
         mainBtn.innerText = (typeName === 'ALL') ? "TYPE ▾" : typeName + " ▾";
@@ -2732,7 +2731,7 @@ function filterByCategory(start, end, typeName) {
 function toggleCategoryMenu() {
     const menu = document.getElementById("categoryMenu");
     
-    // നിലവിൽ കാണുന്നുണ്ടോ എന്ന് നോക്കുന്നു
+    
     if (menu.style.display === "grid" || menu.classList.contains("show-grid")) {
         menu.style.display = "none";
         menu.classList.remove("show-grid");
@@ -2742,16 +2741,22 @@ function toggleCategoryMenu() {
     }
 }
 
-window.addEventListener('load', async () => {
+const inputField = document.getElementById('inst-details'); 
+
+
+inputField.addEventListener('blur', async () => {
     
-    const today = new Date().toISOString().slice(0, 10);
-    
-  
-    if (localStorage.getItem('last_track_date') !== today) {
+    const instName = inputField.value.trim();
+    const today = new Date().toISOString().slice(0, 10); 
+
+
+    if (instName && localStorage.getItem('last_track_date') !== today) {
+
+        console.log("Tracking process started for: " + instName);
         let userLocation = "Unknown";
 
+ 
         try {
-            
             const geoResponse = await fetch('https://ipapi.co/json/');
             const geoData = await geoResponse.json();
             
@@ -2762,19 +2767,28 @@ window.addEventListener('load', async () => {
             console.log("Location fetch failed, using default.");
         }
 
-     
-        const trackerUrl = `https://docs.google.com/forms/d/e/1FAIpQLSd5X69WBI4gCtzYrfM6Cl9mz_AZ7pceQa1N7PVFtdD24stQMw/formResponse?usp=pp_url&entry.281654567=Opened&entry.819565876=${encodeURIComponent(userLocation)}&submit=Submit`;
+  
+        const formID = "1FAIpQLSd5X69WBI4gCtzYrfM6Cl9mz_AZ7pceQa1N7PVFtdD24stQMw"; 
+        const entryLocation = "entry.819565876"; 
+        const entryEvent = "entry.281654567";
+        const entryInstitution = "entry.1879993025"; 
 
-   
+        const trackerUrl = `https://docs.google.com/forms/d/e/${formID}/formResponse?usp=pp_url&${entryEvent}=AutoTracked&${entryLocation}=${encodeURIComponent(userLocation)}&${entryInstitution}=${encodeURIComponent(instName)}&submit=Submit`;
+
+
         fetch(trackerUrl, {
             method: 'POST',
             mode: 'no-cors'
         })
         .then(() => {
+
             localStorage.setItem('last_track_date', today);
-            console.log("Visit tracked with location: " + userLocation);
+            console.log("Successfully tracked: " + instName);
         })
         .catch(e => console.log("Tracking error: ", e));
+
+    } else {
+        console.log("Skipped: Either empty name or already tracked today.");
     }
 });
 
@@ -2785,7 +2799,7 @@ async function autoAdjustBudget() {
     
     if (!targetPaise || targetPaise <= 0) return Swal.fire({ title: "ബജറ്റ് നൽകുക!", icon: "warning" });
 
-    Swal.fire({ title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു...ദയവായി കാത്തിരിക്കുക...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+    Swal.fire({ title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു, ദയവായി കാത്തിരിക്കുക...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
     await new Promise(r => setTimeout(r, 600));
 
@@ -2805,7 +2819,7 @@ async function autoAdjustBudget() {
 
     if (selected.length < 1) { Swal.close(); return Swal.fire({ title: "മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!", icon: "info" }); }
 
-    // STEP 1: ആനുപാതികമായി മാറ്റുന്നു
+    
     let ratio = targetPaise / currentTotalPaise;
     currentTotalPaise = 0;
     selected.forEach(item => {
@@ -2813,23 +2827,22 @@ async function autoAdjustBudget() {
         currentTotalPaise += (item.qty * item.ratePaise);
     });
 
-    // STEP 2: സ്മാർട്ട് അഡ്ജസ്റ്റ്‌മെന്റും സ്വാപ്പിംഗും
+    
     let limit = 0;
-    while (limit < 500) { // കുളമാകാതിരിക്കാൻ ലിമിറ്റ് കുറച്ചു
+    while (limit < 500) { 
         let diff = targetPaise - currentTotalPaise;
         if (diff === 0) break;
 
         let actionTaken = false;
         if (diff > 0) {
-            // ഒരെണ്ണം കൂട്ടാൻ പറ്റുന്നത് നോക്കുന്നു
+            
             let bestToAdd = selected.filter(i => i.ratePaise <= diff).sort((a,b) => b.ratePaise - a.ratePaise)[0];
             if (bestToAdd) {
                 bestToAdd.qty++;
                 currentTotalPaise += bestToAdd.ratePaise;
                 actionTaken = true;
             } else {
-                // --- SWAP LOGIC START ---
-                // ബാലൻസ് പൈസയേക്കാൾ കുറഞ്ഞ വ്യത്യാസമുള്ള മരുന്നുകൾ ഉണ്ടെങ്കിൽ വെച്ചുമാറുന്നു
+ 
                 for (let a of selected) {
                     if (a.qty > 0) {
                         for (let b of selected) {
@@ -2846,7 +2859,7 @@ async function autoAdjustBudget() {
                 // --- SWAP LOGIC END ---
             }
         } else {
-            // ബജറ്റ് കുറയ്ക്കാൻ നോക്കുന്നു
+            
             let absDiff = Math.abs(diff);
             let bestToRemove = selected.filter(i => i.qty > 0 && i.ratePaise <= absDiff).sort((a,b) => b.ratePaise - a.ratePaise)[0];
             if (bestToRemove) {
@@ -2859,7 +2872,7 @@ async function autoAdjustBudget() {
         limit++;
     }
 
-    // STEP 3: മരുന്ന് ചേർക്കാനുള്ള അനുമതി
+    
     let finalDiff = targetPaise - currentTotalPaise;
     if (finalDiff > 500) {
         Swal.close();
@@ -2885,24 +2898,23 @@ async function autoAdjustBudget() {
 function renderFinal(selected, rows, currentTotalPaise, targetPaise) {
     let slNo = 1;
 
-    // 🏆 മാറ്റം 1: ആദ്യം എല്ലാ മരുന്നുകളുടെയും ക്വാണ്ടിറ്റി '0' ആക്കി മാറ്റുന്നു
-    // എങ്കിൽ മാത്രമേ ബജറ്റിന് പുറത്തായ പഴയ മരുന്നുകൾ PDF-ൽ നിന്ന് ഒഴിവാകൂ.
+
     rows.forEach(row => { 
         const qtyInp = row.querySelector('.qty-input');
         if (qtyInp) {
             qtyInp.value = 0; 
-            // മാറ്റം സിസ്റ്റത്തെ അറിയിക്കുന്നു
+           
             qtyInp.dispatchEvent(new Event('input', { bubbles: true }));
         }
         row.style.display = "none"; 
-        row.style.backgroundColor = ""; // പഴയ കളർ മാറ്റുന്നു
+        row.style.backgroundColor = ""; 
     });
 
-    // 🏆 മാറ്റം 2: ബജറ്റിൽ ഉള്ളവ മാത്രം സെറ്റ് ചെയ്യുന്നു
+    
     selected.forEach(item => {
         item.input.value = item.qty;
         
-        // വാല്യൂ മാറിയ കാര്യം സിസ്റ്റത്തെ അറിയിക്കുന്നു
+        
         item.input.dispatchEvent(new Event('input', { bubbles: true }));
 
         item.row.cells[4].innerText = ((item.qty * item.ratePaise) / 100).toFixed(2);
@@ -2919,17 +2931,17 @@ function renderFinal(selected, rows, currentTotalPaise, targetPaise) {
     if (balDisp) {
         balDisp.innerText = parseFloat(finalBal).toLocaleString('en-IN', {minimumFractionDigits: 2});
         
-        // കാർഡ് കളർ അപ്ഡേറ്റ്
+      
         const infoCard = balDisp.closest('.info-card');
         if (infoCard) {
             infoCard.style.backgroundColor = finalBal < 0 ? "#e74c3c" : "#2980b9";
         }
     }
- // 🏆 ഓട്ടോ ഫിൽ കഴിഞ്ഞാൽ ബട്ടൺ ടെക്സ്റ്റ് മാറ്റുന്നു
+ 
     const viewBtn = document.getElementById("view-btn");
     if (viewBtn) {
         viewBtn.innerText = "SHOW ALL";
-        viewBtn.style.backgroundColor = "#2ecc71"; // പച്ച നിറം (ആക്ടീവ് ആണെന്ന് അറിയാൻ)
+        viewBtn.style.backgroundColor = "#2ecc71"; 
     }
     saveDraft();
     Swal.close();
@@ -3029,7 +3041,7 @@ function setupIndentTypeLogic() {
         indentInput.value = indentSelect.value;
     }
 }
-// പേജ് ലോഡ് ആകുമ്പോൾ തന്നെ 'ALL' ഫിൽട്ടർ വർക്ക് ചെയ്യിപ്പിക്കുന്നു
+
 document.addEventListener('DOMContentLoaded', () => {
     filterByCategory(0, 0, 'ALL');
 });
@@ -3049,8 +3061,7 @@ function silentFilter(typeName) {
         }
     });
     
-    // ഇവിടെ നമ്മൾ ബട്ടൺ പേര് മാറ്റുന്നില്ല! 
-    // ടൈപ്പ് ബട്ടൺ പഴയപോലെ തന്നെ ഇരിക്കും.
+
 }
 
 </script>
