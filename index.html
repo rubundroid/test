@@ -693,7 +693,7 @@ margin-top: 10px;
 
         <div style="display: flex; gap: 10px; justify-content: center; padding-top: 10px; border-top: 1px solid #eee;">
             <button onclick="downloadActualPDF()" style="background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1;">DOWNLOAD PDF</button>
-            <button onclick="closePDFModal()" style="background: #e67e22; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1;">EDIT MORE</button>
+            <button id="summarySecondaryBtn"  onclick="closePDFModal()" style="background: #e67e22; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1;">EDIT MORE</button>
         </div>
     </div>
 </div>
@@ -1671,67 +1671,82 @@ function updateRow(input) {
     calculateAll();
 }
 
-    function calculateAll() {
-        let total = 0;
-        const costs = document.querySelectorAll('.row-cost');
-        costs.forEach(cell => {
-            total += parseFloat(cell.innerText) || 0;
-        });
+   function calculateAll() {
+    let total = 0;
+    const costs = document.querySelectorAll('.row-cost');
+    costs.forEach(cell => {
+        // കോമകൾ ഉണ്ടെങ്കിൽ അത് കളഞ്ഞിട്ട് വേണം നമ്പർ ആക്കാൻ
+        total += parseFloat(cell.innerText.replace(/,/g, '')) || 0;
+    });
 
-        const budget = parseFloat(document.getElementById('total-budget').value) || 0;
-        const balance = budget - total;
+    const budget = parseFloat(document.getElementById('total-budget').value) || 0;
+    const balance = budget - total;
 
-        document.getElementById('display-total').innerText = total.toLocaleString('en-IN', {minimumFractionDigits: 2});
-        const balanceDisplay = document.getElementById('display-balance');
-        balanceDisplay.innerText = balance.toLocaleString('en-IN', {minimumFractionDigits: 2});
-        
-        balanceDisplay.parentElement.style.backgroundColor = balance < 0 ? "#c0392b" : "#2980b9";
+    // ടോട്ടൽ കാണിക്കുന്നു
+    document.getElementById('display-total').innerText = total.toLocaleString('en-IN', {minimumFractionDigits: 2});
+    
+    // ബാലൻസ് കാണിക്കുന്നു
+    const balanceDisplay = document.getElementById('display-balance');
+    balanceDisplay.innerText = balance.toLocaleString('en-IN', {minimumFractionDigits: 2});
+    
+    // കാർഡിന്റെ കളർ മാറ്റുന്നു (ഇതാണ് ഭായ് പറഞ്ഞ ആ തെറ്റ്)
+    const infoCard = balanceDisplay.closest('.info-card'); 
+    if (infoCard) {
+        infoCard.style.backgroundColor = balance < 0 ? "#e74c3c" : "#2980b9";
     }
+}
 
 let searchTimeout;
 
 
 function filterMedicines() {
     const input = document.getElementById('medicineSearch').value.toLowerCase().trim();
-    const rows = document.getElementById("product-body").getElementsByClassName("med-row");
+    const rows = document.querySelectorAll('.med-row');
+    let searchSlNo = 1;
 
     window.requestAnimationFrame(() => {
-        for (let i = 0; i < rows.length; i++) {
-            const slNo = parseInt(rows[i].cells[0].textContent);
-            const name = rows[i].cells[1].textContent.toLowerCase();
+        rows.forEach(row => {
+            const name = row.cells[1].textContent.toLowerCase();
+            const label = row.getAttribute('data-visible-type');
             
-    
-            if (slNo >= currentMin && slNo <= currentMax && name.includes(input)) {
-                rows[i].style.display = "";
+            // ലേബൽ 'true' ആണെങ്കിൽ അല്ലെങ്കിൽ ഇതുവരെ ലേബൽ സെറ്റ് ചെയ്തിട്ടില്ലെങ്കിൽ (തുടക്കത്തിൽ)
+            // സേർച്ച് വർക്ക് ചെയ്യണം.
+            const isVisibleType = (label === 'true' || label === null);
+
+            if (isVisibleType && name.includes(input)) {
+                row.style.display = "";
+                row.cells[0].innerText = searchSlNo++; 
             } else {
-                rows[i].style.display = "none";
+                row.style.display = "none";
             }
-        }
+        });
     });
 }
-
-
 
 
 
 function getSelectedItems() {
     const items = [];
     document.querySelectorAll('#product-body tr').forEach((row) => {
-        const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-        const cost = parseFloat(row.querySelector('.row-cost').innerText) || 0;
-        const slNo = parseInt(row.cells[0].innerText); 
+        const qtyInp = row.querySelector('.qty-input');
+        const qty = parseFloat(qtyInp.value) || 0;
         
-        // വരിയിൽ നിന്ന് data-type ഇങ്ങോട്ട് എടുക്കുന്നു
+        // റേറ്റും ടൈപ്പും എടുക്കുന്നു
+        const rate = parseFloat(row.cells[3].innerText) || 0;
         const type = row.getAttribute('data-type') || ""; 
+        const slNo = parseInt(row.cells[0].innerText); 
 
         if (qty > 0) {
+            // 🏆 ഇവിടെ നമ്മൾ കോസ്റ്റ് നേരിട്ട് കണക്കാക്കുന്നു (Latest)
+            const calculatedCost = qty * rate;
+
             items.push({
                 sl: slNo,
                 name: row.cells[1].innerText,
                 qty: qty,
-                rate: row.cells[3].innerText,
-                cost: cost.toFixed(2),
-                type: type // ഈ ടൈപ്പ് വെച്ചാണ് നമ്മൾ സ്പ്ലിറ്റ് ചെയ്യുന്നത്
+                rate: rate.toFixed(2),
+                cost: calculatedCost.toFixed(2), // ലേറ്റസ്റ്റ് വില
+                type: type 
             });
         }
     });
@@ -1781,6 +1796,52 @@ const groupPrepared = allData.filter(item => {
     return false;
 });
 
+ // --- മാറ്റം വരുത്തിയ ഭാഗം താഴെ ---
+    const secondaryBtn = document.getElementById('summarySecondaryBtn');
+    if (secondaryBtn) {
+        if (groupPrepared.length > 0) {
+            // Prepared ഐറ്റങ്ങൾ ഉണ്ടെങ്കിൽ
+            secondaryBtn.innerText = "VIEW PREPARED ➔";
+            secondaryBtn.style.backgroundColor = "#3498db";
+            
+            secondaryBtn.onclick = function() {
+                closePDFModal();
+                
+                // ബട്ടൺ പേര് മാറ്റാതെ സൈലന്റ് ആയി ഫിൽട്ടർ ചെയ്യുന്നു
+                const rows = document.querySelectorAll('.med-row');
+                let newSlNo = 1;
+                rows.forEach(row => {
+                    const medType = row.getAttribute('data-type');
+                    if (medType === 'PREPARED') {
+                        row.style.display = "";
+                        row.cells[0].innerText = newSlNo++;
+                        row.setAttribute('data-visible-type', 'true');
+                    } else {
+                        row.style.display = "none";
+                        row.setAttribute('data-visible-type', 'false');
+                    }
+                });
+
+                // ടൈപ്പ് ബട്ടൺ പഴയപോലെ തന്നെ സെറ്റ് ചെയ്യുന്നു
+                const mainBtn = document.getElementById("typeBtn");
+                if (mainBtn) mainBtn.innerText = "TYPE ▾";
+
+                // അടുത്ത തവണ സമ്മറി തുറക്കുമ്പോൾ ബട്ടൺ നോർമൽ ആകാൻ
+                setTimeout(() => {
+                    secondaryBtn.innerText = "EDIT MORE";
+                    secondaryBtn.style.backgroundColor = "#e67e22";
+                    secondaryBtn.onclick = closePDFModal;
+                }, 500);
+            };
+        } else {
+            // Prepared ഇല്ലെങ്കിൽ പഴയപോലെ
+            secondaryBtn.innerText = "EDIT MORE";
+            secondaryBtn.style.backgroundColor = "#e67e22";
+            secondaryBtn.onclick = closePDFModal;
+        }
+    }
+
+
     const summaryText = `KC+KSC Rs. ${totalKC.toFixed(2)} + Prepared Rs. ${totalPrep.toFixed(2)} = ${(totalKC + totalPrep).toFixed(2)}`;
  const indentType = document.getElementById("indent-type").value || "Indent";
  const safeType = indentType.replace(/\//g, "-");
@@ -1794,7 +1855,19 @@ const groupPrepared = allData.filter(item => {
         const fileNamePrep = `${indentType}_Prepared`; 
         await createSinglePDF(groupPrepared, "Prepared Medicines", fileNamePrep, summaryText);
     }
+// ... നിങ്ങളുടെ ബാക്കി PDF ജനറേഷൻ കോഡുകൾക്ക് ശേഷം ...
 
+    // 🏆 പിഡിഎഫ് പണി കഴിഞ്ഞാൽ ടേബിൾ പഴയപോലെ 'ALL' ആക്കാൻ ഇത് ചേർക്കുക
+    setTimeout(() => {
+        if (typeof filterByCategory === "function") {
+            // ബട്ടൺ പേരും ടേബിളും പഴയപോലെ ആക്കാൻ ഇത് സഹായിക്കും
+            filterByCategory(0, 0, 'ALL');
+        }
+        
+        // ടൈപ്പ് ബട്ടൺ "TYPE ▾" എന്ന് തന്നെയാണെന്ന് ഉറപ്പുവരുത്തുന്നു
+        const mainBtn = document.getElementById("typeBtn");
+        if (mainBtn) mainBtn.innerText = "TYPE ▾";
+    }, 1000); // ഒരു സെക്കന്റ് കഴിഞ്ഞ് റീസെറ്റ് ചെയ്യുന്നു
 }
 
 async function downloadCombinedPDF() {
@@ -2101,11 +2174,10 @@ function closePDFModal() {
 function toggleView() {
     const mainBtn = document.getElementById("typeBtn");
     if (mainBtn && mainBtn.innerText !== "TYPE ▾") {
-        // filterByCategory വിളിക്കാതെ തന്നെ ബട്ടൺ മാത്രം മാറ്റാം, 
-        // അല്ലെങ്കിൽ നേരിട്ട് filterByCategory(0,0,'ALL') വിളിക്കാം
         mainBtn.innerText = "TYPE ▾";
         mainBtn.style.backgroundColor = "#2c3e50";
     }
+    
     const viewBtn = document.getElementById("view-btn");
     const rows = document.querySelectorAll("#product-body tr");
     const showingAll = viewBtn.innerText.includes("SHOW SELECTED");
@@ -2113,24 +2185,31 @@ function toggleView() {
     let counter = 1; 
 
     if (showingAll) {
-      
-        showSummaryGrid(() => {
-            rows.forEach(row => {
-                const qty = parseFloat(row.querySelector(".qty-input").value) || 0;
-                if (qty > 0) {
-                    row.style.display = "";
-                    row.cells[0].innerText = counter++; 
-                } else {
-                    row.style.display = "none";
-                }
-            });
-            updateButtonUI(true);
+        // 🏆 showSummaryGrid വിളിക്കുമ്പോൾ നേരിട്ട് ഫിൽട്ടർ ചെയ്യാം
+        rows.forEach(row => {
+            const qtyInput = row.querySelector(".qty-input");
+            const qty = parseFloat(qtyInput.value) || 0;
+            
+            if (qty > 0) {
+                row.style.display = "";
+                row.cells[0].innerText = counter++; 
+                row.setAttribute('data-visible-type', 'true'); // സേർച്ച് വർക്ക് ചെയ്യാൻ
+            } else {
+                row.style.display = "none";
+                row.setAttribute('data-visible-type', 'false');
+            }
         });
+        updateButtonUI(true);
+        
+        // ആവശ്യമെങ്കിൽ മാത്രം Grid കാണിക്കാം
+        if (typeof showSummaryGrid === "function") showSummaryGrid(() => {});
+
     } else {
-       
+        // എല്ലാം തിരിച്ചു കാണിക്കുന്നു
         rows.forEach((row, index) => {
             row.style.display = "";
             row.cells[0].innerText = index + 1;
+            row.setAttribute('data-visible-type', 'true');
         });
         updateButtonUI(false);
     }
@@ -2621,39 +2700,43 @@ let currentMax = 9999;
 
 function filterByCategory(start, end, typeName) {
     const rows = document.querySelectorAll('.med-row');
-    let newSlNo = 1; // പുതിയ സീരിയൽ നമ്പർ ഇവിടെ തുടങ്ങുന്നു
+    let newSlNo = 1;
+
+    // സേർച്ച് ക്ലിയർ ചെയ്യുന്നു
+    const searchInp = document.getElementById('medicineSearch');
+    if (searchInp) searchInp.value = "";
 
     rows.forEach(row => {
         const medType = row.getAttribute('data-type');
         if (typeName === 'ALL' || medType === typeName) {
             row.style.display = "";
-            // ഈ വരിയിലെ ആദ്യത്തെ സെല്ലിൽ (Serial Number) പുതിയ നമ്പർ നൽകുന്നു
             row.cells[0].innerText = newSlNo++; 
+            row.setAttribute('data-visible-type', 'true');
         } else {
             row.style.display = "none";
+            row.setAttribute('data-visible-type', 'false');
         }
     });
+
+    // 🏆 മെനു ക്ലോസ് ചെയ്യുന്ന ഭാഗം (ഇതാണ് പ്രധാനം)
+    const menu = document.getElementById("categoryMenu");
+    if (menu) {
+        menu.style.display = "none"; // ഡിസ്‌പ്ലേ മാറ്റുന്നു
+        menu.classList.remove("show-grid"); // ക്ലാസ് ഉണ്ടെങ്കിൽ നീക്കുന്നു
+    }
 
     // ബട്ടണിലെ പേര് മാറ്റുന്നു
     const mainBtn = document.getElementById("typeBtn");
     if (mainBtn) {
         mainBtn.innerText = (typeName === 'ALL') ? "TYPE ▾" : typeName + " ▾";
     }
-
-    // മെനു ക്ലോസ് ചെയ്യുന്നു
-    const menu = document.getElementById("categoryMenu");
-    if (menu) {
-        menu.style.display = "none";
-        menu.classList.remove("show-grid");
-    }
 }
-
 
 function toggleCategoryMenu() {
     const menu = document.getElementById("categoryMenu");
-    const isGrid = menu.style.display === "grid";
     
-    if (isGrid) {
+    // നിലവിൽ കാണുന്നുണ്ടോ എന്ന് നോക്കുന്നു
+    if (menu.style.display === "grid" || menu.classList.contains("show-grid")) {
         menu.style.display = "none";
         menu.classList.remove("show-grid");
     } else {
@@ -2700,154 +2783,166 @@ window.addEventListener('load', async () => {
 
 
 async function autoAdjustBudget() {
-    const mainBtn = document.getElementById("typeBtn");
-    if (mainBtn && mainBtn.innerText !== "TYPE ▾") {
-        // filterByCategory വിളിക്കാതെ തന്നെ ബട്ടൺ മാത്രം മാറ്റാം, 
-        // അല്ലെങ്കിൽ നേരിട്ട് filterByCategory(0,0,'ALL') വിളിക്കാം
-        mainBtn.innerText = "TYPE ▾";
-        mainBtn.style.backgroundColor = "#2c3e50";
-    }
     const budgetInput = document.getElementById('total-budget');
     const targetPaise = Math.round(parseFloat(budgetInput.value) * 100);
     
-    if (!targetPaise || targetPaise <= 0) {
-        return Swal.fire({ title: "ബജറ്റ് നൽകുക!", icon: "warning", showCloseButton: true });
-    }
+    if (!targetPaise || targetPaise <= 0) return Swal.fire({ title: "ബജറ്റ് നൽകുക!", icon: "warning" });
 
-    Swal.fire({
-        title: 'ബജറ്റ് കൃത്യമാക്കുന്നു...',
-        html: 'കൃത്യത ഉറപ്പാക്കുന്നു. ദയവായി കാത്തിരിക്കൂ.',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
+    Swal.fire({ title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു...ദയവായി കാത്തിരിക്കുക...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 600));
 
     const rows = Array.from(document.querySelectorAll('.med-row'));
     let selected = [];
-    let totalPaise = 0;
+    let unselected = [];
+    let currentTotalPaise = 0;
 
-  
     rows.forEach(row => {
         const qtyInp = row.querySelector('.qty-input');
-        const ratePaise = Math.round(parseFloat(row.cells[3].innerText) * 100); 
+        const ratePaise = Math.round(parseFloat(row.cells[3].innerText) * 100);
         const qty = parseInt(qtyInp.value) || 0;
-        if (qty > 0) {
-            selected.push({ row, qty, ratePaise, input: qtyInp });
-            totalPaise += (qty * ratePaise);
-        }
+        const item = { row, qty, ratePaise, input: qtyInp, name: row.cells[1].innerText };
+        if (qty > 0) { selected.push(item); currentTotalPaise += (qty * ratePaise); }
+        else { unselected.push(item); }
     });
 
-    if (selected.length < 2) {
-        Swal.close();
-        return Swal.fire({ title: "കുറഞ്ഞത് രണ്ട് മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!", icon: "info", showCloseButton: true });
-    }
+    if (selected.length < 1) { Swal.close(); return Swal.fire({ title: "മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!", icon: "info" }); }
 
-   
-    let multiplier = targetPaise / totalPaise;
-    totalPaise = 0;
+    // STEP 1: ആനുപാതികമായി മാറ്റുന്നു
+    let ratio = targetPaise / currentTotalPaise;
+    currentTotalPaise = 0;
     selected.forEach(item => {
-        item.qty = Math.floor(item.qty * multiplier) || 1;
-        totalPaise += (item.qty * item.ratePaise);
+        item.qty = Math.floor(item.qty * ratio);
+        currentTotalPaise += (item.qty * item.ratePaise);
     });
 
-   
+    // STEP 2: സ്മാർട്ട് അഡ്ജസ്റ്റ്‌മെന്റും സ്വാപ്പിംഗും
     let limit = 0;
-    while (limit < 5000) {
-        let diff = targetPaise - totalPaise;
-        if (diff === 0) break; 
+    while (limit < 500) { // കുളമാകാതിരിക്കാൻ ലിമിറ്റ് കുറച്ചു
+        let diff = targetPaise - currentTotalPaise;
+        if (diff === 0) break;
 
         let actionTaken = false;
-
         if (diff > 0) {
-           
-            let bestToAdd = selected.filter(i => i.ratePaise <= diff).sort((a, b) => b.ratePaise - a.ratePaise)[0];
+            // ഒരെണ്ണം കൂട്ടാൻ പറ്റുന്നത് നോക്കുന്നു
+            let bestToAdd = selected.filter(i => i.ratePaise <= diff).sort((a,b) => b.ratePaise - a.ratePaise)[0];
             if (bestToAdd) {
-                bestToAdd.qty += 1;
-                totalPaise += bestToAdd.ratePaise;
+                bestToAdd.qty++;
+                currentTotalPaise += bestToAdd.ratePaise;
                 actionTaken = true;
             } else {
-             
+                // --- SWAP LOGIC START ---
+                // ബാലൻസ് പൈസയേക്കാൾ കുറഞ്ഞ വ്യത്യാസമുള്ള മരുന്നുകൾ ഉണ്ടെങ്കിൽ വെച്ചുമാറുന്നു
                 for (let a of selected) {
-                    if (a.qty <= 1) continue;
-                    for (let b of selected) {
-                        let swapDiff = b.ratePaise - a.ratePaise;
-                        if (swapDiff > 0 && swapDiff <= diff) {
-                            a.qty -= 1;
-                            b.qty += 1;
-                            totalPaise += swapDiff;
-                            actionTaken = true;
-                            break;
+                    if (a.qty > 0) {
+                        for (let b of selected) {
+                            let swapGain = b.ratePaise - a.ratePaise;
+                            if (swapGain > 0 && swapGain <= diff) {
+                                a.qty--; b.qty++;
+                                currentTotalPaise += swapGain;
+                                actionTaken = true; break;
+                            }
                         }
                     }
                     if (actionTaken) break;
                 }
+                // --- SWAP LOGIC END ---
             }
         } else {
-            
-            let bestToRemove = selected.filter(i => i.qty > 1).sort((a, b) => a.ratePaise - b.ratePaise)[0];
+            // ബജറ്റ് കുറയ്ക്കാൻ നോക്കുന്നു
+            let absDiff = Math.abs(diff);
+            let bestToRemove = selected.filter(i => i.qty > 0 && i.ratePaise <= absDiff).sort((a,b) => b.ratePaise - a.ratePaise)[0];
             if (bestToRemove) {
-                bestToRemove.qty -= 1;
-                totalPaise -= bestToRemove.ratePaise;
+                bestToRemove.qty--;
+                currentTotalPaise -= bestToRemove.ratePaise;
                 actionTaken = true;
             }
         }
-
         if (!actionTaken) break;
         limit++;
     }
 
+    // STEP 3: മരുന്ന് ചേർക്കാനുള്ള അനുമതി
+    let finalDiff = targetPaise - currentTotalPaise;
+    if (finalDiff > 500) {
+        Swal.close();
+        let suggestion = unselected.filter(i => i.ratePaise <= finalDiff).sort((a,b) => b.ratePaise - a.ratePaise)[0];
+        if (suggestion) {
+            const result = await Swal.fire({
+                title: 'ബജറ്റ് ഗ്യാപ്പ്!',
+                text: `₹ ${(finalDiff/100).toFixed(2)} ബാക്കിയുണ്ട്. "${suggestion.name}" കൂടി ചേർക്കട്ടെ?`,
+                icon: 'question', showCancelButton: true, confirmButtonText: 'ചേർക്കൂ'
+            });
+            if (result.isConfirmed) {
+                let addQty = Math.floor(finalDiff / suggestion.ratePaise);
+                suggestion.qty = addQty;
+                currentTotalPaise += (addQty * suggestion.ratePaise);
+                selected.push(suggestion);
+            }
+        }
+    }
 
+    renderFinal(selected.filter(i => i.qty > 0), rows, currentTotalPaise, targetPaise);
+}
+
+function renderFinal(selected, rows, currentTotalPaise, targetPaise) {
+    let slNo = 1;
+
+    // 🏆 മാറ്റം 1: ആദ്യം എല്ലാ മരുന്നുകളുടെയും ക്വാണ്ടിറ്റി '0' ആക്കി മാറ്റുന്നു
+    // എങ്കിൽ മാത്രമേ ബജറ്റിന് പുറത്തായ പഴയ മരുന്നുകൾ PDF-ൽ നിന്ന് ഒഴിവാകൂ.
+    rows.forEach(row => { 
+        const qtyInp = row.querySelector('.qty-input');
+        if (qtyInp) {
+            qtyInp.value = 0; 
+            // മാറ്റം സിസ്റ്റത്തെ അറിയിക്കുന്നു
+            qtyInp.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        row.style.display = "none"; 
+        row.style.backgroundColor = ""; // പഴയ കളർ മാറ്റുന്നു
+    });
+
+    // 🏆 മാറ്റം 2: ബജറ്റിൽ ഉള്ളവ മാത്രം സെറ്റ് ചെയ്യുന്നു
     selected.forEach(item => {
         item.input.value = item.qty;
-        item.row.cells[4].innerText = ((item.qty * item.ratePaise) / 100).toFixed(2);
-        item.row.style.backgroundColor = "#e8f5e9";
-        item.row.style.display = ""; 
-    });
-
-   
-let slNo = 1; 
-    rows.forEach(row => {
-        const qtyInp = row.querySelector('.qty-input');
-        const qty = parseInt(qtyInp.value) || 0;
         
-        if (qty > 0) {
-            row.style.display = ""; 
-            row.cells[0].innerText = slNo++; 
-        } else {
-            row.style.display = "none"; 
-        }
+        // വാല്യൂ മാറിയ കാര്യം സിസ്റ്റത്തെ അറിയിക്കുന്നു
+        item.input.dispatchEvent(new Event('input', { bubbles: true }));
+
+        item.row.cells[4].innerText = ((item.qty * item.ratePaise) / 100).toFixed(2);
+        item.row.style.display = "";
+        item.row.cells[0].innerText = slNo++;
+        item.row.style.backgroundColor = "#e8f5e9";
     });
 
+    const finalTotal = (currentTotalPaise / 100).toFixed(2);
+    const finalBal = ((targetPaise - currentTotalPaise) / 100).toFixed(2);
     
-    const finalTotal = (totalPaise / 100).toFixed(2);
-    const finalBalance = ((targetPaise - totalPaise) / 100).toFixed(2);
-
-    document.getElementById('display-total').innerText = finalTotal;
-    const balElement = document.getElementById('display-balance') || document.getElementById('balance-btn');
-    if (balElement) balElement.innerText = finalBalance;
-
-    saveDraft(); 
-
-   
+    document.getElementById('display-total').innerText = parseFloat(finalTotal).toLocaleString('en-IN', {minimumFractionDigits: 2});
+    const balDisp = document.getElementById('display-balance');
+    if (balDisp) {
+        balDisp.innerText = parseFloat(finalBal).toLocaleString('en-IN', {minimumFractionDigits: 2});
+        
+        // കാർഡ് കളർ അപ്ഡേറ്റ്
+        const infoCard = balDisp.closest('.info-card');
+        if (infoCard) {
+            infoCard.style.backgroundColor = finalBal < 0 ? "#e74c3c" : "#2980b9";
+        }
+    }
+ // 🏆 ഓട്ടോ ഫിൽ കഴിഞ്ഞാൽ ബട്ടൺ ടെക്സ്റ്റ് മാറ്റുന്നു
     const viewBtn = document.getElementById("view-btn");
     if (viewBtn) {
         viewBtn.innerText = "SHOW ALL";
-        viewBtn.style.backgroundColor = "#2ecc71";
+        viewBtn.style.backgroundColor = "#2ecc71"; // പച്ച നിറം (ആക്ടീവ് ആണെന്ന് അറിയാൻ)
     }
-
+    saveDraft();
     Swal.close();
-
+    
     Swal.fire({
-        title: finalBalance == "0.00" ? "Perfect Precision!" : "ക്രമീകരണം പൂർത്തിയായി",
-        html: `ടോട്ടൽ: <b>Rs. ${finalTotal}</b><br>ബാലൻസ്: <b>Rs. ${finalBalance}</b>`,
-        icon: finalBalance == "0.00" ? "success" : "warning",
-        showCloseButton: true,
-        confirmButtonText: "Ok"
+        title: finalBal == "0.00" ? "Perfect Alignment!" : "ക്രമീകരണം കഴിഞ്ഞു",
+        html: `ടോട്ടൽ: Rs. ${finalTotal}<br>ബാക്കി: Rs. ${finalBal}`,
+        icon: finalBal == "0.00" ? "success" : "info"
     });
 }
-
 
 function enterApp() {
     const screen = document.getElementById('welcome-screen');
@@ -2936,6 +3031,29 @@ function setupIndentTypeLogic() {
     if (!indentInput.value) {
         indentInput.value = indentSelect.value;
     }
+}
+// പേജ് ലോഡ് ആകുമ്പോൾ തന്നെ 'ALL' ഫിൽട്ടർ വർക്ക് ചെയ്യിപ്പിക്കുന്നു
+document.addEventListener('DOMContentLoaded', () => {
+    filterByCategory(0, 0, 'ALL');
+});
+function silentFilter(typeName) {
+    const rows = document.querySelectorAll('.med-row');
+    let newSlNo = 1;
+
+    rows.forEach(row => {
+        const medType = row.getAttribute('data-type');
+        if (typeName === 'ALL' || medType === typeName) {
+            row.style.display = "";
+            row.cells[0].innerText = newSlNo++; 
+            row.setAttribute('data-visible-type', 'true');
+        } else {
+            row.style.display = "none";
+            row.setAttribute('data-visible-type', 'false');
+        }
+    });
+    
+    // ഇവിടെ നമ്മൾ ബട്ടൺ പേര് മാറ്റുന്നില്ല! 
+    // ടൈപ്പ് ബട്ടൺ പഴയപോലെ തന്നെ ഇരിക്കും.
 }
 
 </script>
