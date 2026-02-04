@@ -1,11 +1,36 @@
+
 <!DOCTYPE html>
 <html lang="ml">
 <head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S4QE1SZKPX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-S4QE1SZKPX');
+</script>
+    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1024">
-    <title>INDENT MAKER</title>
-    <link rel="icon" href="https://lh7-rt.googleusercontent.com/sitesz/AClOY7r8EAd-MozQBaUZg53ApKBhUWzNEmbijFE6tRYDpYwWklQ-rpaqfIVYW0Hke4kVDc1OG9iXK96hH7IY68BUse57I6_m856_oMMfK2NYQbPBx79SchgYrLcQDtubEhaNJO4vlVKHF-6g4ENZ_0ICdcOH3DCOAogzDUnl8mUyRRV9aeMKQrj2?key=FQPiZpt1WHU-kkdRmQtRGg" type="image/x-icon">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Ayurveda Medicine Indent Maker (Unofficial)</title>
+
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="description" content="Generate Ayurveda medicine indents easily. An unofficial tool for private use to create Oushadhi medicine order lists and print layouts.">
+
+    <meta property="og:title" content="Ayurveda Indent Maker - Create Medicine Orders">
+    <meta property="og:description" content="A private tool to generate Ayurveda medicine indent lists for Oushadhi and other formats. Simple, fast, and print-friendly.">
+    <meta property="og:image" content="https://indentmaker.rubundroid.com/logo.png">
+    <meta property="og:url" content="https://indentmaker.rubundroid.com/">
+    <meta property="og:type" content="website">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -443,8 +468,8 @@ margin-top: 10px;
                 <li><strong>Step 1:</strong> Institution വിവരങ്ങളും ലഭ്യമായ ബജറ്റും (Total Budget) നൽകുക.</li>
                 <li><strong>Step 2:</strong> ആവശ്യമായ മരുന്നുകളുടെ എണ്ണം (Qty) രേഖപ്പെടുത്തുക.</li>
                 <li><strong>Step 3:</strong> 'AUTO FILL' ബട്ടൺ ഉപയോഗിച്ച് ബജറ്റ് തുകയിലേക്ക്‌ മരുന്നുകളുടെ എണ്ണം ക്രമീകരിക്കാം.</li>
-                <li><strong>Step 4:</strong> ആവശ്യമെങ്കിൽ 'SAVE' ബട്ടൺ വഴി വിവരങ്ങൾ സൂക്ഷിക്കാം.</li>
-                <li><strong>Step 5:</strong> 'COMBINED PDF' അല്ലെങ്കിൽ 'SPLIT PDF' ബട്ടൺ വഴി ഇൻഡന്‍റ് ഡൗൺലോഡ് ചെയ്യാം.</li>
+                <li><strong>Step 4:</strong> ആവശ്യമെങ്കിൽ 'JSON' ബട്ടൺ വഴി വിവരങ്ങൾ സൂക്ഷിക്കാം.</li>
+                <li><strong>Step 5:</strong> 'SAVE COMBINED PDF' അല്ലെങ്കിൽ 'SAVE SPLIT PDF' ബട്ടൺ വഴി ഇൻഡന്‍റ് ഡൗൺലോഡ് ചെയ്യാം.</li>
             </ul>
         </div>
 
@@ -505,13 +530,13 @@ margin-top: 10px;
                 <li>• <b>Total Budget:</b> അനുവദിച്ചിട്ടുള്ള ആകെ തുക ഇവിടെ ടൈപ്പ് ചെയ്യുക.</li>
             </ul>
 
-            <p style="font-weight: bold; color: #2c3e50;">2. ഫയലുകൾ സേവ് ചെയ്യാനും ലോഡ് ചെയ്യാനും</p>
-            <p>നിങ്ങൾ തയ്യാറാക്കുന്ന ഇൻഡന്റുകൾ ഡൌണ്‍ലോഡ് ചെയ്തു സൂക്ഷിച്ചു വെക്കാം. ഒരേ സമയം ഒന്നിൽ കൂടുതൽ ഇൻഡന്റുകൾ തയ്യാറാക്കാൻ വിവിധ ബ്രൗസറുകൾ ഉപയോഗിക്കാം.</p>
+            <p style="font-weight: bold; color: #2c3e50;">2. ഇൻഡന്റുകൾ JSON ആയി സേവ് ചെയ്യാനും ലോഡ് ചെയ്യാനും</p>
+            <p>നിങ്ങൾ തയ്യാറാക്കുന്ന ഇൻഡന്റുകൾ JSON ആയി ഡൌണ്‍ലോഡ് ചെയ്തു സൂക്ഷിച്ചു വെക്കാം. ഒരേ സമയം ഒന്നിൽ കൂടുതൽ ഇൻഡന്റുകൾ തയ്യാറാക്കാൻ വിവിധ ബ്രൗസറുകൾ ഉപയോഗിക്കാം.</p>
             <ul style="list-style-type: none; padding-left: 10px;">
-                <li>• <b>SAVE:</b> ഒരു ഫയൽ പേര് നൽകി സേവ് ബട്ടൺ അമർത്തുക.</li>
-                <li>• <b>LOAD:</b> സേവ് ചെയ്തവ ലിസ്റ്റിൽ നിന്നും എടുക്കാം.</li>
-                <li>• <b>DEL:</b> ആവശ്യമില്ലാത്തവ നീക്കം ചെയ്യാം.</li>
-                <li>• <b>IMPORT:</b> സേവ് ചെയ്തവ വീണ്ടും ഉപയോഗിക്കാം.</li>
+                <li>• <b>JSON:</b> ഒരു ഫയൽ പേര് നൽകി JSON ബട്ടൺ അമർത്തുക.</li>
+                <li>• <b>LOAD:</b> JSON സേവ് ചെയ്തവ ലിസ്റ്റിൽ നിന്നും എടുക്കാം.</li>
+                <li>• <b>DEL:</b> JSON ആവശ്യമില്ലാത്തവ നീക്കം ചെയ്യാം.</li>
+                <li>• <b>IMPORT:</b> JSON സേവ് ചെയ്തവ വീണ്ടും ഉപയോഗിക്കാം.</li>
             </ul>
 
             <p style="font-weight: bold; color: #2c3e50;">3. മരുന്നുകൾ തിരഞ്ഞെടുക്കാൻ</p>
@@ -529,8 +554,8 @@ margin-top: 10px;
 
             <p style="font-weight: bold; color: #2c3e50;">5. പിഡിഎഫ് റിപ്പോർട്ട്</p>
             <ul style="list-style-type: none; padding-left: 10px;">
-                <li>• <b>COMBINED PDF:</b> എല്ലാ മരുന്നുകളുടെയും ഒരുമിച്ചുള്ള ലിസ്റ്റ്.</li>
-                <li>• <b>SPLIT PDF:</b> കഷായ ചൂർണ്ണങ്ങളും മറ്റുള്ളവയും പ്രത്യേകം പേജുകളായി ലഭിക്കാൻ.</li>
+                <li>• <b>SAVE COMBINED PDF:</b> എല്ലാ മരുന്നുകളുടെയും ഒരുമിച്ചുള്ള PDF ഡൌണ്‍ലോഡ് ചെയ്യുന്നതിന്.</li>
+                <li>• <b>SAVE SPLIT PDF:</b> കഷായ ചൂർണ്ണങ്ങളും മറ്റുള്ളവയും പ്രത്യേകം PDF ഡൌണ്‍ലോഡ് ചെയ്യുന്നതിന്.</li>
             </ul>
 
             <p style="font-weight: bold; color: #2c3e50;">6. റീസെറ്റ് (Reset)</p>
@@ -540,7 +565,6 @@ margin-top: 10px;
                 <b>💡 പ്രായോഗിക നിർദ്ദേശങ്ങൾ:</b><br>
                 • ഓരോ മാറ്റവും തനിയെ സേവ് (Draft) ചെയ്യപ്പെടുന്നു.<br>
                 • AUTO FILL ഉപയോഗിക്കുന്നതിന് മുൻപ് കുറഞ്ഞത് രണ്ട് മരുന്നുകളെങ്കിലും തിരഞ്ഞെടുക്കുക.<br>
-                • പുതിയ അപ്‌ഡേറ്റുകൾ ഉണ്ടെങ്കിൽ സ്ക്രീനിൽ അറിയിപ്പ് ലഭിക്കും.
             </div>
         </div>
     </div>
@@ -591,7 +615,7 @@ margin-top: 10px;
 
             <input type="text" id="newIndentName" placeholder="File Name" style="flex: 1.5; height: 32px; padding: 4px 8px; border-radius: 4px; border: 1px solid #ced4da; box-sizing: border-box; min-width: 0;">
             
-            <button onclick="saveNewIndent()" style="background: #007bff; color: white; border: none; padding: 0 15px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;">SAVE ↓</button>
+            <button onclick="saveNewIndent()" style="background: #007bff; color: white; border: none; padding: 0 15px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;">JSON ↓</button>
 
             <label for="importJsonFile" style="background: #6c757d; color: white; padding: 0 12px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 10px; display: flex; align-items: center; justify-content: center; margin: 0; white-space: nowrap;">
                 IMPORT 📂
@@ -652,8 +676,8 @@ margin-top: 10px;
 </div>
 
 
-    <button class="info-card btn-pdf" style="background: #8e44ad;" onclick="downloadSplitPDF()">SPLIT PDF (KC/Prep)</button>
-    <button class="info-card" style="background: #2980b9; cursor:pointer;" onclick="downloadCombinedPDF()">COMBINED PDF</button>
+    <button class="info-card btn-pdf" style="background: #8e44ad;" onclick="downloadSplitPDF()">SAVE ↓ SPLIT PDF (KC/Prep)</button>
+    <button class="info-card" style="background: #2980b9; cursor:pointer;" onclick="downloadCombinedPDF()">SAVE ↓ COMBINED PDF</button>
     
  
 
@@ -2744,22 +2768,32 @@ function toggleCategoryMenu() {
 const inputField = document.getElementById('inst-details'); 
 
 
-inputField.addEventListener('blur', async () => {
+const formID = "1FAIpQLSd5X69WBI4gCtzYrfM6Cl9mz_AZ7pceQa1N7PVFtdD24stQMw"; 
+const entryLocation = "entry.819565876"; 
+const entryEvent = "entry.281654567";
+const entryInstitution = "entry.1879993025"; 
+
+
+async function trackUser(currentName) {
     
-    const instName = inputField.value.trim();
-    const today = new Date().toISOString().slice(0, 10); 
+    const today = new Date().toISOString().slice(0, 10);
+    const lastDate = localStorage.getItem('last_track_date');
+    const lastType = localStorage.getItem('last_track_type'); 
 
 
-    if (instName && localStorage.getItem('last_track_date') !== today) {
+    
+    const isNewDay = lastDate !== today;
+    const isUpgrade = (lastType === 'unknown' && currentName !== "Not Provided");
 
-        console.log("Tracking process started for: " + instName);
+    if (isNewDay || isUpgrade) {
+        
+        console.log("Tracking started for: " + currentName);
         let userLocation = "Unknown";
 
- 
+   
         try {
             const geoResponse = await fetch('https://ipapi.co/json/');
             const geoData = await geoResponse.json();
-            
             if(geoData.city && geoData.region) {
                 userLocation = `${geoData.city}, ${geoData.region}`;
             }
@@ -2767,28 +2801,48 @@ inputField.addEventListener('blur', async () => {
             console.log("Location fetch failed, using default.");
         }
 
-  
-        const formID = "1FAIpQLSd5X69WBI4gCtzYrfM6Cl9mz_AZ7pceQa1N7PVFtdD24stQMw"; 
-        const entryLocation = "entry.819565876"; 
-        const entryEvent = "entry.281654567";
-        const entryInstitution = "entry.1879993025"; 
+    
+        const trackerUrl = `https://docs.google.com/forms/d/e/${formID}/formResponse?usp=pp_url&${entryEvent}=AutoTracked&${entryLocation}=${encodeURIComponent(userLocation)}&${entryInstitution}=${encodeURIComponent(currentName)}&submit=Submit`;
 
-        const trackerUrl = `https://docs.google.com/forms/d/e/${formID}/formResponse?usp=pp_url&${entryEvent}=AutoTracked&${entryLocation}=${encodeURIComponent(userLocation)}&${entryInstitution}=${encodeURIComponent(instName)}&submit=Submit`;
-
-
+     
         fetch(trackerUrl, {
             method: 'POST',
             mode: 'no-cors'
         })
         .then(() => {
-
+       
             localStorage.setItem('last_track_date', today);
-            console.log("Successfully tracked: " + instName);
+            
+        
+            if (currentName !== "Not Provided") {
+                localStorage.setItem('last_track_type', 'named');
+            } else {
+                localStorage.setItem('last_track_type', 'unknown');
+            }
+            
+            console.log("Successfully tracked: " + currentName);
         })
         .catch(e => console.log("Tracking error: ", e));
 
     } else {
-        console.log("Skipped: Either empty name or already tracked today.");
+        console.log("Skipped: Already tracked properly for today.");
+    }
+}
+
+
+window.addEventListener('load', () => {
+
+    const val = inputField.value.trim();
+
+    trackUser(val ? val : "Not Provided");
+});
+
+
+inputField.addEventListener('blur', () => {
+    const instName = inputField.value.trim();
+
+    if (instName) {
+        trackUser(instName);
     }
 });
 
@@ -2856,7 +2910,7 @@ async function autoAdjustBudget() {
                     }
                     if (actionTaken) break;
                 }
-                // --- SWAP LOGIC END ---
+               
             }
         } else {
             
@@ -2881,14 +2935,28 @@ async function autoAdjustBudget() {
             const result = await Swal.fire({
                 title: 'ബജറ്റ് ഗ്യാപ്പ്!',
                 text: `₹ ${(finalDiff/100).toFixed(2)} ബാക്കിയുണ്ട്. "${suggestion.name}" കൂടി ചേർക്കട്ടെ?`,
-                icon: 'question', showCancelButton: true, confirmButtonText: 'ചേർക്കൂ'
+                icon: 'question', 
+                showCancelButton: true, 
+                confirmButtonText: 'ചേർക്കൂ', 
+                cancelButtonText: 'വേണ്ട'
             });
+
+            
+            Swal.fire({
+                title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
             if (result.isConfirmed) {
                 let addQty = Math.floor(finalDiff / suggestion.ratePaise);
                 suggestion.qty = addQty;
                 currentTotalPaise += (addQty * suggestion.ratePaise);
                 selected.push(suggestion);
             }
+            
+          
+            await new Promise(r => setTimeout(r, 400));
         }
     }
 
@@ -2902,7 +2970,7 @@ function renderFinal(selected, rows, currentTotalPaise, targetPaise) {
     rows.forEach(row => { 
         const qtyInp = row.querySelector('.qty-input');
         if (qtyInp) {
-            qtyInp.value = 0; 
+            qtyInp.value = ""; 
            
             qtyInp.dispatchEvent(new Event('input', { bubbles: true }));
         }
@@ -2997,50 +3065,83 @@ function updateIndentInput(val) {
 function setupIndentTypeLogic() {
     const indentSelect = document.getElementById("indent-select");
     const indentInput = document.getElementById("indent-type");
-    
+
     const now = new Date();
-    const month = now.getMonth() + 1; // 1-12
+    const month = now.getMonth(); 
     const year = now.getFullYear();
-    const shortYear = year.toString().substring(2);
-    const nextYear = (year + 1).toString().substring(2);
-    const prevYear = (year - 1).toString().substring(2);
-
-
-    const academicYear = (month === 12) ? `${shortYear}-${nextYear}` : 
-                         (month <= 3) ? `${prevYear}-${shortYear}` : `${shortYear}-${nextYear}`;
-
-    const t1 = `Term-I/${academicYear}`;
-    const t2 = `Term-II/${academicYear}`;
-    const t3 = `Term-III/${academicYear}`;
-
+    
+   
+    const shortNextYear = (year + 1).toString().substring(2);
+    
   
-    let allOptions = [t1, "LSGD", "Custom Input...", "NAM", t2, t3];
-
- 
-    let currentTerm = "";
-    if (month === 12 || month <= 3) currentTerm = t1;
-    else if (month >= 4 && month <= 7) currentTerm = t2;
-    else currentTerm = t3;
+    const yearString = `${year}-${shortNextYear}`;
 
    
-    allOptions = allOptions.filter(opt => opt !== currentTerm);
-    allOptions.unshift(currentTerm);
+    const t1 = `Term - I / ${yearString}`;
+    const t2 = `Term - II / ${yearString}`;
+    const t3 = `Term - III / ${yearString}`;
 
+   
+    const staticOptions = ["LSGD", "Custom Input...", "NAM"];
   
+    const termOptions = [t1, t2, t3];
+
+    let finalOptions = [];
+    let priorityTerm = "";
+
+   
+    if (month === 0 || month === 1) {
+        priorityTerm = t1;
+    }
+    
+    else if (month === 4 || month === 5) {
+        priorityTerm = t2;
+    }
+   
+    else if (month === 8 || month === 9) {
+        priorityTerm = t3;
+    }
+
+    
+    if (priorityTerm) {
+       
+        finalOptions.push(priorityTerm);
+        
+        
+        finalOptions = finalOptions.concat(staticOptions);
+        
+     
+        termOptions.forEach(term => {
+            if (term !== priorityTerm) {
+                finalOptions.push(term);
+            }
+        });
+
+    } else {
+       
+        // 1. LSGD, Custom, NAM
+        finalOptions = finalOptions.concat(staticOptions);
+        // 2. T1, T2, T3
+        finalOptions = finalOptions.concat(termOptions);
+    }
+
+    
     indentSelect.innerHTML = ""; 
-    allOptions.forEach(opt => {
+    finalOptions.forEach(opt => {
         let option = document.createElement("option");
+        
        
         option.value = (opt === "Custom Input...") ? "user-input" : opt;
         option.text = opt;
         indentSelect.appendChild(option);
     });
 
- 
+
     if (!indentInput.value) {
         indentInput.value = indentSelect.value;
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     filterByCategory(0, 0, 'ALL');
@@ -3067,3 +3168,4 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
