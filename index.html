@@ -244,11 +244,13 @@ td {
 /* --- 2. കമ്പ്യൂട്ടറിൽ (Desktop View) --- */
 @media (min-width: 769px) {
     #categoryMenu.show-grid {
-        /* ബട്ടണിന്റെ തൊട്ടു താഴെ വരാൻ */
-        position: absolute;
-        top: 110%;
-        left: 50%;
-        transform: translateX(-50%);
+        /* ബട്ടണിൽ നിന്ന് മാറ്റി സ്ക്രീനിൽ 'ഫിക്സ്' ചെയ്യുന്നു */
+        position: fixed;        
+        
+        /* കൃത്യം നടുക്ക് കൊണ്ടുവരാൻ */
+        top: 50%;               
+        left: 50%;              
+        transform: translate(-50%, -50%); 
         width: 500px; /* ഡെസ്ക്ടോപ്പിൽ നല്ല വീതി */
         grid-template-columns: repeat(4, 1fr); /* 4 കോളം */
     }
@@ -3252,6 +3254,7 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
 
 
 
