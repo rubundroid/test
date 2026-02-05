@@ -241,7 +241,7 @@ td {
     z-index: 9999;
 }
 
-/* --- 2. കമ്പ്യൂട്ടറിൽ (Desktop View) --- */
+/* --- 2. കമ്പ്യൂട്ടറിലും ടാബിലും (Desktop & Tablet) --- */
 @media (min-width: 769px) {
     #categoryMenu.show-grid {
         /* ബട്ടണിൽ നിന്ന് മാറ്റി സ്ക്രീനിൽ 'ഫിക്സ്' ചെയ്യുന്നു */
@@ -251,8 +251,15 @@ td {
         top: 50%;               
         left: 50%;              
         transform: translate(-50%, -50%); 
+        
         width: 500px; /* ഡെസ്ക്ടോപ്പിൽ നല്ല വീതി */
         grid-template-columns: repeat(4, 1fr); /* 4 കോളം */
+        
+        /* --- താഴെ പറയുന്നവ കൂടി ചേർത്താൽ നല്ലതാണ് --- */
+        z-index: 3000; /* മറ്റെല്ലാറ്റിനും മുകളിൽ വരാൻ (Header-ന് മുകളിൽ) */
+        box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); /* പിന്നിൽ ബാക്കിയുള്ളവ മങ്ങിക്കാൻ */
+        max-height: 90vh; /* സ്ക്രീനിനേക്കാൾ വലുതായാൽ സ്ക്രോൾ ചെയ്യാൻ */
+        overflow-y: auto;
     }
 }
 
@@ -3254,6 +3261,7 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
 
 
 
