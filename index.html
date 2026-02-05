@@ -184,35 +184,53 @@ thead th {
 }
 
 
+/* --- 1. പൊതുവായ സ്റ്റൈൽ (Desktop & Mobile) --- */
 #categoryMenu.show-grid {
     display: grid !important;
-    gap: 5px;
-    
-    /* --- സെന്റർ ആക്കാനുള്ള സൂത്രം --- */
-    position: absolute;
-    top: 100%;             /* ബട്ടന്റെ തൊട്ടു താഴെ വരാൻ */
-    left: 50%;             /* പകുതി ദൂരം നീങ്ങി നിൽക്കാൻ */
-    transform: translateX(-50%); /* സ്വന്തം വലിപ്പത്തിന്റെ പകുതി തിരിച്ചു നീങ്ങാൻ (ഇതാണ് സെന്റർ ആക്കുന്നത്) */
-    
-    /* --- വലിപ്പവും ഭംഗിയും --- */
+    gap: 8px;
     background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    z-index: 2000;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    
-    /* കമ്പ്യൂട്ടറിൽ 4 കോളം */
-    grid-template-columns: repeat(4, 1fr);
-    width: 400px; 
+    border: 1px solid #2c3e50;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    z-index: 9999;
 }
 
-/* --- മൊബൈലിൽ (Phone Layout) --- */
+/* --- 2. കമ്പ്യൂട്ടറിൽ (Desktop View) --- */
+@media (min-width: 769px) {
+    #categoryMenu.show-grid {
+        /* ബട്ടണിന്റെ തൊട്ടു താഴെ വരാൻ */
+        position: absolute;
+        top: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px; /* ഡെസ്ക്ടോപ്പിൽ നല്ല വീതി */
+        grid-template-columns: repeat(4, 1fr); /* 4 കോളം */
+    }
+}
+
+/* --- 3. മൊബൈലിൽ (Mobile View - ഇതാണ് ആ സൂത്രം) --- */
 @media (max-width: 768px) {
     #categoryMenu.show-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 കോളം മതി */
-        width: 300px;          /* ഫോണിൽ ഒതുങ്ങുന്ന വലിപ്പം */
-        max-width: 90vw;       /* സ്ക്രീനിന്റെ 90% ൽ കൂടരുത് (സൈഡ് മുറിയാതിരിക്കാൻ) */
+        /* ബട്ടണിൽ നിന്ന് മാറ്റി സ്ക്രീനിൽ 'ഫിക്സ്' ചെയ്യുന്നു */
+        position: fixed;        
+        
+        /* കൃത്യം നടുക്ക് കൊണ്ടുവരാൻ */
+        top: 50%;               
+        left: 50%;              
+        transform: translate(-50%, -50%); 
+        
+        /* വലിപ്പം സെറ്റ് ചെയ്യാൻ */
+        width: 85%;             /* സ്ക്രീനിന്റെ 85% വീതി */
+        max-width: 350px;
+        max-height: 70vh;       /* സ്ക്രീനിൽ കൊള്ളാത്തത് സ്ക്രോൾ ചെയ്യാൻ */
+        overflow-y: auto;       /* സ്ക്രോൾ ബാർ വരാൻ */
+        
+        /* 2 കോളം */
+        grid-template-columns: repeat(2, 1fr); 
+        
+        /* എടുത്തു കാണിക്കാൻ */
+        box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); /* ബാക്ഗ്രൗണ്ട് മങ്ങിക്കാൻ */
     }
 }
 
@@ -3189,6 +3207,7 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
 
 
 
