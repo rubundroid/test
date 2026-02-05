@@ -184,9 +184,35 @@ thead th {
 }
 
 
+/* 1. സാധാരണ ഡിസൈൻ (Desktop - 4 Columns) */
 #categoryMenu.show-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr); /* 4 കള്ളികൾ */
+    gap: 5px;
+    
+    /* ഭംഗി കൂട്ടാനുള്ളത് */
+    position: absolute;
+    top: 100%;
+    left: 0; /* ഇടതുവശത്ത് ചേർന്നു നിൽക്കും */
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    width: 400px; /* ഡെസ്ക്ടോപ്പിൽ കുറച്ചു വീതി വേണം */
+}
+
+/* 2. മൊബൈൽ ഡിസൈൻ (Mobile - 2 Columns) - ഇതാണ് ആ സൂത്രം */
+@media (max-width: 768px) {
+    #categoryMenu.show-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 കള്ളികൾ മാത്രം */
+        width: 250px; /* ഫോണിൽ ഒതുങ്ങുന്ന വീതി */
+        
+        /* ഫോണിൽ വലത്തോട്ട് തള്ളി പോകാതിരിക്കാൻ */
+        left: auto;  
+        right: 0;    
+    }
 }
 
 .cat-item {
@@ -3162,6 +3188,7 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
 
 
 
