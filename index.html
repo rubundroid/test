@@ -648,14 +648,14 @@ margin-top: 10px;
         <span class="card-value">₹ <span id="display-balance">0.00</span></span>
     </div>
 
-<button class="info-card" style="background: #16a085;" onclick="autoAdjustBudget()">AUTO FILL</button>
+<button class="info-card" style="background: #16a085; cursor:pointer;" onclick="autoAdjustBudget()">AUTO FILL</button>
 
     <button id="view-btn" class="info-card" style="background-color: #f39c12; border:none; cursor:pointer;" onclick="toggleView()">SHOW SELECTED</button>
 
 
     
 <div style="position: relative; flex: 1; display: flex;">
-    <button id="typeBtn" class="info-card" style="background: #2c3e50; width: 100%;" onclick="toggleCategoryMenu()">TYPE ▾</button>
+    <button id="typeBtn" class="info-card" style="background: #2c3e50; cursor:pointer; width: 100%;" onclick="toggleCategoryMenu()">TYPE ▾</button>
     
 <div id="categoryMenu">
     <div class="cat-item" onclick="filterByCategory(0, 0, 'ALL')">ALL</div>
@@ -675,7 +675,7 @@ margin-top: 10px;
 </div>
 </div>
 <div style="position: relative; flex: 1; display: flex;">
-    <button class="info-card btn-pdf" style="background: #8e44ad;" onclick="downloadSplitPDF()">SAVE ↓ SPLIT PDF (KC/Prep)</button>
+    <button class="info-card btn-pdf" style="background: #8e44ad; cursor:pointer;" onclick="downloadSplitPDF()">SAVE ↓ SPLIT PDF (KC/Prep)</button>
 </div>
     <button class="info-card" style="background: #2980b9; cursor:pointer;" onclick="downloadCombinedPDF()">SAVE ↓ COMBINED PDF</button>
 
@@ -3163,5 +3163,6 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
 
 
