@@ -184,34 +184,35 @@ thead th {
 }
 
 
-/* 1. സാധാരണ ഡിസൈൻ (Desktop - 4 Columns) */
 #categoryMenu.show-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr); /* 4 കള്ളികൾ */
     gap: 5px;
     
-    /* ഭംഗി കൂട്ടാനുള്ളത് */
+    /* --- സെന്റർ ആക്കാനുള്ള സൂത്രം --- */
     position: absolute;
-    top: 100%;
-    left: 0; /* ഇടതുവശത്ത് ചേർന്നു നിൽക്കും */
+    top: 100%;             /* ബട്ടന്റെ തൊട്ടു താഴെ വരാൻ */
+    left: 50%;             /* പകുതി ദൂരം നീങ്ങി നിൽക്കാൻ */
+    transform: translateX(-50%); /* സ്വന്തം വലിപ്പത്തിന്റെ പകുതി തിരിച്ചു നീങ്ങാൻ (ഇതാണ് സെന്റർ ആക്കുന്നത്) */
+    
+    /* --- വലിപ്പവും ഭംഗിയും --- */
     background: white;
     border: 1px solid #ccc;
     padding: 10px;
-    z-index: 1000;
-    border-radius: 5px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    width: 400px; /* ഡെസ്ക്ടോപ്പിൽ കുറച്ചു വീതി വേണം */
+    z-index: 2000;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    
+    /* കമ്പ്യൂട്ടറിൽ 4 കോളം */
+    grid-template-columns: repeat(4, 1fr);
+    width: 400px; 
 }
 
-/* 2. മൊബൈൽ ഡിസൈൻ (Mobile - 2 Columns) - ഇതാണ് ആ സൂത്രം */
+/* --- മൊബൈലിൽ (Phone Layout) --- */
 @media (max-width: 768px) {
     #categoryMenu.show-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 കള്ളികൾ മാത്രം */
-        width: 250px; /* ഫോണിൽ ഒതുങ്ങുന്ന വീതി */
-        
-        /* ഫോണിൽ വലത്തോട്ട് തള്ളി പോകാതിരിക്കാൻ */
-        left: auto;  
-        right: 0;    
+        grid-template-columns: repeat(2, 1fr); /* 2 കോളം മതി */
+        width: 300px;          /* ഫോണിൽ ഒതുങ്ങുന്ന വലിപ്പം */
+        max-width: 90vw;       /* സ്ക്രീനിന്റെ 90% ൽ കൂടരുത് (സൈഡ് മുറിയാതിരിക്കാൻ) */
     }
 }
 
@@ -3188,6 +3189,7 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
 
 
 
