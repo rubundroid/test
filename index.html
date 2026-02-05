@@ -84,39 +84,38 @@
         }
         
         .summary-buttons { 
-            display: flex; gap: 15px; max-width: 900px; margin: 0 auto;
-        }
-
-        .info-card { 
-            padding: 3px 8px; border-radius: 3px; flex: 1; 
-            text-align: center; color: white; font-weight: bold;
-            display: flex; flex-direction: column; justify-content: center;
-        }
-
-        .card-label { font-size: 11px; text-transform: uppercase; opacity: 0.9; }
-        .card-value { font-size: 18px; }
-
-        .btn-total { background-color: var(--success-color); }
-        .btn-balance { background-color: var(--accent-color); }
-        .btn-pdf { 
-            background-color: #8e44ad !important; cursor: pointer; border: none;
-            transition: transform 0.2s; font-size: 15px;
-        }
-        
-  
-.info-card {
-    transition: transform 0.2s, filter 0.2s; 
+    display: flex; 
+    gap: 10px;               /* 15px എന്നത് മൊബൈലിൽ കൂടാം, 10px മതി */
+    max-width: 1200px;       /* 900px കുറവാണ്, കുറച്ചുകൂടി സ്ഥലം നൽകാം */
+    margin: 0 auto;
+    flex-wrap: wrap;         /* ഇതാണ് പ്രധാനം! സ്ഥലമില്ലെങ്കിൽ അടുത്ത വരിയിൽ വരും */
+    justify-content: center; /* ബട്ടണുകൾ നടുക്ക് (Center) വരാൻ */
 }
 
+.info-card { 
+    padding: 8px 12px;       /* പാഡിംഗ് കുറച്ചു കൂട്ടാം */
+    border-radius: 5px; 
+    flex: 1 1 auto;          /* 'flex: 1' ന് പകരം ഇത് നല്ലത്. ആവശ്യത്തിന് വലിപ്പം എടുക്കും */
+    min-width: 120px;        /* തീരെ ചെറുതായി പോകാതിരിക്കാൻ */
+    text-align: center; 
+    color: white; 
+    font-weight: bold;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    font-size: 13px;         /* ഫോണ്ട് സൈസ് ഏകീകരിച്ചു */
+}
+
+/* ബാക്കി ഉള്ളവ (Hover, Colors) പഴയത് തന്നെ മതി */
 .info-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     filter: brightness(1.1); 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
 }
 
-
-
-
+/* പ്രത്യേക കളറുകൾ */
+.btn-total { background-color: var(--success-color); }
+.btn-balance { background-color: var(--accent-color); }
    
 .table-container {
     max-height: 80vh; 
@@ -3163,6 +3162,7 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
+
 
 
 
