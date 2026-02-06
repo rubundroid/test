@@ -649,106 +649,148 @@ td {
     outline: none;
 }
 
-/* --- മൊത്തം ബോക്സിന്റെ ഡിസൈൻ --- */
+/* Container Layout */
 .file-manager-container {
-    background: #f8f9fa;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap; /* സ്ഥലം ഇല്ലെങ്കിൽ താഴെ വരാൻ */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    align-items: flex-end;
+    justify-content: center; /* ഇതാണ് മാറ്റം: ഇത് നടുവിലേക്ക് കൊണ്ടുവരും */
+    gap: 20px;               /* ഗ്രൂപ്പുകൾ തമ്മിലുള്ള അകലം കുറച്ചുകൂടി കൂട്ടി */
+    padding: 15px 0;
+    flex-wrap: wrap;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
 }
 
-/* --- ഓരോ ഗ്രൂപ്പും (Load & Save Sections) --- */
+/* Common Group Styling */
 .fm-group {
     display: flex;
-    gap: 8px;
-    align-items: center;
-    flex: 1; /* ഉള്ള സ്ഥലം വീതിച്ചെടുക്കാൻ */
-    min-width: 280px; /* വലിപ്പം തീരെ കുറയാതിരിക്കാൻ */
+    flex-direction: column;
+    gap: 5px;
 }
 
-/* --- Input & Select Boxes --- */
-.fm-input {
-    flex: 1; /* കിട്ടാവുന്ന സ്ഥലം മുഴുവൻ എടുക്കാൻ */
-    height: 38px; /* വലിപ്പം കൂട്ടി */
-    padding: 5px 10px;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    font-size: 13px;
-    width: 100%; /* മൊബൈലിൽ ഫുൾ വീതി */
-}
-
-/* --- ബട്ടണുകളുടെ ഗ്രൂപ്പ് --- */
-.fm-buttons {
+.fm-row {
     display: flex;
     gap: 5px;
 }
 
-/* --- ബട്ടണുകളുടെ പൊതുവായ സ്റ്റൈൽ --- */
-.fm-buttons button, .btn-import {
-    height: 38px;
-    padding: 0 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+/* Labels */
+.fm-label {
     font-size: 12px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 2px;
 }
 
-/* --- കളറുകൾ --- */
-.btn-load { background: #28a745; }
-.btn-del { background: #dc3545; }
-.btn-json { background: #007bff; }
-.btn-import { background: #6c757d; margin: 0; }
+/* Hidden label just for spacing alignment */
+.hidden-label {
+    visibility: hidden; 
+}
 
-/* --- നടുക്കത്തെ വര (Desktop only) --- */
+/* Budget Input Specific Style */
+.budget-input {
+    width: 160px;
+    border: 2px solid #27ae60;
+    border-radius: 4px;
+    padding: 5px 8px;
+    height: 38px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #27ae60;
+    box-sizing: border-box;
+}
+
+/* Common Inputs (Dropdown & Text) */
+.fm-input {
+    height: 38px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Saved Indents Dropdown Width */
+#savedIndentsList {
+    min-width: 200px; /* ഡ്രോപ്പ്ഡൗണിന് കുറഞ്ഞത് ഇത്ര നീളം വേണം */
+}
+
+/* Buttons Common Style */
+.btn-action {
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    padding: 0 15px;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Button Colors */
+.btn-load { background-color: #27ae60; } /* Green */
+.btn-del { background-color: #c0392b; }  /* Red */
+.btn-json { background-color: #2980b9; } /* Blue */
+.btn-import { background-color: #7f8c8d; margin-bottom: 0; } /* Grey */
+
+/* Separator Line */
 .fm-separator {
     width: 1px;
-    height: 30px;
-    background: #dee2e6;
+    height: 40px;
+    background-color: #e0e0e0;
     margin: 0 5px;
 }
 
-/* --- Hover Effects --- */
-.fm-buttons button:hover, .btn-import:hover { opacity: 0.9; }
-.fm-buttons button:active { transform: scale(0.96); }
-
-
-/* --- MOBILE VIEW (ഇതാണ് മൊബൈലിലെ മാജിക്) --- */
+/* Mobile Responsive Design */
+/* Mobile Responsive Design (Updated for Full Width Beauty) */
 @media (max-width: 768px) {
+    
+    /* 1. കണ്ടെയ്നർ താഴേക്ക് (Column) മാറ്റുന്നു, ഒപ്പം ഫുൾ വീതിയും */
     .file-manager-container {
-        flex-direction: column; /* താഴെ താഴെ വരാൻ */
+        flex-direction: column;
+        align-items: stretch; /* ഇത് വളരെ പ്രധാനം: എല്ലാം വലിച്ച് നീട്ടി വെക്കാൻ */
         gap: 15px;
-        padding: 15px;
+        margin-top: 15px;
+        width: 100%; /* കണ്ടെയ്നർ തന്നെ ഫുൾ വീതി */
     }
 
-    .fm-separator { display: none; } /* മൊബൈലിൽ വര വേണ്ട */
-
-    .fm-group {
-        width: 100%; /* ഫുൾ വീതി */
-        flex-direction: column; /* ഇൻപുട്ട് മുകളിലും ബട്ടൺ താഴെയും */
-        align-items: stretch; /* വശങ്ങളിലേക്ക് വലിച്ചു നീട്ടാൻ */
+    /* 2. ബജറ്റ് ഫീൽഡ് മുകളിലെ Indent Type പോലെ ഫുൾ വീതിയിൽ */
+    .budget-input {
+        width: 100% !important; 
+        height: 40px; /* ടച്ച് ചെയ്യാൻ എളുപ്പത്തിന് ഉയരം അല്പം കൂട്ടി */
     }
 
-    .fm-buttons {
+    /* 3. ഓരോ വരിയും (Load & Save Rows) ഫുൾ വീതിയിൽ */
+    .fm-row {
         display: flex;
         width: 100%;
+        gap: 5px;
     }
 
-    /* ബട്ടണുകൾക്ക് തുല്യ വലിപ്പം നൽകാൻ */
-    .fm-buttons button, .btn-import {
-        flex: 1; /* ഉള്ള സ്ഥലം പകുതി വെച്ച് എടുക്കും */
-        height: 42px; /* വിരൽ തൊടാൻ എളുപ്പത്തിന് ഉയരം കൂട്ടി */
-        font-size: 14px;
+    /* 4. ഡ്രോപ്പ്ഡൗണും ടെക്സ്റ്റ് ബോക്സും മാക്സിമം സ്ഥലമെടുക്കാൻ */
+    .fm-input {
+        flex: 1; /* ബാക്കി വരുന്ന സ്ഥലം മുഴുവൻ എടുക്കും */
+        width: auto; /* ഫിക്സഡ് വീതി ഒഴിവാക്കി */
+        min-width: 0; /* ഫ്ലെക്സ് ബോക്സിൽ ചുരുങ്ങാതിരിക്കാൻ */
+    }
+
+    /* 5. ബട്ടണുകൾക്ക് ഫിക്സഡ് വീതിക്ക് പകരം കണ്ടന്റ് അനുസരിച്ച് */
+    .btn-action {
+        padding: 0 15px;
+        white-space: nowrap; /* ടെക്സ്റ്റ് പൊട്ടിപ്പോകാതിരിക്കാൻ */
+    }
+
+    /* 6. ലൈനുകൾ മൊബൈലിൽ വേണ്ട */
+    .fm-separator, .hidden-label {
+        display: none;
+    }
+    
+    /* ലേബലുകൾ കൃത്യമായി ഇടത്തോട്ട് ചേർന്ന് നിൽക്കാൻ */
+    .fm-group {
+        align-items: flex-start;
+        width: 100%;
     }
 }
 
@@ -899,37 +941,44 @@ td {
     </div>
 </div>
 
-        <div style="flex: 1; min-width: 0;">
-            <label style="font-size: 13px; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 4px;">Total Budget (₹):</label>
-            <input type="number" id="total-budget" placeholder="₹" 
-                   oninput="calculateAll(); saveDraft()" 
-                   style="width: 100%; font-weight: bold; border: 2px solid #27ae60; border-radius: 4px; box-sizing: border-box; padding: 5px 8px; height: 35px; font-size: 14px; color: #27ae60;">
-        </div>
-    </div>
+
 <div class="file-manager-container">
-    
+
+    <div class="fm-group budget-group">
+        <label class="fm-label">Total Budget (₹):</label>
+        <input type="number" id="total-budget" class="budget-input" 
+               placeholder="Enter Amount" 
+               oninput="calculateAll(); saveDraft()">
+    </div>
+
+    <div class="fm-separator"></div>
+
     <div class="fm-group load-group">
-        <select id="savedIndentsList" class="fm-input">
-            <option value="">-- Select a saved indent --</option>
-        </select>
-        <div class="fm-buttons">
-            <button onclick="loadSelectedIndent()" class="btn-load">LOAD</button>
-            <button onclick="deleteSelectedIndent()" class="btn-del">DEL</button>
+        <label class="fm-label hidden-label">Select Indent</label>
+        <div class="fm-row">
+            <select id="savedIndentsList" class="fm-input">
+                <option value="">-- Select a saved indent --</option>
+            </select>
+            <button onclick="loadSelectedIndent()" class="btn-action btn-load">LOAD</button>
+            <button onclick="deleteSelectedIndent()" class="btn-action btn-del">DEL</button>
         </div>
     </div>
 
     <div class="fm-separator"></div>
 
     <div class="fm-group save-group">
-        <input type="text" id="newIndentName" placeholder="File Name" class="fm-input">
-        <div class="fm-buttons">
-            <button onclick="saveNewIndent()" class="btn-json">JSON ↓</button>
-            <label for="importJsonFile" class="btn-import">
+        <label class="fm-label hidden-label">File Name</label>
+        <div class="fm-row">
+            <input type="text" id="newIndentName" placeholder="File Name" class="fm-input">
+            <button onclick="saveNewIndent()" class="btn-action btn-json">JSON ↓</button>
+            <label for="importJsonFile" class="btn-action btn-import">
                 IMPORT 📂
             </label>
             <input type="file" id="importJsonFile" accept=".json" style="display: none;" onchange="importJsonData(this)">
         </div>
     </div>
+
+</div>
 
 </div>
 <div class="search-container">
