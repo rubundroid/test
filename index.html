@@ -47,40 +47,99 @@
         }
         
 
+/* --- സ്റ്റിക്കി ഹെഡർ കണ്ടെയ്നർ --- */
 .sticky-header-container {
-    position: sticky;
+    background: #fff;
+    padding: 15px;
+    border-bottom: 2px solid #ddd;
+    box-sizing: border-box;
+    width: 100%;
+    /* താഴെ സ്ക്രോൾ ചെയ്യുമ്പോൾ ഹെഡർ ഉറച്ചു നിൽക്കാൻ (Optional) */
+    position: sticky; 
     top: 0;
-    background-color: white;
-    z-index: 1000;
-    padding: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  
-    min-height: 100px; 
+    z-index: 100;
 }
 
-        .header-section { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-            max-width: 1200px; 
-            margin: 0 auto 15px;
-        }
+/* --- ഉള്ളിലെ ലേഔട്ട് (Desktop View) --- */
+.header-inputs {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+}
 
-        .input-group { display: flex; flex-direction: column; }
-        
-        label { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: #444; }
-        
-        input, textarea { 
-            padding: 10px; border: 1px solid #ced4da; border-radius: 6px; 
-            font-size: 14px; transition: border 0.3s;
-        }
+/* --- ഓരോ ഇൻപുട്ട് ഗ്രൂപ്പും --- */
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* ഫ്ലെക്സ് ബോക്സിൽ കണ്ടന്റ് ഓവർഫ്ലോ ഒഴിവാക്കാൻ */
+}
 
-        input:focus, textarea:focus { border-color: var(--accent-color); outline: none; }
+/* ഡെസ്ക്ടോപ്പിൽ അഡ്രസ്സിന് കൂടുതൽ സ്ഥലം */
+.address-section { flex: 1.5; }
+.indent-section { flex: 1; }
 
-        #medicineSearch { 
-            width: 92%; padding: 12px 20px; border: 2px solid var(--accent-color); 
-            border-radius: 30px; font-size: 16px; margin-top: 10px;
-        }
+/* --- ലേബലുകൾ --- */
+.input-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* --- Textarea (അഡ്രസ്സ് ബോക്സ്) --- */
+#inst-details {
+    font-size: 14px;
+    border: 1px solid #3498db;
+    width: 100%;
+    border-radius: 5px;
+    padding: 8px;
+    box-sizing: border-box;
+    resize: vertical; /* താഴോട്ട് മാത്രം വലിച്ചു നീട്ടാം */
+    min-height: 75px;
+    font-family: inherit;
+}
+
+/* --- Select Dropdown & Input --- */
+#indent-select, #indent-type {
+    width: 100%;
+    border: 2px solid #3498db;
+    border-radius: 5px;
+    font-weight: bold;
+    height: 40px; /* വിരൽ കൊണ്ട് തൊടാൻ പാകത്തിന് */
+    font-size: 13px;
+    padding: 0 10px;
+    cursor: pointer;
+    background: white;
+    box-sizing: border-box;
+}
+
+/* Type ചെയ്യാനുള്ള ഇൻപുട്ടിന് വേറെ കളർ */
+#indent-type {
+    border-color: #e67e22;
+    background-color: #fff9f4;
+    margin-top: 5px;
+}
+
+/* --- MOBILE VIEW (മാജിക് ഇവിടെയാണ്) --- */
+@media (max-width: 768px) {
+    .header-inputs {
+        flex-direction: column; /* വരി മാറ്റി താഴെ താഴെ ആക്കുന്നു */
+        gap: 15px;
+    }
+
+    .address-section, 
+    .indent-section {
+        width: 100%; /* മൊബൈലിൽ രണ്ടിനും ഫുൾ വീതി */
+        flex: none;
+    }
+
+    /* മൊബൈലിൽ അഡ്രസ്സ് ബോക്സ് കുറച്ചു ചെറുതാക്കാം */
+    #inst-details {
+        min-height: 60px;
+    }
+}
         
 .summary-buttons { 
     display: flex; 
@@ -217,7 +276,6 @@ td {
 
 
 #categoryMenu {
-    display: none; 
 }
 
 /* --- 1. പൊതുവായ സ്റ്റൈൽ (Desktop & Mobile) --- */
@@ -811,27 +869,28 @@ td {
 </div>
 
 
-<div class="sticky-header-container" style="background: #fff; padding: 15px; border-bottom: 2px solid #ddd; box-sizing: border-box; width: 100%;">
-    
-    <div style="display: flex; gap: 15px; margin-bottom: 12px; align-items: flex-start; width: 100%;">
+<div class="sticky-header-container">
+    <div class="header-inputs">
         
-        <div style="flex: 1.5; min-width: 0;">
-            <label style="font-size: 13px; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 4px;">Institution Name & Address:</label>
-            <textarea id="inst-details" rows="2" placeholder="Name of institution...,&#10;District...,&#10;Localbody..." 
-                      oninput="saveDraft()" 
-                      style="font-size: 14px; border: 1px solid #3498db; width: 100%; border-radius: 4px; padding: 6px; box-sizing: border-box; resize: none; min-height: 70px;"></textarea>
+        <div class="input-wrapper address-section">
+            <label class="input-label">Institution Name & Address:</label>
+            <textarea id="inst-details" rows="2" 
+                      placeholder="Name of institution...,&#10;District...,&#10;Localbody..." 
+                      oninput="saveDraft()"></textarea>
         </div>
 
-        <div style="flex: 1; min-width: 0;">
-            <label style="font-size: 13px; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 4px;">Indent Type:</label>
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-                <select id="indent-select" onchange="updateIndentInput(this.value)" 
-                        style="width: 100%; border: 2px solid #3498db; border-radius: 4px; font-weight: bold; height: 35px; font-size: 13px; padding: 0 5px; cursor: pointer; background: white;">
-                </select>
-                <input type="text" id="indent-type" placeholder="Type here..." oninput="saveDraft()" 
-                       style="display: none; width: 100%; border: 2px solid #e67e22; border-radius: 4px; font-weight: bold; height: 35px; font-size: 13px; padding: 5px 8px; box-sizing: border-box; background-color: #fff9f4;">
+        <div class="input-wrapper indent-section">
+            <label class="input-label">Indent Type:</label>
+            <div class="select-group">
+                <select id="indent-select" onchange="updateIndentInput(this.value)">
+                    </select>
+                <input type="text" id="indent-type" placeholder="Type here..." 
+                       oninput="saveDraft()" style="display: none;">
             </div>
         </div>
+
+    </div>
+</div>
 
         <div style="flex: 1; min-width: 0;">
             <label style="font-size: 13px; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 4px;">Total Budget (₹):</label>
@@ -3406,5 +3465,4 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
-
 
