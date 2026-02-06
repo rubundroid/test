@@ -141,7 +141,7 @@
     display: flex; 
     gap: 10px;               /* 15px എന്നത് മൊബൈലിൽ കൂടാം, 10px മതി */
     max-width: 1200px;       /* 900px കുറവാണ്, കുറച്ചുകൂടി സ്ഥലം നൽകാം */
-    margin: 0 auto;
+    margin: 15px auto;
     flex-wrap: wrap;         /* ഇതാണ് പ്രധാനം! സ്ഥലമില്ലെങ്കിൽ അടുത്ത വരിയിൽ വരും */
     justify-content: center; /* ബട്ടണുകൾ നടുക്ക് (Center) വരാൻ */
 }
@@ -171,7 +171,16 @@
 .btn-total { background-color: var(--success-color); }
 .btn-balance { background-color: var(--accent-color); }
 
-
+@media (max-width: 768px) {
+    
+    .summary-buttons {
+        /* Desktop-ലെ 'margin: 0 auto' മാറ്റി മൊബൈലിൽ സൈഡ് ഗ്യാപ്പ് നൽകുന്നു */
+        margin-left: 20px !important;  
+        margin-right: 20px !important; 
+        width: auto !important;
+    }
+    
+}
 
 
    
