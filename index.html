@@ -54,10 +54,6 @@
     border-bottom: 2px solid #ddd;
     box-sizing: border-box;
     width: 100%;
-    /* താഴെ സ്ക്രോൾ ചെയ്യുമ്പോൾ ഹെഡർ ഉറച്ചു നിൽക്കാൻ (Optional) */
-    position: sticky; 
-    top: 0;
-    z-index: 100;
 }
 
 /* --- ഉള്ളിലെ ലേഔട്ട് (Desktop View) --- */
@@ -206,7 +202,7 @@ thead th {
     letter-spacing: 0.5px;
     position: sticky;       /* മുകളിൽ ഉറച്ചു നിൽക്കാൻ */
     top: 0;
-    z-index: 10;
+    z-index: 50;
 }
 
 td {
@@ -983,9 +979,7 @@ td {
      <button class="info-card" style="background-color: #e74c3c; cursor:pointer;" onclick="resetForm()">RESET</button>
 </div>
 </div>
-</div>
-</div>
-</div>
+
 <div class="table-container">
     <table id="medicineTable">
         <thead>
