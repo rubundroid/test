@@ -423,31 +423,56 @@ td {
     transform: scale(0.95);
 }
 
-/* --- 3. മൊബൈൽ സ്ക്രീൻ (Mobile View) --- */
 @media (max-width: 768px) {
+
+    /* 1. Main Container */
     .search-container {
-        flex-direction: column; /* താഴെ താഴെ വരാൻ */
+        display: flex;
+        flex-direction: column;
         gap: 10px;
+        
+        /* === മാറ്റം വരുത്തേണ്ട ഭാഗം === */
+        width: auto;      /* 100% മാറ്റി auto ആക്കുക */
+        margin: 0 20px;   /* ഇടത്തും വലത്തും 20px വീതം വിടവ് നൽകുക */
+        /* ============================ */
     }
 
-    .search-box-wrapper, 
-    .rate-box-wrapper {
-        width: 100%; /* മൊബൈലിൽ ഫുൾ വീതി */
-        flex: none;
-    }
-
-    /* മൊബൈലിൽ FIND ബട്ടൺ താഴെ പോകാതെ ഇൻപുട്ടിന്റെ കൂടെ നിൽക്കാൻ */
-    .rate-box-wrapper {
-        display: flex; 
-        flex-direction: row; /* വരിയായി തന്നെ നിൽക്കും */
+    /* 2. SEARCH ROW (Line 1) - Full Width */
+    .search-box-wrapper {
+        width: 100%;
     }
     
-    /* ചെറിയ സ്ക്രീനിൽ ബട്ടൺ വലിപ്പം അഡ്ജസ്റ്റ് ചെയ്യാൻ */
+    .search-box-wrapper input {
+        width: 100% !important; 
+        box-sizing: border-box;
+    }
+
+    /* 3. RATE + FIND ROW (Line 2) */
+    .rate-box-wrapper {
+        display: flex !important;
+        flex-direction: row !important; 
+        width: 100% !important; 
+        gap: 8px; 
+        align-items: center; 
+    }
+
+    /* 4. RATE INPUT */
+    .rate-box-wrapper input {
+        flex: 1 !important; 
+        width: auto !important; 
+        min-width: 0; 
+        margin: 0 !important; 
+    }
+
+    /* 5. FIND BUTTON */
     .find-btn {
-        padding: 0 15px;
+        width: auto !important; 
+        flex-shrink: 0; 
+        padding: 0 20px; 
+        margin: 0 !important;
+        white-space: nowrap; 
     }
 }
-
 
 #welcome-screen {
     position: fixed;
@@ -744,52 +769,50 @@ td {
 }
 
 /* Mobile Responsive Design */
-/* Mobile Responsive Design (Updated for Full Width Beauty) */
 @media (max-width: 768px) {
     
-    /* 1. കണ്ടെയ്നർ താഴേക്ക് (Column) മാറ്റുന്നു, ഒപ്പം ഫുൾ വീതിയും */
     .file-manager-container {
         flex-direction: column;
-        align-items: stretch; /* ഇത് വളരെ പ്രധാനം: എല്ലാം വലിച്ച് നീട്ടി വെക്കാൻ */
+        align-items: stretch;
         gap: 15px;
         margin-top: 15px;
-        width: 100%; /* കണ്ടെയ്നർ തന്നെ ഫുൾ വീതി */
+        
+        /* മാറ്റം 1: Width 100% ൽ നിന്ന് മാറ്റുക അല്ലെങ്കിൽ ബോക്സ് സൈസിങ് കൊടുക്കുക */
+        width: auto; 
+        
+        /* മാറ്റം 2: സൈഡുകളിൽ 15px സ്ഥലം (Padding) നൽകുക. 
+           ഇതാണ് മുകളിലെ കോളങ്ങളുമായി ഒരേ നിരപ്പിൽ വരാൻ സഹായിക്കുന്നത് */
+        padding: 0 15px; 
     }
 
-    /* 2. ബജറ്റ് ഫീൽഡ് മുകളിലെ Indent Type പോലെ ഫുൾ വീതിയിൽ */
     .budget-input {
-        width: 100% !important; 
-        height: 40px; /* ടച്ച് ചെയ്യാൻ എളുപ്പത്തിന് ഉയരം അല്പം കൂട്ടി */
+        width: 100% !important;
+        height: 40px;
     }
 
-    /* 3. ഓരോ വരിയും (Load & Save Rows) ഫുൾ വീതിയിൽ */
+    /* ബാക്കി ഉള്ളവ പഴയത് പോലെ തന്നെ */
     .fm-row {
         display: flex;
         width: 100%;
-        gap: 5px;
+        gap: 10px; /* ബട്ടണുകൾ തമ്മിലുള്ള ഗ്യാപ്പ് അല്പം കൂട്ടി */
     }
 
-    /* 4. ഡ്രോപ്പ്ഡൗണും ടെക്സ്റ്റ് ബോക്സും മാക്സിമം സ്ഥലമെടുക്കാൻ */
     .fm-input {
-        flex: 1; /* ബാക്കി വരുന്ന സ്ഥലം മുഴുവൻ എടുക്കും */
-        width: auto; /* ഫിക്സഡ് വീതി ഒഴിവാക്കി */
-        min-width: 0; /* ഫ്ലെക്സ് ബോക്സിൽ ചുരുങ്ങാതിരിക്കാൻ */
+        flex: 1;
+        width: auto;
+        min-width: 0;
     }
 
-    /* 5. ബട്ടണുകൾക്ക് ഫിക്സഡ് വീതിക്ക് പകരം കണ്ടന്റ് അനുസരിച്ച് */
     .btn-action {
-        padding: 0 15px;
-        white-space: nowrap; /* ടെക്സ്റ്റ് പൊട്ടിപ്പോകാതിരിക്കാൻ */
+        padding: 0 10px;
+        white-space: nowrap;
     }
 
-    /* 6. ലൈനുകൾ മൊബൈലിൽ വേണ്ട */
     .fm-separator, .hidden-label {
         display: none;
     }
     
-    /* ലേബലുകൾ കൃത്യമായി ഇടത്തോട്ട് ചേർന്ന് നിൽക്കാൻ */
     .fm-group {
-        align-items: flex-start;
         width: 100%;
     }
 }
