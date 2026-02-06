@@ -595,7 +595,111 @@ td {
     font-size: 12px; 
     outline: none;
 }
- </style>
+
+/* --- മൊത്തം ബോക്സിന്റെ ഡിസൈൻ --- */
+.file-manager-container {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap; /* സ്ഥലം ഇല്ലെങ്കിൽ താഴെ വരാൻ */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* --- ഓരോ ഗ്രൂപ്പും (Load & Save Sections) --- */
+.fm-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex: 1; /* ഉള്ള സ്ഥലം വീതിച്ചെടുക്കാൻ */
+    min-width: 280px; /* വലിപ്പം തീരെ കുറയാതിരിക്കാൻ */
+}
+
+/* --- Input & Select Boxes --- */
+.fm-input {
+    flex: 1; /* കിട്ടാവുന്ന സ്ഥലം മുഴുവൻ എടുക്കാൻ */
+    height: 38px; /* വലിപ്പം കൂട്ടി */
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    font-size: 13px;
+    width: 100%; /* മൊബൈലിൽ ഫുൾ വീതി */
+}
+
+/* --- ബട്ടണുകളുടെ ഗ്രൂപ്പ് --- */
+.fm-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+/* --- ബട്ടണുകളുടെ പൊതുവായ സ്റ്റൈൽ --- */
+.fm-buttons button, .btn-import {
+    height: 38px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* --- കളറുകൾ --- */
+.btn-load { background: #28a745; }
+.btn-del { background: #dc3545; }
+.btn-json { background: #007bff; }
+.btn-import { background: #6c757d; margin: 0; }
+
+/* --- നടുക്കത്തെ വര (Desktop only) --- */
+.fm-separator {
+    width: 1px;
+    height: 30px;
+    background: #dee2e6;
+    margin: 0 5px;
+}
+
+/* --- Hover Effects --- */
+.fm-buttons button:hover, .btn-import:hover { opacity: 0.9; }
+.fm-buttons button:active { transform: scale(0.96); }
+
+
+/* --- MOBILE VIEW (ഇതാണ് മൊബൈലിലെ മാജിക്) --- */
+@media (max-width: 768px) {
+    .file-manager-container {
+        flex-direction: column; /* താഴെ താഴെ വരാൻ */
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .fm-separator { display: none; } /* മൊബൈലിൽ വര വേണ്ട */
+
+    .fm-group {
+        width: 100%; /* ഫുൾ വീതി */
+        flex-direction: column; /* ഇൻപുട്ട് മുകളിലും ബട്ടൺ താഴെയും */
+        align-items: stretch; /* വശങ്ങളിലേക്ക് വലിച്ചു നീട്ടാൻ */
+    }
+
+    .fm-buttons {
+        display: flex;
+        width: 100%;
+    }
+
+    /* ബട്ടണുകൾക്ക് തുല്യ വലിപ്പം നൽകാൻ */
+    .fm-buttons button, .btn-import {
+        flex: 1; /* ഉള്ള സ്ഥലം പകുതി വെച്ച് എടുക്കും */
+        height: 42px; /* വിരൽ തൊടാൻ എളുപ്പത്തിന് ഉയരം കൂട്ടി */
+        font-size: 14px;
+    }
+}
+
+</style>
 </head>
 <body>
 
@@ -748,29 +852,32 @@ td {
                    style="width: 100%; font-weight: bold; border: 2px solid #27ae60; border-radius: 4px; box-sizing: border-box; padding: 5px 8px; height: 35px; font-size: 14px; color: #27ae60;">
         </div>
     </div>
+<div class="file-manager-container">
+    
+    <div class="fm-group load-group">
+        <select id="savedIndentsList" class="fm-input">
+            <option value="">-- Select a saved indent --</option>
+        </select>
+        <div class="fm-buttons">
+            <button onclick="loadSelectedIndent()" class="btn-load">LOAD</button>
+            <button onclick="deleteSelectedIndent()" class="btn-del">DEL</button>
+        </div>
+    </div>
 
-    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6; font-size: 12px; box-sizing: border-box; width: 100%;">
-        <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
-            
-            <select id="savedIndentsList" style="flex: 2; height: 32px; padding: 4px; border-radius: 4px; border: 1px solid #ced4da; min-width: 0;">
-                <option value="">-- Select a saved indent --</option>
-            </select>
-            
-            <button onclick="loadSelectedIndent()" style="background: #28a745; color: white; border: none; padding: 0 12px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;">LOAD</button>
-            <button onclick="deleteSelectedIndent()" style="background: #dc3545; color: white; border: none; padding: 0 12px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;">DEL</button>
+    <div class="fm-separator"></div>
 
-            <div style="border-left: 2px solid #dee2e6; height: 22px; margin: 0 5px;"></div>
-
-            <input type="text" id="newIndentName" placeholder="File Name" style="flex: 1.5; height: 32px; padding: 4px 8px; border-radius: 4px; border: 1px solid #ced4da; box-sizing: border-box; min-width: 0;">
-            
-            <button onclick="saveNewIndent()" style="background: #007bff; color: white; border: none; padding: 0 15px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;">JSON ↓</button>
-
-            <label for="importJsonFile" style="background: #6c757d; color: white; padding: 0 12px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 10px; display: flex; align-items: center; justify-content: center; margin: 0; white-space: nowrap;">
+    <div class="fm-group save-group">
+        <input type="text" id="newIndentName" placeholder="File Name" class="fm-input">
+        <div class="fm-buttons">
+            <button onclick="saveNewIndent()" class="btn-json">JSON ↓</button>
+            <label for="importJsonFile" class="btn-import">
                 IMPORT 📂
             </label>
             <input type="file" id="importJsonFile" accept=".json" style="display: none;" onchange="importJsonData(this)">
         </div>
     </div>
+
+</div>
 <div class="search-container">
     
     <div class="search-box-wrapper">
