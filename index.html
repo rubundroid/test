@@ -233,46 +233,56 @@ td {
 .row-cost { font-weight: bold; color: #2c3e50; }
 
 
-/* --- 2. മൊബൈൽ സ്ക്രീൻ ക്രമീകരണങ്ങൾ (ഇതാണ് ആ സൂത്രം!) --- */
+/* --- 2. മൊബൈൽ സ്ക്രീൻ ക്രമീകരണങ്ങൾ (New Updated Code) --- */
 @media (max-width: 768px) {
-    
-    /* പാഡിംഗ് കുറയ്ക്കുന്നു */
-    thead th, td {
-        padding: 8px 4px;   /* സ്ഥലം ലാഭിക്കാൻ */
-        font-size: 12px;    /* അക്ഷര വലിപ്പം കുറച്ചു */
-    }
 
-    /* SL No (ആദ്യത്തെ കോളം) മൊബൈലിൽ വേണ്ട, ഒളിപ്പിക്കുന്നു */
+    /* 1. SL No (Column 1) ഒളിപ്പിക്കുന്നു */
     thead th:nth-child(1), 
     tbody td:nth-child(1) {
         display: none; 
     }
 
-    /* മരുന്നിന്റെ പേര് (രണ്ടാമത്തെ കോളം) പൊട്ടിപ്പോകാതെ മടങ്ങി വരാൻ */
+    /* 2. മരുന്നിന്റെ പേര് (Column 2) - ഇതാണ് പ്രധാനം */
+    thead th:nth-child(2),
     tbody td:nth-child(2) {
-        white-space: normal; /* വരി മടങ്ങി താഴെ വരും */
-        max-width: 120px;    /* പേരിന് കൂടുതൽ സ്ഥലം */
+        width: auto;  /* ബാക്കിയുള്ള സ്ഥലം മുഴുവൻ എടുക്കാൻ */
+        white-space: normal; /* വരി മടങ്ങി വരാൻ */
+        word-wrap: break-word; /* നീളമുള്ള വാക്കുകൾ പൊട്ടി താഴെ വരാൻ */
+        max-width: 0; /* ടേബിൾ സ്ക്രീനിന് പുറത്തു പോകാതിരിക്കാൻ ഇത് സഹായിക്കും */
     }
 
-    /* ഇൻപുട്ട് ബോക്സ് ചെറുതാക്കുന്നു */
+    /* 3. Qty, Rate, Cost (Columns 3, 4, 5) - ഇവയെ ഒതുക്കി നിർത്താൻ */
+    thead th:nth-child(3), tbody td:nth-child(3),
+    thead th:nth-child(4), tbody td:nth-child(4),
+    thead th:nth-child(5), tbody td:nth-child(5)
+    {
+        width: 1%; /* ഉള്ളടക്കത്തിന് ആവശ്യമുള്ള വീതി മാത്രം എടുക്കാൻ */
+        white-space: nowrap; /* ഇവ പൊട്ടി താഴെ വരാതിരിക്കാൻ */
+    }
+
+    /* 4. പാഡിംഗ് അല്പം കുറയ്ക്കുന്നു */
+    thead th, td {
+        padding: 8px 3px; 
+        font-size: 12px;
+    }
+
+    /* 5. ഇൻപുട്ട് ബോക്സ് */
     .qty-input {
-        width: 50px;    /* 80px ൽ നിന്ന് 50px ആക്കി */
-        padding: 5px;
-        font-size: 14px;
+        width: 45px; 
+        padding: 5px 2px;
+        font-size: 13px;
     }
     
-    /* Rate ഉം Cost ഉം വലത്തോട്ട് ചേർന്നു നിൽക്കാൻ */
-    thead th:nth-last-child(1),
-    thead th:nth-last-child(2),
-    tbody td:nth-last-child(1),
-    tbody td:nth-last-child(2) {
+    /* 6. അലൈൻമെന്റ് (Rate & Cost Right Align) */
+    thead th:nth-last-child(1), tbody td:nth-last-child(1),
+    thead th:nth-last-child(2), tbody td:nth-last-child(2) {
         text-align: right;
     }
 }
 
 
 #categoryMenu {
-  display: none;
+    display: none;
 }
 
 /* --- 1. പൊതുവായ സ്റ്റൈൽ (Desktop & Mobile) --- */
@@ -3460,5 +3470,4 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
-
 
