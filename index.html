@@ -770,6 +770,7 @@ td {
 /* Button Colors */
 .btn-load { background-color: #27ae60; } /* Green */
 .btn-del { background-color: #c0392b; }  /* Red */
+.btn-rct { background-color: #b6c02b; }  /* gol */
 .btn-json { background-color: #2980b9; } /* Blue */
 .btn-import { background-color: #7f8c8d; margin-bottom: 0; } /* Grey */
 
@@ -997,6 +998,7 @@ td {
             </select>
             <button onclick="loadSelectedIndent()" class="btn-action btn-load">LOAD</button>
             <button onclick="deleteSelectedIndent()" class="btn-action btn-del">DEL</button>
+            <button onclick="resetForm()" class="btn-action btn-rct">RESET</button>
         </div>
     </div>
 
@@ -1032,18 +1034,15 @@ td {
 
 </div>
 <div class="summary-buttons" style="max-width: 1200px; margin-top: 15px;">
-    <div class="info-card btn-total">
-        <span class="card-label">Total</span>
-        <span class="card-value">₹ <span id="display-total">0.00</span></span>
-    </div>
-    <div class="info-card btn-balance">
-        <span class="card-label">Balance</span>
-        <span class="card-value">₹ <span id="display-balance">0.00</span></span>
-    </div>
+
+
+    <button class="info-card btn-pdf" style="background: #8e44ad; cursor:pointer;" onclick="downloadSplitPDF()">SAVE ↓ SPLIT PDF (KC/Prep)</button>
+
+    <button class="info-card" style="background: #2980b9; cursor:pointer;" onclick="downloadCombinedPDF()">SAVE ↓ COMBINED PDF</button>
 
 <button class="info-card" style="background: #16a085; cursor:pointer;" onclick="autoAdjustBudget()">AUTO FILL</button>
 
-    <button id="view-btn" class="info-card" style="background-color: #f39c12; border:none; cursor:pointer;" onclick="toggleView()">SHOW SELECTED</button>
+<button id="view-btn" class="info-card" style="background-color: #f39c12; border:none; cursor:pointer;" onclick="toggleView()">SHOW SELECTED</button>
 
 
     
@@ -1068,14 +1067,18 @@ td {
 </div>
 </div>
 <div style="position: relative; flex: 1; display: flex;">
-    <button class="info-card btn-pdf" style="background: #8e44ad; cursor:pointer;" onclick="downloadSplitPDF()">SAVE ↓ SPLIT PDF (KC/Prep)</button>
+    <div class="info-card btn-total">
+        <span class="card-label">Total</span>
+        <span class="card-value">₹ <span id="display-total">0.00</span></span>
+    </div>
+    </div>
+<div style="position: relative; flex: 1; display: flex;">
+    <div class="info-card btn-balance">
+        <span class="card-label">Balance</span>
+        <span class="card-value">₹ <span id="display-balance">0.00</span></span>
+    </div>
+    </div>
 </div>
-    <button class="info-card" style="background: #2980b9; cursor:pointer;" onclick="downloadCombinedPDF()">SAVE ↓ COMBINED PDF</button>
-
-     <button class="info-card" style="background-color: #e74c3c; cursor:pointer;" onclick="resetForm()">RESET</button>
-</div>
-</div>
-
 <div class="table-container">
     <table id="medicineTable">
         <thead>
