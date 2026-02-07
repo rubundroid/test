@@ -258,60 +258,77 @@ td {
 .row-cost { font-weight: bold; color: #2c3e50; }
 
 
-/* --- 2. മൊബൈൽ സ്ക്രീൻ ക്രമീകരണങ്ങൾ (New Updated Code) --- */
 @media (max-width: 768px) {
 
-    /* 1. SL No (Column 1) ഒളിപ്പിക്കുന്നു */
+    /* 1. TABLE CONTAINER: മുകളിലെ ബോക്സുകളുടെ അതേ മാർജിൻ നൽകുന്നു */
+    .table-responsive, 
+    .table-container { /* നിങ്ങളുടെ ടേബിൾ കിടക്കുന്ന div-ന്റെ ക്ലാസ് */
+        width: auto !important;
+        margin-left: 20px !important;  /* ഇടതുവശത്ത് 20px */
+        margin-right: 20px !important; /* വലതുവശത്ത് 20px */
+        overflow-x: hidden; /* സൈഡ് സ്ക്രോൾ വരാതിരിക്കാൻ */
+    }
+
+    /* 2. FONT STYLING: ബോൾഡ് മാറ്റി സാധാരണ ഫോണ്ട് ആക്കുന്നു */
+    table {
+        font-size: 13px; /* ഫോണ്ട് ഒരല്പം ചെറുതാക്കാം */
+    }
+
+    tbody td {
+        font-weight: normal !important; /* ബോഡിയിലെ അക്ഷരങ്ങൾ നോർമൽ */
+        padding: 8px 5px !important;    /* സെല്ലുകൾക്കുള്ളിലെ സ്ഥലം അഡ്ജസ്റ്റ് ചെയ്യാൻ */
+        vertical-align: middle;         /* വരിയുടെ നടുക്കായി ടെക്സ്റ്റ് വരാൻ */
+        color: #333;                    /* കറുപ്പ് നിറം (കാണാൻ എളുപ്പം) */
+    }
+
+    thead th {
+        font-weight: 600; /* ഹെഡർ മാത്രം അല്പം ബോൾഡ് ആയി ഇരിക്കട്ടെ */
+        font-size: 12px;
+        padding: 8px 5px !important;
+    }
+
+    /* 3. COLUMN SETTINGS (നിങ്ങൾ തന്നത് തന്നെ) */
+    
+    /* Hide SL No */
     thead th:nth-child(1), 
     tbody td:nth-child(1) {
         display: none; 
     }
 
-    /* 2. മരുന്നിന്റെ പേര് (Column 2) - ഇതാണ് പ്രധാനം */
+    /* Medicine Name (Column 2) - ബാക്കി സ്ഥലം മുഴുവൻ എടുക്കാൻ */
     thead th:nth-child(2),
     tbody td:nth-child(2) {
-        width: auto;  /* ബാക്കിയുള്ള സ്ഥലം മുഴുവൻ എടുക്കാൻ */
-        white-space: normal; /* വരി മടങ്ങി വരാൻ */
-        word-wrap: break-word; /* നീളമുള്ള വാക്കുകൾ പൊട്ടി താഴെ വരാൻ */
-        max-width: 0; /* ടേബിൾ സ്ക്രീനിന് പുറത്തു പോകാതിരിക്കാൻ ഇത് സഹായിക്കും */
+        width: auto; 
+        white-space: normal;  /* ടെക്സ്റ്റ് മടങ്ങി വരാൻ */
+        word-wrap: break-word; 
+        text-align: left;     /* പേര് ഇടതുവശത്തേക്ക് ചേർന്നു നിൽക്കാൻ */
     }
 
-    /* 3. Qty, Rate, Cost (Columns 3, 4, 5) - ഇവയെ ഒതുക്കി നിർത്താൻ */
+    /* Qty, Rate, Cost - വലിപ്പം ചുരുക്കാൻ */
     thead th:nth-child(3), tbody td:nth-child(3),
     thead th:nth-child(4), tbody td:nth-child(4),
     thead th:nth-child(5), tbody td:nth-child(5)
     {
-        width: 1%; /* ഉള്ളടക്കത്തിന് ആവശ്യമുള്ള വീതി മാത്രം എടുക്കാൻ */
-        white-space: nowrap; /* ഇവ പൊട്ടി താഴെ വരാതിരിക്കാൻ */
+        width: 1%;           /* കണ്ടന്റ് ഉള്ള അത്രയും സ്ഥലം മതി */
+        white-space: nowrap; /* പൊട്ടി താഴെ വരരുത് */
     }
 
-    tbody td {
-        font-weight: normal !important; /* ഇതാണ് ബോൾഡ് മാറ്റുന്ന കോഡ് */
-        color: #000; /* നല്ല കറുപ്പ് നിറം നൽകുന്നു, വായിക്കാൻ എളുപ്പത്തിന് */
-    }
-    
-    /* ഹെഡർ മാത്രം അല്പം ബോൾഡ് ആയി നിൽക്കട്ടെ */
-    thead th {
-        font-weight: 600; 
-        font-size: 11px;
-    }
-
-    /* 5. Input Box */
-    .qty-input {
-        width: 40px; /* ബോക്സ് വലിപ്പം 45-ൽ നിന്ന് 40 ആക്കി */
-        padding: 4px 2px;
-        font-size: 12px;
-        text-align: center;
-        border: 1px solid #999; /* ബോർഡർ വ്യക്തമായി കാണാൻ */
-    }
-    
-    /* 6. അലൈൻമെന്റ് (Rate & Cost Right Align) */
-    thead th:nth-last-child(1), tbody td:nth-last-child(1),
-    thead th:nth-last-child(2), tbody td:nth-last-child(2) {
+    /* Numbers (Rate & Cost) Right Align */
+    tbody td:nth-last-child(1),
+    tbody td:nth-last-child(2) {
         text-align: right;
     }
-}
 
+    /* Input Box Styling */
+    .qty-input {
+        width: 40px;      /* വലിപ്പം കുറച്ചു */
+        padding: 4px;
+        font-size: 13px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+}
 
 #categoryMenu {
     display: none;
@@ -3570,4 +3587,3 @@ function silentFilter(typeName) {
 </script>
 </body>
 </html>
-
