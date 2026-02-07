@@ -285,17 +285,24 @@ td {
         white-space: nowrap; /* ഇവ പൊട്ടി താഴെ വരാതിരിക്കാൻ */
     }
 
-    /* 4. പാഡിംഗ് അല്പം കുറയ്ക്കുന്നു */
-    thead th, td {
-        padding: 8px 3px; 
-        font-size: 12px;
+    tbody td {
+        font-weight: normal !important; /* ഇതാണ് ബോൾഡ് മാറ്റുന്ന കോഡ് */
+        color: #000; /* നല്ല കറുപ്പ് നിറം നൽകുന്നു, വായിക്കാൻ എളുപ്പത്തിന് */
+    }
+    
+    /* ഹെഡർ മാത്രം അല്പം ബോൾഡ് ആയി നിൽക്കട്ടെ */
+    thead th {
+        font-weight: 600; 
+        font-size: 11px;
     }
 
-    /* 5. ഇൻപുട്ട് ബോക്സ് */
+    /* 5. Input Box */
     .qty-input {
-        width: 45px; 
-        padding: 5px 2px;
-        font-size: 13px;
+        width: 40px; /* ബോക്സ് വലിപ്പം 45-ൽ നിന്ന് 40 ആക്കി */
+        padding: 4px 2px;
+        font-size: 12px;
+        text-align: center;
+        border: 1px solid #999; /* ബോർഡർ വ്യക്തമായി കാണാൻ */
     }
     
     /* 6. അലൈൻമെന്റ് (Rate & Cost Right Align) */
