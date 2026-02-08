@@ -501,127 +501,126 @@ td {
 
 /* --- WELCOME SCREEN & HELP MODAL (Super Mobile Look) --- */
 
-/* 1. Main Background with Dark Gradient */
+/* --- COMPACT WELCOME SCREEN STYLE --- */
+
+/* 1. Main Container */
 #welcome-screen {
     position: fixed;
     top: 0; left: 0; 
     width: 100%; height: 100%;
-    /* പുതിയ ഡാർക്ക് തീം ബാക്ഗ്രൗണ്ട് */
     background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
     display: flex; 
     justify-content: center; 
     align-items: center; 
-    overflow-y: auto;
-    padding: 15px; 
+    padding: 10px; /* സൈഡ് പാഡിംഗ് കുറച്ചു */
     z-index: 9999;
     box-sizing: border-box;
-    backdrop-filter: blur(5px); /* പിന്നിലെ കാഴ്ച മങ്ങിക്കാൻ */
+    backdrop-filter: blur(5px);
 }
 
-/* 2. Welcome Card (Glass Effect) */
+/* 2. Compact Card */
 .welcome-card {
-    background: rgba(255, 255, 255, 0.95); /* ഗ്ലാസ് പോലെ */
-    padding: 30px 20px;
-    border-radius: 24px; 
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5); /* നല്ല 3D നിഴൽ */
-    max-width: 500px;
+    background: rgba(255, 255, 255, 0.96);
+    /* പാഡിംഗ് 30-ല്‍ നിന്ന് 20 ആക്കി കുറച്ചു */
+    padding: 20px; 
+    border-radius: 20px; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    max-width: 450px;
     width: 100%;
-    max-height: 90vh; 
-    overflow-y: auto;
+    max-height: 95vh; /* സ്ക്രീനിന്റെ 95% വരെ ഉയരം ആകാം */
+    overflow-y: auto; /* ആവശ്യം വന്നാല്‍ മാത്രം സ്ക്രോള്‍ */
     text-align: center;
-    position: relative;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Scrollbar Styling */
-.welcome-card::-webkit-scrollbar { width: 4px; }
-.welcome-card::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+/* Scrollbar ഒളിപ്പിക്കുന്നു (ഭംഗിക്ക്) */
+.welcome-card::-webkit-scrollbar { width: 0px; background: transparent; }
 
-/* 3. Typography */
+/* 3. Headers (സ്ഥലം ലാഭിക്കാൻ) */
 .welcome-card h1 { 
     color: #1e3c72; 
-    margin-bottom: 5px; 
-    font-size: 28px; 
+    margin: 0 0 2px 0; /* താഴെയുള്ള ഗ്യാപ്പ് കുറച്ചു */
+    font-size: 24px; /* ഫോണ്ട് അല്പം കുറച്ചു */
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
-.developer-info { color: #555; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+.developer-info { 
+    color: #555; font-size: 12px; margin-bottom: 12px; line-height: 1.3; 
+}
 
-/* 4. Alert Box (Update Note) */
+/* 4. Alert Box */
 .update-note {
     background: #fff8e1; color: #856404;
-    padding: 12px; border-radius: 12px;
-    margin-bottom: 20px; font-size: 13px; 
-    border-left: 4px solid #ffc107; /* സൈഡിൽ മഞ്ഞ വര */
+    padding: 8px 12px; /* പാഡിംഗ് കുറച്ചു */
+    border-radius: 8px;
+    margin-bottom: 12px; /* താഴെയുള്ള ഗ്യാപ്പ് കുറച്ചു */
+    font-size: 12px; 
+    border-left: 4px solid #ffc107;
     text-align: left;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* 5. Short Help Guide */
+/* 5. Help Content (Compact Mode) */
 .help-content { 
     text-align: left; 
     background: #f1f5f9; 
-    padding: 15px; 
-    border-radius: 15px; 
-    margin-bottom: 20px; 
+    padding: 12px; /* പാഡിംഗ് കുറച്ചു */
+    border-radius: 12px; 
+    margin-bottom: 12px; /* ബട്ടണുമായിട്ടുള്ള അകലം കുറച്ചു */
 }
 .help-content h3 { 
-    color: #2c3e50; margin-top: 0; font-size: 16px;
-    border-bottom: 2px solid #3498db; display: inline-block; 
+    color: #2c3e50; margin: 0 0 5px 0; font-size: 14px;
+    border-bottom: 1px solid #3498db; display: inline-block; 
 }
-.help-content ul { padding-left: 20px; color: #444; font-size: 13px; line-height: 1.6; }
-
-/* 6. Main Buttons (Enter & Help) */
-.enter-btn, .help-btn, .help-theme-btn {
-    width: 100%; /* മൊബൈലിൽ ഫുൾ വീതി */
-    padding: 15px; 
-    font-size: 16px; 
-    font-weight: bold;
-    border-radius: 50px; 
-    cursor: pointer;
-    border: none;
-    margin-bottom: 10px;
-    transition: transform 0.2s;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.help-content ul { 
+    padding-left: 15px; margin: 0;
+    color: #444; font-size: 12px; line-height: 1.5; /* ലൈനുകൾ അടുപ്പിച്ചു */
 }
 
-.enter-btn {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); /* പച്ച ഗ്രേഡിയന്റ് */
-    color: white;
-}
-.help-theme-btn {
-    background: white; color: #333; border: 2px solid #eee;
+/* 6. Buttons (Closer Together) */
+.action-buttons {
+    display: flex; flex-direction: column; 
+    gap: 8px; /* ബട്ടണുകൾ തമ്മിലുള്ള അകലം കുറച്ചു */
+    margin-top: 5px;
 }
 
-.enter-btn:active, .help-theme-btn:active { transform: scale(0.96); }
+.enter-btn, .help-theme-btn {
+    width: 100%; padding: 12px; /* ബട്ടൺ വലിപ്പം ഒതുക്കി */
+    font-size: 15px; font-weight: bold;
+    border-radius: 50px; cursor: pointer; border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.enter-btn { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+.help-theme-btn { background: white; color: #333; border: 1px solid #ddd; }
 
-/* 7. Footer & WhatsApp Contacts (നിങ്ങൾ ചോദിച്ച പ്രധാനം ഭാഗം) */
+/* 7. Footer & Contacts (Compact Grid) */
 .footer-contact { 
-    margin-top: 20px; font-size: 12px; color: #777; 
-    border-top: 1px solid #eee; padding-top: 15px; 
+    margin-top: 12px; /* ഫൂട്ടർ മുകളിലേക്ക് അടുപ്പിച്ചു */
+    font-size: 11px; color: #777; 
+    border-top: 1px solid #eee; padding-top: 10px; 
 }
 
-/* മൊബൈലിൽ കോണ്ടാക്റ്റുകൾ ഗ്രിഡ് ആയി വരാൻ */
 .contact-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* ഓട്ടോമാറ്റിക് അഡ്ജസ്റ്റ് */
-    gap: 10px;
-    margin-top: 15px;
+    /* രണ്ട് കോളമായി തിരിക്കുന്നു (കൂടുതൽ ഒതുങ്ങാൻ) */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 8px;
+    margin-top: 8px;
+}
+/* മൂന്നാമത്തെ ആളെ നടുക്ക് കൊണ്ടുവരാൻ */
+.contact-grid > a:last-child {
+   grid-column: span 2; /* ബാക്കിയുള്ള ആൾ വരി ഫുൾ എടുക്കും */
+   width: 60%; /* പക്ഷെ നീളം കുറച്ച് */
+   margin: 0 auto; /* നടുക്ക് നിൽക്കും */
 }
 
-/* WhatsApp Link Styles (നിങ്ങളുടെ പഴയ സ്റ്റൈൽ + പുതിയ ലുക്ക്) */
 .wa-chat-link {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
     background: #ffffff; color: #25d366; text-decoration: none;
-    padding: 10px; border-radius: 12px;
+    padding: 6px 10px; /* ബോക്സ് ചെറുതാക്കി */
+    border-radius: 8px;
     border: 1px solid #dcfce7;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-
 .wa-chat-link:hover, .wa-chat-link:active {
     background: #25d366; color: white;
     transform: translateY(-2px);
@@ -632,10 +631,9 @@ td {
 .wa-chat-link:hover .contact-number, 
 .wa-chat-link:active .contact-number { color: #e8f5e9; }
 
-.contact-info { display: flex; flex-direction: column; text-align: left; line-height: 1.2; }
-.contact-name { font-weight: bold; font-size: 13px; }
-.contact-number { font-size: 11px; color: #666; margin-top: 2px; }
-
+.contact-info { text-align: left; line-height: 1.1; }
+.contact-name { font-weight: bold; font-size: 12px; }
+.contact-number { font-size: 10px; color: #666; }
 
 /* --- 8. HELP MODAL STYLES (Detailed Popup) --- */
 .modal-overlay {
