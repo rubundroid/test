@@ -499,161 +499,191 @@ td {
     }
 }
 
+/* --- WELCOME SCREEN & HELP MODAL (Super Mobile Look) --- */
+
+/* 1. Main Background with Dark Gradient */
 #welcome-screen {
     position: fixed;
     top: 0; left: 0; 
     width: 100%; height: 100%;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    /* പുതിയ ഡാർക്ക് തീം ബാക്ഗ്രൗണ്ട് */
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
     display: flex; 
     justify-content: center; 
     align-items: center; 
     overflow-y: auto;
-    padding: 20px;
+    padding: 15px; 
     z-index: 9999;
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    backdrop-filter: blur(5px); /* പിന്നിലെ കാഴ്ച മങ്ങിക്കാൻ */
 }
 
+/* 2. Welcome Card (Glass Effect) */
 .welcome-card {
-    background: white;
-    padding: 30px;
-    border-radius: 25px; 
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-    max-width: 550px;
+    background: rgba(255, 255, 255, 0.95); /* ഗ്ലാസ് പോലെ */
+    padding: 30px 20px;
+    border-radius: 24px; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); /* നല്ല 3D നിഴൽ */
+    max-width: 500px;
     width: 100%;
     max-height: 90vh; 
     overflow-y: auto;
     text-align: center;
     position: relative;
-    animation: fadeIn 0.8s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* Scrollbar Styling */
+.welcome-card::-webkit-scrollbar { width: 4px; }
+.welcome-card::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 
-.welcome-card::-webkit-scrollbar {
-    width: 6px;
+/* 3. Typography */
+.welcome-card h1 { 
+    color: #1e3c72; 
+    margin-bottom: 5px; 
+    font-size: 28px; 
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
-.welcome-card::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
-}
 
-.welcome-card h1 { color: #1e3c72; margin-bottom: 5px; font-size: 32px; letter-spacing: 2px; }
+.developer-info { color: #555; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
 
-.developer-info { color: #555; font-size: 16px; margin-bottom: 20px; line-height: 1.5; }
-
+/* 4. Alert Box (Update Note) */
 .update-note {
-    background: #fff3cd; color: #856404;
-    padding: 10px; border-radius: 8px;
-    margin-bottom: 20px; font-size: 14px; border: 1px solid #ffeeba;
-}
-
-.help-content { text-align: left; background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 25px; }
-.help-content h3 { color: #2c3e50; margin-top: 0; border-bottom: 2px solid #3498db; display: inline-block; }
-.help-content ul { padding-left: 20px; color: #444; font-size: 14px; line-height: 1.8; }
-
-.enter-btn {
-    background: #27ae60; color: white; border: none;
-    padding: 15px 40px; font-size: 18px; font-weight: bold;
-    border-radius: 50px; cursor: pointer;
-    transition: transform 0.2s, background 0.3s;
-    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
-}
-
-.enter-btn:hover { background: #2ecc71; transform: scale(1.05); }
-.help-btn:hover { background: #2ecc71; transform: scale(1.05); }
-.footer-contact { margin-top: 25px; font-size: 13px; color: #777; border-top: 1px solid #eee; padding-top: 15px; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-
-
-.help-btn {
-    background: #27ae60; color: white; border: none;
-    padding: 15px 40px; font-size: 18px; font-weight: bold;
-    border-radius: 50px; cursor: pointer;
-    transition: transform 0.2s, background 0.3s;
-    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
-}
-
-
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
-    display: none; 
-    justify-content: center; align-items: center;
-    z-index: 10000;
-}
-
-.modal-content {
-    background: white;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    padding: 20px;
-    border-radius: 15px;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-scroll-area {
-    overflow-y: auto;
-    padding-right: 10px;
+    background: #fff8e1; color: #856404;
+    padding: 12px; border-radius: 12px;
+    margin-bottom: 20px; font-size: 13px; 
+    border-left: 4px solid #ffc107; /* സൈഡിൽ മഞ്ഞ വര */
     text-align: left;
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-.close-modal {
-    position: absolute;
-    right: 15px; top: 10px;
-    font-size: 28px; font-weight: bold;
-    cursor: pointer; color: #777;
-}
-
-.wa-chat-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #ffffff;
-    color: #25d366;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 12px;
-    border: 1px solid #25d366;
-    transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.wa-chat-link:hover {
-    background: #25d366;
+/* 5. Short Help Guide */
+.help-content { 
+    text-align: left; 
+    background: #f1f5f9; 
+    padding: 15px; 
+    border-radius: 15px; 
+    margin-bottom: 20px; 
+}
+.help-content h3 { 
+    color: #2c3e50; margin-top: 0; font-size: 16px;
+    border-bottom: 2px solid #3498db; display: inline-block; 
+}
+.help-content ul { padding-left: 20px; color: #444; font-size: 13px; line-height: 1.6; }
+
+/* 6. Main Buttons (Enter & Help) */
+.enter-btn, .help-btn, .help-theme-btn {
+    width: 100%; /* മൊബൈലിൽ ഫുൾ വീതി */
+    padding: 15px; 
+    font-size: 16px; 
+    font-weight: bold;
+    border-radius: 50px; 
+    cursor: pointer;
+    border: none;
+    margin-bottom: 10px;
+    transition: transform 0.2s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.enter-btn {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); /* പച്ച ഗ്രേഡിയന്റ് */
     color: white;
+}
+.help-theme-btn {
+    background: white; color: #333; border: 2px solid #eee;
+}
+
+.enter-btn:active, .help-theme-btn:active { transform: scale(0.96); }
+
+/* 7. Footer & WhatsApp Contacts (നിങ്ങൾ ചോദിച്ച പ്രധാനം ഭാഗം) */
+.footer-contact { 
+    margin-top: 20px; font-size: 12px; color: #777; 
+    border-top: 1px solid #eee; padding-top: 15px; 
+}
+
+/* മൊബൈലിൽ കോണ്ടാക്റ്റുകൾ ഗ്രിഡ് ആയി വരാൻ */
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* ഓട്ടോമാറ്റിക് അഡ്ജസ്റ്റ് */
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* WhatsApp Link Styles (നിങ്ങളുടെ പഴയ സ്റ്റൈൽ + പുതിയ ലുക്ക്) */
+.wa-chat-link {
+    display: flex; align-items: center; gap: 10px;
+    background: #ffffff; color: #25d366; text-decoration: none;
+    padding: 10px; border-radius: 12px;
+    border: 1px solid #dcfce7;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.wa-chat-link:hover, .wa-chat-link:active {
+    background: #25d366; color: white;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
 }
 
-.wa-chat-link:hover .contact-number {
-    color: #e8f5e9;
+/* Hover ചെയ്യുമ്പോൾ നമ്പറിന്റെ കളർ മാറാൻ */
+.wa-chat-link:hover .contact-number, 
+.wa-chat-link:active .contact-number { color: #e8f5e9; }
+
+.contact-info { display: flex; flex-direction: column; text-align: left; line-height: 1.2; }
+.contact-name { font-weight: bold; font-size: 13px; }
+.contact-number { font-size: 11px; color: #666; margin-top: 2px; }
+
+
+/* --- 8. HELP MODAL STYLES (Detailed Popup) --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); /* കറുപ്പ് ഷേഡ് */
+    display: none; justify-content: center; align-items: center;
+    z-index: 10000; padding: 20px; box-sizing: border-box;
+    backdrop-filter: blur(5px);
 }
 
-.contact-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    line-height: 1.2;
+.modal-content {
+    background: white; width: 100%; max-width: 500px;
+    max-height: 85vh; border-radius: 20px;
+    position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column;
+    animation: zoomIn 0.3s ease-out;
 }
 
-.contact-name {
-    font-weight: bold;
-    font-size: 14px;
+.close-modal {
+    position: absolute; right: 15px; top: 10px;
+    font-size: 30px; font-weight: bold; cursor: pointer; color: #e74c3c;
+    background: #fff; border-radius: 50%; padding: 0 8px; z-index: 10;
 }
 
-.contact-number {
-    font-size: 11px;
-    color: #666;
-    margin-top: 2px;
+.modal-scroll-area {
+    padding: 20px; overflow-y: auto; text-align: left;
+    font-size: 14px; line-height: 1.6; color: #333;
+}
+
+/* Animations */
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* --- MOBILE TWEAKS (ഇത് CSS-ന്റെ ഏറ്റവും താഴെ ഇടുക) --- */
+@media (max-width: 480px) {
+    .welcome-card, .modal-content {
+        padding: 20px 15px !important; /* മൊബൈലിൽ പാഡിംഗ് കുറയ്ക്കുന്നു, സ്ഥലം ലാഭിക്കാൻ */
+        width: 92% !important; /* സൈഡുകളിൽ വല്ലാതെ മുട്ടി നിൽക്കാതിരിക്കാൻ */
+    }
+
+    .welcome-card h1 {
+        font-size: 24px; /* മൊബൈലിൽ പേര് വല്ലാതെ വലുതാകാതിരിക്കാൻ */
+    }
+    
+    .app-btn {
+        padding: 14px; /* ബട്ടൺ മൊബൈലിൽ ഒതുങ്ങി നിൽക്കാൻ */
+        font-size: 15px;
+    }
 }
 
 #medicineTable thead th {
@@ -852,34 +882,26 @@ td {
         <h1>INDENT MAKER</h1>
         <p class="developer-info">Designed and Developed by <br> 
            <strong>Ramakrishnan K</strong>, Ayurveda Pharmacist, Malappuram</p>
-        
-        <div class="update-note">
+         <div class="update-note">
             ⚠️ ഇതിലെ ഔഷധങ്ങളുടെ വില <strong>07-11-2025</strong>-ലെ ഔഷധി GST ഉള്‍പ്പെടെയുള്ള നിരക്ക് പ്രകാരം ക്രമീകരിച്ചിട്ടുള്ളതാണ്.
         </div>
-
         <div class="help-content">
             <h3>ഉപയോഗക്രമം (Help Guide)</h3>
             <ul>
-                <li><strong>Step 1:</strong> Institution വിവരങ്ങളും ലഭ്യമായ ബജറ്റും (Total Budget) നൽകുക.</li>
+                <li><strong>Step 1:</strong> സ്ഥാപനവിവരങ്ങളും ബജറ്റും നൽകുക.</li>
                 <li><strong>Step 2:</strong> ആവശ്യമായ മരുന്നുകളുടെ എണ്ണം (Qty) രേഖപ്പെടുത്തുക.</li>
                 <li><strong>Step 3:</strong> 'AUTO FILL' ബട്ടൺ ഉപയോഗിച്ച് ബജറ്റ് തുകയിലേക്ക്‌ മരുന്നുകളുടെ എണ്ണം ക്രമീകരിക്കാം.</li>
-                <li><strong>Step 4:</strong> ആവശ്യമെങ്കിൽ 'JSON' ബട്ടൺ വഴി വിവരങ്ങൾ സൂക്ഷിക്കാം.</li>
-                <li><strong>Step 5:</strong> 'SAVE COMBINED PDF' അല്ലെങ്കിൽ 'SAVE SPLIT PDF' ബട്ടൺ വഴി ഇൻഡന്‍റ് ഡൗൺലോഡ് ചെയ്യാം.</li>
+                <li><strong>Step 4:</strong> 'SAVE COMBINED / SPLIT PDF' ബട്ടൺ വഴി ഇൻഡന്‍റ് ഡൗൺലോഡ് ചെയ്യാം.</li>
             </ul>
         </div>
-
-<div style="display: flex; flex-direction: column; gap: 12px; align-items: center; margin-top: 20px;">
-        <button class="enter-btn" onclick="enterApp()">ENTER INDENT MAKER</button>
-        <button class="enter-btn help-theme-btn" onclick="toggleHelp()">📖 HELP GUIDE (കൂടുതൽ അറിയാൻ)</button>
-    </div>
-
-
+<div class="action-buttons">
+    <button class="enter-btn" onclick="enterApp()">ENTER INDENT MAKER 🚀</button>
+    <button class="enter-btn help-theme-btn" onclick="toggleHelp()">📖 HELP GUIDE (കൂടുതൽ അറിയാൻ)</button>
+</div>
        <div class="footer-contact">
     Technical Assistance and Suggestions<br>
-    <div style="display: flex; gap: 20px; justify-content: center; margin-top: 15px; flex-wrap: wrap;">
-        
-
-
+    <div class="contact-grid">
+  
 <a href="https://wa.me/919605081081?text=Hi%20Ramakrishnan,%20I%20need%20help%20with%20Indent%20Maker" 
    target="_blank" class="wa-chat-link">
    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20" height="20" alt="WA"> 
@@ -904,8 +926,7 @@ td {
        <span class="contact-number">9946479273</span>
    </div>
 </a>
-
-    </div>
+</div>
 </div>
         </div>
     </div>
