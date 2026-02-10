@@ -1130,7 +1130,7 @@
             onclick="toggleCategoryMenu()">TYPE ▾</button>
         <div id="categoryMenu">
             <div class="cat-item" onclick="filterByCategory(0, 0, 'ALL')">ALL</div>
-            <div class="cat-item" onclick="filterByCategory(0, 0, 'ARISHTASAVAM')">ARISHTAS</div>
+            <div class="cat-item" onclick="filterByCategory(0, 0, 'ARISHTASAVAM')">ARISHTASAVAM</div>
             <div class="cat-item" onclick="filterByCategory(0, 0, 'BHASMAM')">BHASMAM</div>
             <div class="cat-item" onclick="filterByCategory(0, 0, 'CHOORNAM')">CHOORNAM</div>
             <div class="cat-item" onclick="filterByCategory(0, 0, 'GHRUTHAM')">GHRUTHAM</div>
@@ -2529,77 +2529,60 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
                 window.resolveCurrentPDF = null;
             }
         }
-        function toggleView() {
-            const mainBtn = document.getElementById("typeBtn");
-            if (mainBtn && mainBtn.innerText !== "TYPE ▾") {
-                mainBtn.innerText = "TYPE ▾";
-                mainBtn.style.backgroundColor = "#2c3e50";
-            }
-            const viewBtn = document.getElementById("view-btn");
-            const rows = document.querySelectorAll("#product-body tr");
-            const showingAll = viewBtn.innerText.includes("SHOW SELECTED");
-            let counter = 1;
-            if (showingAll) {
-                rows.forEach(row => {
-                    const qtyInput = row.querySelector(".qty-input");
-                    const qty = parseFloat(qtyInput.value) || 0;
-                    if (qty > 0) {
-                        row.style.display = "";
-                        row.cells[0].innerText = counter++;
-                        row.setAttribute('data-visible-type', 'true');
-                    } else {
-                        row.style.display = "none";
-                        row.setAttribute('data-visible-type', 'false');
-                    }
-                });
-                updateButtonUI(true);
-                if (typeof showSummaryGrid === "function") showSummaryGrid(() => { });
-            } else {
-                rows.forEach((row, index) => {
+function toggleView() {
+    // സമ്മറി കാണിച്ച് അതിൽ നിന്നുള്ള മറുപടി (mode) കാക്കുന്നു
+    showSummaryGrid((mode) => {
+        const rows = document.querySelectorAll("#product-body tr");
+        let counter = 1;
+
+        if (mode === 'SELECTED') {
+            // തിരഞ്ഞെടുത്തവ മാത്രം കാണിക്കാൻ
+            rows.forEach(row => {
+                const qtyInput = row.querySelector(".qty-input");
+                const qty = parseFloat(qtyInput.value) || 0;
+                
+                if (qty > 0) {
                     row.style.display = "";
-                    row.cells[0].innerText = index + 1;
-                    row.setAttribute('data-visible-type', 'true');
-                });
-                updateButtonUI(false);
-            }
+                    row.cells[0].innerText = counter++; 
+                    row.setAttribute('data-visible-type', 'true'); 
+                } else {
+                    row.style.display = "none";
+                    row.setAttribute('data-visible-type', 'false');
+                }
+            });
+            updateButtonUI(true);
+        } else {
+            // 'തിരുത്തുക' അമർത്തിയാൽ എല്ലാം പഴയപടി ആക്കാൻ (നിങ്ങളുടെ ഫങ്ക്ഷൻ വിളിക്കുന്നു)
+            filterByCategory(0, 0, 'ALL');
+            updateButtonUI(false);
         }
-        function updateButtonUI(isShowingSelected) {
-            const viewBtn = document.getElementById("view-btn");
-            if (isShowingSelected) {
-                viewBtn.innerText = "SHOW ALL";
-                viewBtn.style.backgroundColor = "#2ecc71";
-            } else {
-                viewBtn.innerText = "SHOW SELECTED";
-                viewBtn.style.backgroundColor = "#f39c12";
-            }
-        }
+    });
+}
+
+function updateButtonUI(isShowingSelected) {
+    const viewBtn = document.getElementById("view-btn");
+    if (!viewBtn) return;
+
+    if (isShowingSelected) {
+        viewBtn.innerText = "SHOW ALL";
+        viewBtn.style.backgroundColor = "#2ecc71"; // പച്ച നിറം
+    } else {
+        viewBtn.innerText = "SHOW SELECTED";
+        viewBtn.style.backgroundColor = "#f39c12"; // ഓറഞ്ച് നിറം
+    }
+}
         function showSummaryGrid(callback) {
             const rows = document.querySelectorAll("#product-body tr");
             let summary = {};
             let totalItems = 0;
             let grandTotal = 0;
-            const categories = [
-                { name: 'ARISHTAS', start: 1, end: 75 },
-                { name: 'BHASMAN', start: 76, end: 99 },
-                { name: 'CHOORNA', start: 100, end: 243 },
-                { name: 'GHRUTHA', start: 244, end: 309 },
-                { name: 'GULIKA', start: 310, end: 369 },
-                { name: 'KASHAYAM', start: 370, end: 417 },
-                { name: 'KC', start: 418, end: 544 },
-                { name: 'KSC', start: 545, end: 567 },
-                { name: 'LEHYAM', start: 568, end: 626 },
-                { name: 'OINTMENT', start: 627, end: 632 },
-                { name: 'RASAKRIY', start: 633, end: 634 },
-                { name: 'SYRUP', start: 635, end: 638 },
-                { name: 'THAILAM', start: 639, end: 922 }
-            ];
-            rows.forEach((row, index) => {
-                const slNo = index + 1;
+
+            rows.forEach((row) => {
+            
                 const qty = parseFloat(row.querySelector(".qty-input").value) || 0;
                 if (qty > 0) {
-                    let catObj = categories.find(c => slNo >= c.start && slNo <= c.end);
-                    let catName = catObj ? catObj.name : "OTHERS";
-                    const amount = parseFloat(row.cells[4].innerText) || 0;
+                    let catName = row.getAttribute('data-type') || "OTHERS";
+                    const amount = parseFloat(row.cells[4].innerText.replace(/,/g, '')) || 0;
                     if (!summary[catName]) {
                         summary[catName] = { count: 0, total: 0 };
                     }
@@ -2653,7 +2636,9 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
                 focusConfirm: false
             }).then((result) => {
                 if (result.isConfirmed) {
-                    callback();
+                 callback('SELECTED');
+        } else {
+            callback('ALL');
                 }
             });
         }
