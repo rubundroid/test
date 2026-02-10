@@ -2603,36 +2603,38 @@ function updateButtonUI(isShowingSelected) {
             if (totalItems === 0) {
                 return Swal.fire("അറിയിപ്പ്", "മരുന്നുകളൊന്നും തിരഞ്ഞെടുത്തിട്ടില്ല!", "info");
             }
-            let gridHtml = `
-        <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse: collapse; font-size: 14px; text-align: left; border: 1px solid #ddd;">
-                <thead>
-                    <tr style="background: #1e3c72; color: white;">
-                        <th style="padding: 10px; border: 1px solid #ddd;">Category</th>
-                        <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Items</th>
-                        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-            for (let cat in summary) {
-                gridHtml += `
+let gridHtml = `
+<div style="overflow-x:auto; padding: 2px; background: #fff; width: 100%; box-sizing: border-box;">
+    <table style="width:100%; border-collapse: collapse; font-size: 13px; text-align: left; border: 1px solid #ddd; margin: 0 auto;">
+        <thead>
+            <tr style="background: #1e3c72; color: white !important;">
+                <th style="padding: 10px 5px; border: 1px solid #ddd; display: table-cell !important; white-space: nowrap;">Category</th>
+                <th style="padding: 10px 5px; border: 1px solid #ddd; text-align: center; display: table-cell !important;">Items</th>
+                <th style="padding: 10px 5px; border: 1px solid #ddd; text-align: right; display: table-cell !important;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+for (let cat in summary) {
+    gridHtml += `
+    <tr>
+        <td style="padding: 8px 5px; border: 1px solid #ddd; font-weight: bold; display: table-cell !important;">${cat}</td>
+        <td style="padding: 8px 5px; border: 1px solid #ddd; text-align: center; display: table-cell !important;">${summary[cat].count}</td>
+        <td style="padding: 8px 5px; border: 1px solid #ddd; text-align: right; display: table-cell !important; white-space: nowrap;">₹${summary[cat].total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+    </tr>`;
+}
+
+gridHtml += `
+        </tbody>
+        <tfoot style="font-weight: bold; background: #f8f9fa;">
             <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${cat}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${summary[cat].count}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">₹${summary[cat].total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-            </tr>`;
-            }
-            gridHtml += `
-                </tbody>
-                <tfoot style="font-weight: bold; background: #f8f9fa;">
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #ddd;">GRAND TOTAL</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${totalItems}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>`;
+                <td style="padding: 10px 5px; border: 1px solid #ddd; display: table-cell !important;">GRAND TOTAL</td>
+                <td style="padding: 10px 5px; border: 1px solid #ddd; text-align: center; display: table-cell !important;">${totalItems}</td>
+                <td style="padding: 10px 5px; border: 1px solid #ddd; text-align: right; display: table-cell !important; white-space: nowrap;">₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>`;
             Swal.fire({
                 title: '<span style="color: #1e3c72;">ഇൻഡന്‍റ് സമ്മറി</span>',
                 html: gridHtml,
