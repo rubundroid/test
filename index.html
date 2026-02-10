@@ -2530,33 +2530,41 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
             }
         }
 function toggleView() {
-    // സമ്മറി കാണിച്ച് അതിൽ നിന്നുള്ള മറുപടി (mode) കാക്കുന്നു
-    showSummaryGrid((mode) => {
-        const rows = document.querySelectorAll("#product-body tr");
-        let counter = 1;
+    const viewBtn = document.getElementById("view-btn");
+    const isShowingSelected = viewBtn && viewBtn.innerText.includes("SHOW ALL");
 
-        if (mode === 'SELECTED') {
-            // തിരഞ്ഞെടുത്തവ മാത്രം കാണിക്കാൻ
-            rows.forEach(row => {
-                const qtyInput = row.querySelector(".qty-input");
-                const qty = parseFloat(qtyInput.value) || 0;
-                
-                if (qty > 0) {
-                    row.style.display = "";
-                    row.cells[0].innerText = counter++; 
-                    row.setAttribute('data-visible-type', 'true'); 
-                } else {
-                    row.style.display = "none";
-                    row.setAttribute('data-visible-type', 'false');
-                }
-            });
-            updateButtonUI(true);
-        } else {
-            // 'തിരുത്തുക' അമർത്തിയാൽ എല്ലാം പഴയപടി ആക്കാൻ (നിങ്ങളുടെ ഫങ്ക്ഷൻ വിളിക്കുന്നു)
-            filterByCategory(0, 0, 'ALL');
-            updateButtonUI(false);
-        }
-    });
+    if (isShowingSelected) {
+        // നിലവിൽ Selected ലിസ്റ്റിലാണ് നിൽക്കുന്നത്, അതുകൊണ്ട് നേരിട്ട് ALL കാണിക്കുക
+        filterByCategory(0, 0, 'ALL');
+        updateButtonUI(false);
+    } else {
+        // നിലവിൽ ALL ലിസ്റ്റിലാണ്, അതുകൊണ്ട് സമ്മറി കാണിച്ചിട്ട് മുന്നോട്ട് പോകുക
+        showSummaryGrid((mode) => {
+            const rows = document.querySelectorAll("#product-body tr");
+            let counter = 1;
+
+            if (mode === 'SELECTED') {
+                rows.forEach(row => {
+                    const qtyInput = row.querySelector(".qty-input");
+                    const qty = parseFloat(qtyInput.value) || 0;
+                    
+                    if (qty > 0) {
+                        row.style.display = "";
+                        row.cells[0].innerText = counter++; 
+                        row.setAttribute('data-visible-type', 'true'); 
+                    } else {
+                        row.style.display = "none";
+                        row.setAttribute('data-visible-type', 'false');
+                    }
+                });
+                updateButtonUI(true);
+            } else {
+                // സമ്മറിയിൽ 'തിരുത്തുക' അമർത്തിയാൽ എല്ലാം കാണിക്കണം
+                filterByCategory(0, 0, 'ALL');
+                updateButtonUI(false);
+            }
+        });
+    }
 }
 
 function updateButtonUI(isShowingSelected) {
