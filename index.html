@@ -2632,21 +2632,33 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
 
             // ഓരോ സെക്ഷനും പ്രിവ്യൂ ഏരിയയിലേക്ക് ചേർക്കുന്നു
             // table ഹെഡർ ഫ്രീസ് ചെയ്യാനും Qty കോളം സെറ്റ് ചെയ്യാനുമുള്ള മാറ്റം
-            const sectionHtml = `
+// showPDFPreview ഫങ്ക്ഷനുള്ളിലെ sectionHtml മാറ്റുക:
+
+const sectionHtml = `
+<style>
+    /* PDF പ്രിവ്യൂ ടേബിളിനുള്ള നിർബന്ധിത നിയമങ്ങൾ */
+    .pdf-preview-table th:nth-child(1), 
+    .pdf-preview-table td:nth-child(1) {
+        display: table-cell !important;
+        visibility: visible !important;
+        min-width: 150px !important; /* വൺപ്ലസിൽ ചുരുങ്ങിപ്പോകാതിരിക്കാൻ */
+    }
+</style>
+
 <div class="pdf-section" style="margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #fff; width: 100%; box-sizing: border-box;">
     <div style="background: ${sectionColor}; color: white; padding: 12px; font-weight: bold; display: flex; justify-content: space-between; font-size: 14px; position: sticky; top: 0; z-index: 10;">
         <span>${sectionTitle} (${itemCount})</span>
         <span>Rs. ${subTotal.toFixed(2)}</span>
     </div>
-    <div style="overflow-y: auto; max-height: 350px; width: 100%;"> 
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; min-width: 100%;">
-<thead>
-    <tr>
-        <th style="padding: 10px 5px; text-align: left; width: 60%; display: table-cell !important;">ITEM</th>
-        <th style="padding: 10px 5px; text-align: center; width: 15%; display: table-cell !important; white-space: nowrap;">QTY</th>
-        <th style="padding: 10px 5px; text-align: right; width: 25%; display: table-cell !important; white-space: nowrap;">TOTAL</th>
-    </tr>
-</thead>
+    <div style="overflow-x: auto; overflow-y: auto; max-height: 400px; width: 100%;"> 
+        <table class="pdf-preview-table" style="width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; min-width: 100%;">
+            <thead style="position: sticky; top: 0; background: #2c3e50; color: white; z-index: 5;">
+                <tr>
+                    <th style="padding: 10px 5px; text-align: left; width: 55%;">ITEM</th>
+                    <th style="padding: 10px 5px; text-align: center; width: 15%; white-space: nowrap;">QTY</th>
+                    <th style="padding: 10px 5px; text-align: right; width: 30%; white-space: nowrap;">TOTAL</th>
+                </tr>
+            </thead>
             <tbody>${tableRows}</tbody>
         </table>
     </div>
@@ -2811,17 +2823,31 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
             if (totalItems === 0) {
                 return Swal.fire("അറിയിപ്പ്", "മരുന്നുകളൊന്നും തിരഞ്ഞെടുത്തിട്ടില്ല!", "info");
             }
-            let gridHtml = `
-<div style="overflow-x:auto; padding: 2px; background: #fff; width: 100%; box-sizing: border-box;">
-    <table style="width:100%; border-collapse: collapse; font-size: 13px; text-align: left; border: 1px solid #ddd; margin: 0 auto;">
+// showSummaryGrid ഫങ്ക്ഷനുള്ളിലെ gridHtml മാറ്റുക:
+
+let gridHtml = `
+<style>
+    /* ഈ പേജിലെ ടേബിളിന് മാത്രമായി പ്രത്യേക നിയമം */
+    .force-show-table th:first-child, 
+    .force-show-table td:first-child {
+        display: table-cell !important;
+        visibility: visible !important;
+        width: auto !important; 
+        min-width: 150px; /* പേര് മുറിഞ്ഞു പോകാതിരിക്കാൻ */
+    }
+</style>
+<div style="overflow-x:auto; padding: 5px; background: #fff; width: 100%; box-sizing: border-box;">
+    <table class="force-show-table" style="width:100%; border-collapse: collapse; font-size: 13px; text-align: left; border: 1px solid #ddd; margin: 0 auto;">
         <thead>
             <tr style="background: #1e3c72; color: white !important;">
-                <th style="padding: 10px 5px; border: 1px solid #ddd; display: table-cell !important; white-space: nowrap;">Category</th>
-                <th style="padding: 10px 5px; border: 1px solid #ddd; text-align: center; display: table-cell !important;">Qty</th>
-                <th style="padding: 10px 5px; border: 1px solid #ddd; text-align: right; display: table-cell !important;">Amount</th>
+                <th style="padding: 12px 5px; border: 1px solid #ddd; white-space: nowrap;">Category</th>
+                <th style="padding: 12px 5px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">Items</th>
+                <th style="padding: 12px 5px; border: 1px solid #ddd; text-align: right; white-space: nowrap;">Amount</th>
             </tr>
         </thead>
         <tbody>`;
+
+// ... ബാക്കി ലൂപ്പ് പഴയതുപോലെ തുടരുക ...
 
             for (let cat in summary) {
                 gridHtml += `
