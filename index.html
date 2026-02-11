@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ml">
-
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-S4QE1SZKPX"></script>
@@ -1100,3 +1099,4 @@ function setupIndentTypeLogic(){const indentSelect=document.getElementById("inde
 if(priorityTerm){finalOptions.push(priorityTerm);finalOptions=finalOptions.concat(staticOptions);termOptions.forEach(term=>{if(term!==priorityTerm){finalOptions.push(term)}})}else{finalOptions=finalOptions.concat(staticOptions);finalOptions=finalOptions.concat(termOptions)}
 indentSelect.innerHTML="";finalOptions.forEach(opt=>{let option=document.createElement("option");option.value=(opt==="Custom Input...")?"user-input":opt;option.text=opt;indentSelect.appendChild(option)});if(!indentInput.value){indentInput.value=indentSelect.value}}
 document.addEventListener('DOMContentLoaded',()=>{filterByCategory(0,0,'ALL')});function silentFilter(typeName){const rows=document.querySelectorAll('.med-row');let newSlNo=1;rows.forEach(row=>{const medType=row.getAttribute('data-type');if(typeName==='ALL'||medType===typeName){row.style.display="";row.cells[0].innerText=newSlNo++;row.setAttribute('data-visible-type','true')}else{row.style.display="none";row.setAttribute('data-visible-type','false')}})}</script></body></html>
+
