@@ -1,7 +1,5 @@
-
 <!DOCTYPE html>
 <html lang="ml">
-
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-S4QE1SZKPX"></script>
@@ -1235,10 +1233,20 @@
                 ✖
             </span>
         </div>
-        <div class="rate-box-wrapper">
-            <input type="text" id="rateRange" class="styled-input" placeholder="🔍 Rate: 40-50">
-            <button class="find-btn" onclick="filterByRate()">FIND</button>
-        </div>
+<div class="rate-box-wrapper" style="display: flex; align-items: center; gap: 5px;">
+    
+    <div style="position: relative; flex: 1;">
+        <input type="text" id="rateRange" class="styled-input" placeholder="🔍 Rate: 40-50"
+            onkeyup="checkRateInput()" style="width: 100%; padding-right: 25px;">
+            
+        <span id="clearRate" onclick="clearRateInput()" 
+            style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #e74c3c; display: none; font-weight: bold; font-size: 16px;">
+            ✖
+        </span>
+    </div>
+
+    <button class="find-btn" onclick="filterByRate()">FIND</button>
+</div>
     </div>
     <div class="summary-buttons" style="max-width: 1200px; margin-top: 15px;">
         <button class="info-card" style="background-color: #e74c3c; cursor:pointer;"
@@ -3459,6 +3467,24 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
                 }
             });
         }
+    // ടൈപ്പ് ചെയ്യുമ്പോൾ X ബട്ടൺ കാണിക്കാൻ
+function checkRateInput() {
+    const input = document.getElementById('rateRange');
+    const clearBtn = document.getElementById('clearRate');
+    
+    if (clearBtn) {
+        // ബോക്സിൽ വല്ലതും ഉണ്ടെങ്കിൽ മാത്രം X കാണിക്കുക
+        clearBtn.style.display = input.value.length > 0 ? "block" : "none";
+    }
+}
+
+// X അമർത്തുമ്പോൾ ബോക്സ് ക്ലിയർ ആകാൻ (ലിസ്റ്റ് മാറില്ല)
+function clearRateInput() {
+    const input = document.getElementById('rateRange');
+    input.value = ""; // വാല്യൂ മാത്രം കളയുന്നു
+    checkRateInput(); // ബട്ടൺ മറയ്ക്കുന്നു
+    input.focus(); // വീണ്ടും ടൈപ്പ് ചെയ്യാൻ പാകത്തിന് കർസർ അവിടെ വെക്കുന്നു
+}
     </script>
 </body>
 
