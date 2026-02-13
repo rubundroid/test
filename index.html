@@ -285,62 +285,77 @@
         }
 
         /* --- 2. മൊബൈൽ സ്ക്രീൻ ക്രമീകരണങ്ങൾ (New Updated Code) --- */
-        @media (max-width: 768px) {
+@media (max-width: 768px) {
 
-            /* 1. SL No (Column 1) ഒളിപ്പിക്കുന്നു */
-            thead th:nth-child(1),
-            tbody td:nth-child(1) {
-                display: none;
-            }
+    /* 1. SL No (Column 1) ഒളിപ്പിക്കുന്നു */
+    thead th:nth-child(1),
+    tbody td:nth-child(1) {
+        display: none;
+    }
 
-            /* 2. മരുന്നിന്റെ പേര് (Column 2) - ഇതാണ് പ്രധാനം */
-            thead th:nth-child(2),
-            tbody td:nth-child(2) {
-                width: auto;
-                /* ബാക്കിയുള്ള സ്ഥലം മുഴുവൻ എടുക്കാൻ */
-                white-space: normal;
-                /* വരി മടങ്ങി വരാൻ */
-                word-wrap: break-word;
-                /* നീളമുള്ള വാക്കുകൾ പൊട്ടി താഴെ വരാൻ */
-                min-width: 130px;
-                /* ടേബിൾ സ്ക്രീനിന് പുറത്തു പോകാതിരിക്കാൻ ഇത് സഹായിക്കും */
-            }
+    /* 2. മരുന്നിന്റെ പേര് (Column 2) - മാറ്റം വരുത്തിയത് */
+    thead th:nth-child(2),
+    tbody td:nth-child(2) {
+        width: auto;
+        white-space: normal;
+        word-wrap: break-word;
+        /* OnePlus-ൽ ഞെരുങ്ങിപ്പോകാതിരിക്കാൻ ഇത് 130-ൽ നിന്ന് 150 ആക്കി */
+        min-width: 150px; 
+    }
 
-            /* 3. Qty, Rate, Cost (Columns 3, 4, 5) - ഇവയെ ഒതുക്കി നിർത്താൻ */
-            thead th:nth-child(3),
-            tbody td:nth-child(3),
-            thead th:nth-child(4),
-            tbody td:nth-child(4),
-            thead th:nth-child(5),
-            tbody td:nth-child(5) {
-                width: 1%;
-                /* ഉള്ളടക്കത്തിന് ആവശ്യമുള്ള വീതി മാത്രം എടുക്കാൻ */
-                white-space: nowrap;
-                /* ഇവ പൊട്ടി താഴെ വരാതിരിക്കാൻ */
-            }
+    /* 3. Qty, Rate, Cost - ഡാറ്റ (Body) മാത്രം */
+    tbody td:nth-child(3),
+    tbody td:nth-child(4),
+    tbody td:nth-child(5) {
+        width: 1%;
+        white-space: nowrap;
+    }
 
-            /* 4. പാഡിംഗ് അല്പം കുറയ്ക്കുന്നു */
-            thead th,
-            td {
-                padding: 8px 3px;
-                font-size: 12px;
-            }
+    /* 4. ഹെഡറുകൾക്കുള്ള പ്രത്യേക മാറ്റം (ഇതാണ് പ്രധാനം) */
+    
+    /* Qty Header */
+    thead th:nth-child(3) {
+        width: 1%;
+        white-space: nowrap;
+    }
 
-            /* 5. ഇൻപുട്ട് ബോക്സ് */
-            .qty-input {
-                width: 45px;
-                padding: 5px 2px;
-                font-size: 13px;
-            }
+    /* Rate+GST Header (Column 4) - മാറ്റം വരുത്തിയത് */
+    thead th:nth-child(4) {
+        width: 1%;
+        white-space: normal; /* വരി മുറിയാൻ അനുവദിക്കുന്നു */
+        font-size: 10px; /* ഫോണ്ട് അല്പം കുറയ്ക്കുന്നു */
+        line-height: 1.1; /* വരികൾ തമ്മിലുള്ള അകലം കുറയ്ക്കുന്നു */
+        vertical-align: middle;
+    }
 
-            /* 6. അലൈൻമെന്റ് (Rate & Cost Right Align) */
-            thead th:nth-last-child(1),
-            tbody td:nth-last-child(1),
-            thead th:nth-last-child(2),
-            tbody td:nth-last-child(2) {
-                text-align: right;
-            }
-        }
+    /* Cost Header */
+    thead th:nth-child(5) {
+        width: 1%;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    /* 5. പാഡിംഗ് */
+    thead th, td {
+        padding: 8px 3px;
+        font-size: 12px;
+    }
+
+    /* 6. ഇൻപുട്ട് ബോക്സ് */
+    .qty-input {
+        width: 45px;
+        padding: 5px 2px;
+        font-size: 13px;
+    }
+
+    /* 7. അലൈൻമെന്റ് */
+    thead th:nth-last-child(1),
+    tbody td:nth-last-child(1),
+    thead th:nth-last-child(2),
+    tbody td:nth-last-child(2) {
+        text-align: right;
+    }
+}
 
         #categoryMenu {
             display: none;
