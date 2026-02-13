@@ -1006,7 +1006,22 @@
         }
         /* --- MOBILE VIEW OPTIMIZATION (SEPARATE TABLES) --- */
 /* --- UNIVERSAL MOBILE TABLE STYLING --- */
-
+@media (max-width: 768px) {
+    /* Main Table Fix */
+    #medicineTable th:nth-child(2), #medicineTable td:nth-child(2) {
+        width: auto !important; /* പേരിന് ബാക്കി സ്ഥലം */
+        min-width: 120px;
+    }
+    #medicineTable th:nth-child(3), #medicineTable td:nth-child(3) {
+        width: 40px !important; /* Qty */
+    }
+    #medicineTable th:nth-child(4), #medicineTable td:nth-child(4) {
+        width: 55px !important; /* Rate */
+    }
+    #medicineTable th:nth-child(5), #medicineTable td:nth-child(5) {
+        width: 60px !important; /* Cost */
+    }
+}
     </style>
 </head>
 
@@ -2577,9 +2592,9 @@ function renderPreviewTable(type) {
                 
                 tableRows += `
                 <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 6px 4px; word-break: break-word; line-height: 1.2;">${name}</td>
-                    <td style="padding: 6px 4px; text-align: center; font-weight: bold;">${qty}</td>
-                    <td style="padding: 6px 4px; text-align: right;">${cost.toFixed(2)}</td>
+<td style="border: 1px solid #ddd; padding: 6px 4px; word-break: break-word; line-height: 1.2; text-align: left;">${name}</td>
+<td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-weight: bold;">${qty}</td>
+<td style="border: 1px solid #ddd; padding: 6px 4px; text-align: right;">${cost.toFixed(2)}</td>
                 </tr>`;
             }
         }
@@ -2642,9 +2657,9 @@ function renderPreviewTable(type) {
             <table class="preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
                 <thead style="position: sticky; top: 0; background: #34495e; color: white; z-index: 5;">
                     <tr>
-                        <th style="padding: 8px 5px; text-align: left; width: 60%;">ITEM</th>
-                        <th style="padding: 8px 5px; text-align: center; width: 15%;">QTY</th>
-                        <th style="padding: 8px 5px; text-align: right; width: 25%;">TOTAL</th>
+<th style="border: 1px solid #ddd; padding: 8px 5px; text-align: left; width: 60%;">ITEM</th>
+<th style="border: 1px solid #ddd; padding: 8px 5px; text-align: center; width: 15%;">QTY</th>
+<th style="border: 1px solid #ddd; padding: 8px 5px; text-align: right; width: 25%;">TOTAL</th>
                     </tr>
                 </thead>
                 <tbody>${tableRows}</tbody>
