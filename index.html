@@ -1005,91 +1005,125 @@
             }
         }
         /* --- MOBILE VIEW OPTIMIZATION (SEPARATE TABLES) --- */
-/* --- MOBILE VIEW FIXED WIDTHS --- */
-/* --- MOBILE VIEW FIX (MAXIMIZED NAME WIDTH) --- */
+/* --- UNIVERSAL MOBILE TABLE STYLING --- */
 @media (max-width: 768px) {
-    
-    #medicineTable {
-        table-layout: fixed;
-        width: 100%;
-        margin: 0;
-        border-collapse: collapse;
+
+    /* 1. കണ്ടെയ്നർ ഒതുക്കുന്നു */
+    .table-container, .pdf-section, #pdfPreviewContent {
+        width: 100% !important;
+        padding: 0 !important;
+        overflow-x: hidden;
     }
 
-    /* 1. SL No (Column 1) - Hide */
-    #medicineTable thead th:nth-child(1),
-    #medicineTable tbody td:nth-child(1) {
+    /* 2. എല്ലാ ടേബിളുകൾക്കും Indent Summary-യുടെ അതേ ഭംഗി നൽകുന്നു */
+    table {
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse; /* ബോർഡറുകൾ കൂട്ടിമുട്ടിക്കാൻ */
+        background-color: white;
+    }
+
+    th, td {
+        border: 1px solid #ddd; /* Indent Summary-യിലെ പോലെ ബോർഡർ */
+        padding: 8px 4px; /* കൃത്യമായ അകലം */
+        font-size: 12px;
+        vertical-align: middle;
+    }
+
+    /* ഹെഡറിന് നിറം */
+    thead th {
+        background-color: #1e3c72; /* നേവി ബ്ലൂ */
+        color: white;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+    /* =========================================
+       3. MAIN TABLE SETTINGS (#medicineTable)
+       ========================================= */
+    
+    /* SL No - Hide */
+    #medicineTable th:nth-child(1),
+    #medicineTable td:nth-child(1) {
         display: none;
     }
 
-    /* 2. Medicine Name (Column 2) - 62% സ്ഥലം (പരമാവധി നൽകുന്നു) */
-    #medicineTable thead th:nth-child(2),
-    #medicineTable tbody td:nth-child(2) {
-        width: 62%; 
+    /* Medicine Name - Column 2 (ഏറ്റവും പ്രധാനം) */
+    #medicineTable th:nth-child(2),
+    #medicineTable td:nth-child(2) {
+        width: auto !important; /* ബാക്കിയുള്ള സ്ഥലം മുഴുവൻ എടുക്കാൻ */
+        min-width: 160px; /* ചുരുങ്ങിപ്പോകാതിരിക്കാൻ ഇത് നിർബന്ധം */
         white-space: normal;
         word-wrap: break-word;
-        font-size: 11px;
-        font-weight: 600;
-        line-height: 1.1;
-        padding: 5px 2px;
         text-align: left;
-    }
-    
-    /* Header Adjustment */
-    #medicineTable thead th:nth-child(2) {
-        padding-left: 5px;
-        vertical-align: middle;
-        font-size: 10px;
+        font-weight: 600;
+        line-height: 1.3;
     }
 
-    /* 3. Qty (Column 3) - 10% (ഏറ്റവും കുറവ്) */
-    #medicineTable thead th:nth-child(3),
-    #medicineTable tbody td:nth-child(3) {
-        width: 10%;
+    /* Qty - Column 3 */
+    #medicineTable th:nth-child(3),
+    #medicineTable td:nth-child(3) {
+        width: 50px; /* ഫിക്സഡ് വീതി */
         text-align: center;
-        padding: 2px 0;
+        padding: 5px 2px;
     }
 
-    /* 4. Rate+GST (Column 4) - 13% */
-    #medicineTable thead th:nth-child(4),
-    #medicineTable tbody td:nth-child(4) {
-        width: 13%;
+    /* Rate - Column 4 */
+    #medicineTable th:nth-child(4),
+    #medicineTable td:nth-child(4) {
+        width: 60px;
         text-align: right;
-        font-size: 10px;
-        padding-right: 2px;
-    }
-    
-    #medicineTable thead th:nth-child(4) {
-        white-space: normal;
-        font-size: 9px;
-        line-height: 1;
-        vertical-align: middle;
-        padding: 0;
-    }
-
-    /* 5. Cost (Column 5) - 15% */
-    #medicineTable thead th:nth-child(5),
-    #medicineTable tbody td:nth-child(5) {
-        width: 15%;
-        text-align: right;
-        font-weight: bold;
         font-size: 11px;
-        padding-right: 4px;
     }
     
-    #medicineTable thead th:nth-child(5) { 
-        font-size: 10px; 
-        vertical-align: middle; 
+    /* Cost - Column 5 (മൊബൈലിൽ സ്ഥലം ലാഭിക്കാൻ ഇത് ഒഴിവാക്കാം, വേണമെങ്കിൽ വെക്കാം) */
+    /* ഇവിടെ ഞാൻ Cost കോളം മൊബൈലിൽ ഒഴിവാക്കുന്നു, അത് തിരക്ക് കുറയ്ക്കും */
+    #medicineTable th:nth-child(5),
+    #medicineTable td:nth-child(5) {
+        display: none; 
     }
 
-    /* Input Box styling */
+    /* ഇൻപുട്ട് ബോക്സ് Indent Summary-യിലെ പോലെ */
     .qty-input {
         width: 100%;
-        max-width: 30px;
-        padding: 2px 0;
-        font-size: 11px;
-        height: 24px;
         text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        font-size: 12px;
+    }
+
+
+    /* =========================================
+       4. PREVIEW TABLE SETTINGS (.preview-table)
+       Order Summary
+       ========================================= */
+    
+    .preview-table th:first-child, 
+    .preview-table td:first-child {
+        width: auto !important;
+        min-width: 150px; /* പേര് ചുരുങ്ങില്ല */
+        text-align: left;
+        white-space: normal;
+    }
+
+    .preview-table th:nth-child(2), 
+    .preview-table td:nth-child(2) {
+        width: 50px;
+        text-align: center;
+    }
+
+    .preview-table th:nth-child(3), 
+    .preview-table td:nth-child(3) {
+        width: 80px;
+        text-align: right;
+    }
+    
+    /* Indent Summary-യുടെ ഡിസൈൻ എല്ലാത്തിനും കിട്ടും */
+    .summary-table th, .summary-table td,
+    .preview-table th, .preview-table td,
+    #medicineTable th, #medicineTable td {
+        border: 1px solid #e0e0e0;
     }
 }
     </style>
@@ -2520,13 +2554,18 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
                     taxableCost.toFixed(2)
                 ];
             });
-            doc.setFillColor(44, 62, 80);
+            doc.setFillColor(255, 255, 255);
             doc.rect(0, 0, 210, 25, 'F');
-            doc.setTextColor(255, 255, 255);
+            doc.setTextColor(44, 62, 80);
             doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
             doc.text(`${type.toUpperCase()} MEDICINE INDENT`, 105, 12, { align: "center" });
             doc.setFontSize(11);
             doc.text(subTitle, 105, 19, { align: "center" });
+ // ഹെഡറിന് താഴെ ഒരു കറുത്ത വര (Separator Line)
+doc.setLineWidth(0.5);
+doc.setDrawColor(0, 0, 0); // Black Line
+doc.line(10, 26, 200, 26); // വരയുടെ സ്ഥാനം (y=26)           
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(10);
             doc.setFont("helvetica", "bold");
@@ -2545,6 +2584,8 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
                 body: tableRows,
                 startY: 55,
                 theme: 'grid',
+                tableLineColor: [230, 240, 255], // വരയുടെ നിറം (കറുപ്പ്)
+    tableLineWidth: 0.2,       // വരയുടെ കട്ടി
                 headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], halign: 'center' },
                 bodyStyles: {
                     textColor: [0, 0, 0],
