@@ -1006,124 +1006,118 @@
         }
         /* --- MOBILE VIEW OPTIMIZATION (SEPARATE TABLES) --- */
 /* --- UNIVERSAL MOBILE TABLE STYLING --- */
+/* --- FINAL FIXED CSS FOR MOBILE --- */
 @media (max-width: 768px) {
 
-    /* 1. കണ്ടെയ്നർ ഒതുക്കുന്നു */
+    /* 1. കണ്ടെയ്നറുകൾ ഒതുക്കുന്നു & സെന്റർ ആക്കുന്നു */
     .table-container, .pdf-section, #pdfPreviewContent {
         width: 100% !important;
         padding: 0 !important;
         overflow-x: hidden;
+        text-align: center; /* Order Summary സെന്റർ ആകാൻ */
     }
 
-    /* 2. എല്ലാ ടേബിളുകൾക്കും Indent Summary-യുടെ അതേ ഭംഗി നൽകുന്നു */
+    /* 2. എല്ലാ ടേബിളുകൾക്കും ബോർഡർ നൽകുന്നു (Indent Summary Style) */
     table {
-        table-layout: fixed;
-        width: 100%;
-        border-collapse: collapse; /* ബോർഡറുകൾ കൂട്ടിമുട്ടിക്കാൻ */
-        background-color: white;
+        table-layout: fixed; /* വീതി നമ്മൾ പറയുന്നത് പോലെ നിൽക്കാൻ */
+        width: 100% !important;
+        border-collapse: collapse;
+        margin: 0 auto; /* ടേബിൾ നടുക്ക് വരാൻ */
+        background: white;
     }
 
+    /* കള്ളികൾക്ക് ബോർഡർ */
     th, td {
-        border: 1px solid #ddd; /* Indent Summary-യിലെ പോലെ ബോർഡർ */
-        padding: 8px 4px; /* കൃത്യമായ അകലം */
-        font-size: 12px;
+        border: 1px solid #999; /* ബോർഡർ കുറച്ചുകൂടി കടുപ്പത്തിൽ */
+        padding: 5px 2px;
+        font-size: 11px;
         vertical-align: middle;
+        word-wrap: break-word;
     }
 
-    /* ഹെഡറിന് നിറം */
+    /* ഹെഡർ ഡിസൈൻ */
     thead th {
-        background-color: #1e3c72; /* നേവി ബ്ലൂ */
+        background-color: #1e3c72;
         color: white;
-        text-transform: uppercase;
+        text-align: center;
         font-weight: bold;
     }
 
     /* =========================================
        3. MAIN TABLE SETTINGS (#medicineTable)
        ========================================= */
-    
-    /* SL No - Hide */
-    #medicineTable th:nth-child(1),
-    #medicineTable td:nth-child(1) {
-        display: none;
-    }
 
-    /* Medicine Name - Column 2 (ഏറ്റവും പ്രധാനം) */
+    /* SL No (Col 1) - Hide */
+    #medicineTable th:nth-child(1),
+    #medicineTable td:nth-child(1) { display: none; }
+
+    /* Medicine Name (Col 2) - 60% Width (ഇതാണ് പ്രധാനം) */
     #medicineTable th:nth-child(2),
     #medicineTable td:nth-child(2) {
-        width: auto !important; /* ബാക്കിയുള്ള സ്ഥലം മുഴുവൻ എടുക്കാൻ */
-        min-width: 160px; /* ചുരുങ്ങിപ്പോകാതിരിക്കാൻ ഇത് നിർബന്ധം */
-        white-space: normal;
-        word-wrap: break-word;
+        width: 60%; 
         text-align: left;
+        padding-left: 5px;
         font-weight: 600;
-        line-height: 1.3;
+        line-height: 1.2;
     }
 
-    /* Qty - Column 3 */
+    /* Qty (Col 3) - 12% Width (ഏറ്റവും കുറച്ചു) */
     #medicineTable th:nth-child(3),
     #medicineTable td:nth-child(3) {
-        width: 50px; /* ഫിക്സഡ് വീതി */
-        text-align: center;
-        padding: 5px 2px;
+        width: 12%;
     }
 
-    /* Rate - Column 4 */
+    /* Rate (Col 4) - 14% Width */
     #medicineTable th:nth-child(4),
     #medicineTable td:nth-child(4) {
-        width: 60px;
+        width: 14%;
         text-align: right;
-        font-size: 11px;
-    }
-    
-    /* Cost - Column 5 (മൊബൈലിൽ സ്ഥലം ലാഭിക്കാൻ ഇത് ഒഴിവാക്കാം, വേണമെങ്കിൽ വെക്കാം) */
-    /* ഇവിടെ ഞാൻ Cost കോളം മൊബൈലിൽ ഒഴിവാക്കുന്നു, അത് തിരക്ക് കുറയ്ക്കും */
-    #medicineTable th:nth-child(5),
-    #medicineTable td:nth-child(5) {
-        display: none; 
+        padding-right: 2px;
     }
 
-    /* ഇൻപുട്ട് ബോക്സ് Indent Summary-യിലെ പോലെ */
+    /* Cost (Col 5) - 14% Width */
+    #medicineTable th:nth-child(5),
+    #medicineTable td:nth-child(5) {
+        width: 14%;
+        text-align: right;
+        font-weight: bold;
+        padding-right: 2px;
+    }
+    
+    /* Input Box Styling */
     .qty-input {
         width: 100%;
         text-align: center;
+        padding: 2px 0;
+        font-size: 11px;
         border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 4px;
-        font-size: 12px;
     }
-
 
     /* =========================================
-       4. PREVIEW TABLE SETTINGS (.preview-table)
-       Order Summary
+       4. ORDER SUMMARY (.preview-table)
        ========================================= */
-    
+       
+    /* Item Name */
     .preview-table th:first-child, 
     .preview-table td:first-child {
-        width: auto !important;
-        min-width: 150px; /* പേര് ചുരുങ്ങില്ല */
+        width: 60%; /* പേരിന് കൂടുതൽ സ്ഥലം */
         text-align: left;
-        white-space: normal;
+        padding-left: 5px;
     }
 
+    /* Qty */
     .preview-table th:nth-child(2), 
     .preview-table td:nth-child(2) {
-        width: 50px;
+        width: 15%;
         text-align: center;
     }
 
+    /* Total */
     .preview-table th:nth-child(3), 
     .preview-table td:nth-child(3) {
-        width: 80px;
+        width: 25%;
         text-align: right;
-    }
-    
-    /* Indent Summary-യുടെ ഡിസൈൻ എല്ലാത്തിനും കിട്ടും */
-    .summary-table th, .summary-table td,
-    .preview-table th, .preview-table td,
-    #medicineTable th, #medicineTable td {
-        border: 1px solid #e0e0e0;
+        padding-right: 5px;
     }
 }
     </style>
