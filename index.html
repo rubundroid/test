@@ -1006,20 +1006,121 @@
         }
         /* --- MOBILE VIEW OPTIMIZATION (SEPARATE TABLES) --- */
 /* --- UNIVERSAL MOBILE TABLE STYLING --- */
+/* --- BULLETPROOF MOBILE TABLE CSS --- */
 @media (max-width: 768px) {
-    /* Main Table Fix */
+
+    /* 1. സ്ക്രീനിന് പുറത്തേക്ക് പോകാതിരിക്കാൻ Box Sizing നിർബന്ധം */
+    *, *:before, *:after {
+        box-sizing: border-box !important;
+    }
+
+    .table-container, .pdf-section, #pdfPreviewContent {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        overflow-x: hidden !important; /* സ്ക്രോളിംഗ് പൂർണ്ണമായും ഒഴിവാക്കുന്നു */
+    }
+
+    /* 2. ടേബിൾ സ്ക്രീനിൽ ഒതുങ്ങി നിൽക്കാൻ */
+    table {
+        table-layout: fixed !important; /* വീതി നമ്മൾ പറയുന്നത് പോലെ നിൽക്കാൻ ഇത് നിർബന്ധം */
+        width: 100% !important;
+        max-width: 100% !important; /* സ്ക്രീനിനേക്കാൾ വലുതാകില്ല */
+        border-collapse: collapse;
+        margin: 0 auto; /* നടുക്ക് വരാൻ */
+        background-color: #fff;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 6px 3px !important; /* പാഡിംഗ് കുറച്ചു */
+        font-size: 11px !important;
+        vertical-align: middle;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+        min-width: 0 !important; /* പഴയ min-width റദ്ദാക്കുന്നു */
+    }
+
+    thead th {
+        background-color: #1e3c72;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    /* =========================================
+       3. MAIN TABLE (ആകെ 100% കൃത്യമായി വീതിച്ചു)
+       ========================================= */
+
+    /* SL No (Hide) */
+    #medicineTable th:nth-child(1), #medicineTable td:nth-child(1) { 
+        display: none !important; 
+    }
+
+    /* Medicine Name (52%) */
     #medicineTable th:nth-child(2), #medicineTable td:nth-child(2) {
-        width: auto !important; /* പേരിന് ബാക്കി സ്ഥലം */
-        min-width: 120px;
+        width: 52% !important; 
+        text-align: left;
     }
+
+    /* Qty (16%) */
     #medicineTable th:nth-child(3), #medicineTable td:nth-child(3) {
-        width: 40px !important; /* Qty */
+        width: 16% !important; 
+        text-align: center;
     }
+
+    /* Rate (16%) */
     #medicineTable th:nth-child(4), #medicineTable td:nth-child(4) {
-        width: 55px !important; /* Rate */
+        width: 16% !important; 
+        text-align: right;
     }
+
+    /* Cost (16%) */
     #medicineTable th:nth-child(5), #medicineTable td:nth-child(5) {
-        width: 60px !important; /* Cost */
+        width: 16% !important; 
+        text-align: right;
+        font-weight: bold;
+    }
+
+    .qty-input {
+        width: 100%;
+        max-width: 45px;
+        text-align: center;
+        padding: 4px 0;
+        font-size: 11px;
+        border: 1px solid #999;
+        border-radius: 3px;
+    }
+
+    /* =========================================
+       4. ORDER SUMMARY (ആകെ 100% കൃത്യമായി വീതിച്ചു)
+       ========================================= */
+
+    .preview-table th:nth-child(1), .preview-table td:nth-child(1) {
+        width: 60% !important;
+        text-align: left;
+    }
+
+    .preview-table th:nth-child(2), .preview-table td:nth-child(2) {
+        width: 15% !important;
+        text-align: center;
+    }
+
+    .preview-table th:nth-child(3), .preview-table td:nth-child(3) {
+        width: 25% !important;
+        text-align: right;
+    }
+
+    /* =========================================
+       5. MODAL CENTERING FIX (Order Summary Window)
+       ========================================= */
+       
+    #pdfModal > div {
+        width: 95% !important; /* സ്ക്രീനിൽ ഒതുങ്ങാൻ */
+        margin: 5% auto !important; /* കൃത്യം നടുവിലേക്ക് മാറ്റുന്നു */
+        padding: 10px !important; /* ഉള്ളിലെ പാഡിംഗ് കുറച്ചു */
+        box-sizing: border-box !important;
     }
 }
     </style>
