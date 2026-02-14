@@ -2458,88 +2458,141 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
             });
             return items;
         }
-        async function downloadSplitPDF() {
-            window.isSplitMode = true;
-            pdfQueue = [];
-            const viewBtn = document.getElementById("view-btn");
-            if (viewBtn && viewBtn.innerText.includes("SHOW ALL")) {
-                toggleView();
+async function downloadSplitPDF() {
+    window.isSplitMode = true;
+    let safeQueue = []; 
+
+    // പ്രിവ്യൂ വിൻഡോ താൽക്കാലികമായി അദൃശ്യമാക്കുന്നു (Hide the jumping UI)
+    const pdfModal = document.getElementById("pdfModal");
+    if (pdfModal) {
+        pdfModal.style.transition = "none";
+        pdfModal.style.opacity = "0"; // വിൻഡോയെ ട്രാൻസ്പരൻ്റ് ആക്കുന്നു
+    }
+
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Generating PDFs...',
+            text: 'Please wait a moment',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
-            if (typeof filterByCategory === "function") {
-                filterByCategory(0, 9999, 'ALL');
-            }
-            await new Promise(r => setTimeout(r, 200));
-            const allData = getSelectedItems();
-            if (allData.length === 0) return alert("ദയവായി മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!");
-            let totalKC = 0;
-            let totalPrep = 0;
-            const groupKC = allData.filter(item => {
-                if (item.type === 'KC' || item.type === 'KSC') {
-                    totalKC += (parseFloat(item.cost) || 0);
-                    return true;
-                }
-                return false;
-            });
-            const groupPrepared = allData.filter(item => {
-                if (item.type !== 'KC' && item.type !== 'KSC') {
-                    totalPrep += (parseFloat(item.cost) || 0);
-                    return true;
-                }
-                return false;
-            });
-            const secondaryBtn = document.getElementById('summarySecondaryBtn');
-            if (secondaryBtn) {
-                if (groupPrepared.length > 0) {
-                    secondaryBtn.innerText = "VIEW PREPARED ➔";
-                    secondaryBtn.style.backgroundColor = "#3498db";
-                    secondaryBtn.onclick = function () {
-                        closePDFModal();
-                        const rows = document.querySelectorAll('.med-row');
-                        let newSlNo = 1;
-                        rows.forEach(row => {
-                            const medType = row.getAttribute('data-type');
-                            if (medType === 'PREPARED') {
-                                row.style.display = "";
-                                row.cells[0].innerText = newSlNo++;
-                                row.setAttribute('data-visible-type', 'true');
-                            } else {
-                                row.style.display = "none";
-                                row.setAttribute('data-visible-type', 'false');
-                            }
-                        });
-                        const mainBtn = document.getElementById("typeBtn");
-                        if (mainBtn) mainBtn.innerText = "TYPE ▾";
-                        setTimeout(() => {
-                            secondaryBtn.innerText = "EDIT MORE";
-                            secondaryBtn.style.backgroundColor = "#e67e22";
-                            secondaryBtn.onclick = closePDFModal;
-                        }, 300);
-                    };
-                } else {
-                    secondaryBtn.innerText = "EDIT MORE";
-                    secondaryBtn.style.backgroundColor = "#e67e22";
-                    secondaryBtn.onclick = closePDFModal;
-                }
-            }
-            const summaryText = `KC+KSC Rs. ${totalKC.toFixed(2)} + Prepared Rs. ${totalPrep.toFixed(2)} = ${(totalKC + totalPrep).toFixed(2)}`;
-            const indentType = document.getElementById("indent-type").value || "Indent";
-            const safeType = indentType.replace(/\//g, "-");
-            if (groupKC.length > 0) {
-                const fileNameKC = `${indentType}_KC_KSC`; // 
-                await createSinglePDF(groupKC, "Kashaya Choornam (KC+KSC)", fileNameKC, summaryText);
-            }
-            if (groupPrepared.length > 0) {
-                const fileNamePrep = `${indentType}_Prepared`;
-                await createSinglePDF(groupPrepared, "Prepared Medicines", fileNamePrep, summaryText);
-            }
-            setTimeout(() => {
-                if (typeof filterByCategory === "function") {
-                    filterByCategory(0, 0, 'ALL');
-                }
-                const mainBtn = document.getElementById("typeBtn");
-                if (mainBtn) mainBtn.innerText = "TYPE ▾";
-            }, 1000);
+        });
+    }
+
+    const viewBtn = document.getElementById("view-btn");
+    if (viewBtn && viewBtn.innerText.includes("SHOW ALL")) {
+        toggleView();
+    }
+
+    if (typeof filterByCategory === "function") {
+        filterByCategory(0, 9999, 'ALL');
+    }
+
+    await new Promise(r => setTimeout(r, 200));
+
+    const allData = getSelectedItems();
+    if (allData.length === 0) {
+        if (typeof Swal !== 'undefined') Swal.close();
+        if (pdfModal) pdfModal.style.opacity = "1";
+        return alert("ദയവായി മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!");
+    }
+
+    let totalKC = 0;
+    let totalPrep = 0;
+
+    const groupKC = allData.filter(item => {
+        if (item.type === 'KC' || item.type === 'KSC') {
+            totalKC += (parseFloat(item.cost) || 0);
+            return true;
         }
+        return false;
+    });
+
+    const groupPrepared = allData.filter(item => {
+        if (item.type !== 'KC' && item.type !== 'KSC') {
+            totalPrep += (parseFloat(item.cost) || 0);
+            return true;
+        }
+        return false;
+    });
+
+    const summaryText = `KC+KSC Rs. ${totalKC.toFixed(2)} + Prepared Rs. ${totalPrep.toFixed(2)} = Rs. ${(totalKC + totalPrep).toFixed(2)}`;
+    const indentType = document.getElementById("indent-type").value || "Indent";
+    const safeType = indentType.replace(/\//g, "-");
+
+    // ==========================================
+    // 1. KC PDF
+    // ==========================================
+    if (groupKC.length > 0) {
+        const fileNameKC = `${safeType}_KC_KSC`; 
+        let promiseKC = createSinglePDF(groupKC, "Kashaya Choornam (KC+KSC)", fileNameKC, summaryText);
+        
+        let check1 = setInterval(() => {
+            if (window.resolveCurrentPDF) {
+                window.resolveCurrentPDF();
+                window.resolveCurrentPDF = null;
+                clearInterval(check1);
+            }
+        }, 100);
+        
+        await promiseKC; 
+        
+        if (typeof pdfQueue !== 'undefined' && pdfQueue.length > 0) {
+            safeQueue.push(pdfQueue[pdfQueue.length - 1]);
+        }
+    }
+
+    // ==========================================
+    // 2. PREPARED PDF
+    // ==========================================
+    if (groupPrepared.length > 0) {
+        const fileNamePrep = `${safeType}_PREP_Medicines`; 
+        let promisePrep = createSinglePDF(groupPrepared, "Prepared Medicines", fileNamePrep, summaryText);
+        
+        let check2 = setInterval(() => {
+            if (window.resolveCurrentPDF) {
+                window.resolveCurrentPDF();
+                window.resolveCurrentPDF = null;
+                clearInterval(check2);
+            }
+        }, 100);
+        
+        await promisePrep; 
+        
+        if (typeof pdfQueue !== 'undefined' && pdfQueue.length > 0) {
+            safeQueue.push(pdfQueue[pdfQueue.length - 1]);
+        }
+    }
+
+    pdfQueue = safeQueue; 
+
+    // ==========================================
+    // എല്ലാം സെറ്റ് ആയ ശേഷം മാത്രം വിൻഡോ കാണിക്കുന്നു
+    // ==========================================
+    setTimeout(() => {
+        if (typeof renderPreviewTable === "function") {
+            renderPreviewTable(groupKC.length > 0 ? 'KC' : 'PREPARED');
+        }
+        
+        if (typeof filterByCategory === "function") {
+            filterByCategory(0, 0, 'ALL');
+        }
+        const mainBtn = document.getElementById("typeBtn");
+        if (mainBtn) mainBtn.innerText = "TYPE ▾";
+
+        // വിൻഡോയെ തിരികെ കാണിക്കുന്നു (Show the modal smoothly)
+        if (pdfModal) {
+            pdfModal.style.transition = "opacity 0.3s ease";
+            pdfModal.style.opacity = "1";
+        }
+
+        // Loading സ്ക്രീൻ ക്ലോസ് ചെയ്യുന്നു
+        if (typeof Swal !== 'undefined') Swal.close();
+        
+    }, 600); 
+}
         async function downloadCombinedPDF() {
             window.isSplitMode = false;
             pdfQueue = [];
@@ -2616,11 +2669,11 @@ doc.line(10, 26, 200, 26); // വരയുടെ സ്ഥാനം (y=26)
                 today.getFullYear();
             doc.text(`Date: ${formattedDate}`, 140, 41);
             doc.autoTable({
-                head: [['SL', 'Medicine Name', 'Qty', 'Rate (Excl.GST)', 'Cost (Excl.GST)']],
+                head: [['SL No', 'Medicine Name', 'Qty', 'Rate (Excl.GST)', 'Cost (Excl.GST)']],
                 body: tableRows,
                 startY: 55,
                 theme: 'grid',
-                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], halign: 'center' },
+                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], halign: 'center',lineColor: [255, 255, 255],lineWidth: 0.2 },
                 bodyStyles: {
                     textColor: [0, 0, 0],
                 },
@@ -2813,12 +2866,44 @@ function renderPreviewTable(type) {
 
 // പുതിയ ഡൗൺലോഡ് Helper Function (ശരിയായ ഫയൽ ഡൗൺലോഡ് ചെയ്യാൻ)
 function downloadSpecificPDFByContent(type) {
-    // pdfQueue-ൽ നിന്ന് പേര് നോക്കി ശരിയായ ഫയൽ കണ്ടുപിടിക്കുന്നു
-    const index = pdfQueue.findIndex(p => p.name.toUpperCase().includes(type));
-    if (index !== -1) {
-        downloadSpecificPDF(index);
+    let targetIndex = -1;
+    
+    // ക്യൂവിലെ അവസാനത്തെ ഫയലിൽ നിന്ന് പുറകോട്ട് പരിശോധിക്കുന്നു (ഏറ്റവും പുതിയ ഫയൽ കിട്ടാൻ)
+    for (let i = pdfQueue.length - 1; i >= 0; i--) {
+        let fileName = pdfQueue[i].name.toUpperCase();
+        
+        if (type === 'KC') {
+            // പേരിൽ 'KC' ഉണ്ടാവണം, എന്നാൽ 'PREP' ഉണ്ടാകാൻ പാടില്ല
+            if (fileName.includes('KC') && !fileName.includes('PREP')) {
+                targetIndex = i;
+                break;
+            }
+        } 
+        else if (type === 'PREPARED') {
+            // പേരിൽ 'PREPARED' അല്ലെങ്കിൽ 'PREP' എന്ന് ഉണ്ടോ എന്ന് നോക്കുന്നു
+            if (fileName.includes('PREP')) {
+                targetIndex = i;
+                break;
+            }
+        }
+    }
+
+    // പേരുകൾ വെച്ച് കണ്ടുപിടിക്കാൻ കഴിഞ്ഞില്ലെങ്കിൽ, ഏറ്റവും പുതിയ 2 ഫയലുകൾ എടുക്കുന്നു
+    if (targetIndex === -1 && pdfQueue.length >= 2) {
+        if (type === 'KC') {
+            targetIndex = pdfQueue.length - 2; // KC സാധാരണ ആദ്യം ഉണ്ടാക്കുന്നു
+        } else if (type === 'PREPARED') {
+            targetIndex = pdfQueue.length - 1; // Prepared സാധാരണ രണ്ടാമത് ഉണ്ടാക്കുന്നു
+        }
+    }
+
+    // ഫയൽ കിട്ടിയാൽ അത് ഡൗൺലോഡ് ചെയ്യുക
+    if (targetIndex !== -1 && pdfQueue[targetIndex]) {
+        downloadSpecificPDF(targetIndex);
     } else {
-        alert("PDF not found for " + type);
+        // എന്തെങ്കിലും കാരണം കൊണ്ട് ഫയൽ കിട്ടിയില്ലെങ്കിൽ, ക്യൂവിലുള്ള ഫയലുകളുടെ പേരുകൾ സ്ക്രീനിൽ കാണിക്കും (നമുക്ക് പ്രശ്നം എളുപ്പം മനസ്സിലാക്കാൻ)
+        let availableFiles = pdfQueue.map(p => p.name).join(" | ");
+        alert("അറിയിപ്പ്: " + type + " ഫയൽ കണ്ടെത്താൻ കഴിഞ്ഞില്ല. നിലവിലുള്ള ഫയലുകൾ: " + availableFiles);
     }
 }
 
