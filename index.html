@@ -2581,14 +2581,12 @@ doc.line(10, 26, 200, 26); // വരയുടെ സ്ഥാനം (y=26)
                 body: tableRows,
                 startY: 55,
                 theme: 'grid',
-                tableLineColor: [230, 240, 255], // വരയുടെ നിറം (കറുപ്പ്)
-    tableLineWidth: 0.2,       // വരയുടെ കട്ടി
                 headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], halign: 'center' },
                 bodyStyles: {
                     textColor: [0, 0, 0],
                 },
                 columnStyles: { 0: { halign: 'center', cellWidth: 12 }, 2: { halign: 'center', cellWidth: 20 }, 3: { halign: 'right', cellWidth: 35 }, 4: { halign: 'right', cellWidth: 40 } },
-                styles: { fontSize: 9, cellPadding: 3 }
+                styles: { fontSize: 9, cellPadding: 3,  lineColor: [139, 69, 19], neWidth: 0.3  }
             });
             let finalY = doc.lastAutoTable.finalY + 10;
             const grandTotal = totalTaxableValue + totalSGST + totalCGST;
