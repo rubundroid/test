@@ -1122,6 +1122,45 @@
         padding: 10px !important; /* ഉള്ളിലെ പാഡിംഗ് കുറച്ചു */
         box-sizing: border-box !important;
     }
+    /* =========================================
+       6. INDENT SUMMARY FIX (.summary-table)
+       ========================================= */
+       
+    .summary-table {
+        table-layout: fixed !important;
+        width: 100% !important;
+    }
+
+    /* Category (Col 1) - പകുതി സ്ഥലം (50%) */
+    .summary-table th:nth-child(1), 
+    .summary-table td:nth-child(1) {
+        width: 50% !important;
+        text-align: left;
+        font-weight: bold;
+        font-size: 11px !important;
+    }
+
+    /* Items (Col 2) - 15% സ്ഥലം */
+    .summary-table th:nth-child(2), 
+    .summary-table td:nth-child(2) {
+        width: 15% !important;
+        text-align: center;
+        font-size: 11px !important;
+    }
+
+    /* Amount (Col 3) - 35% സ്ഥലം */
+    .summary-table th:nth-child(3), 
+    .summary-table td:nth-child(3) {
+        width: 35% !important;
+        text-align: right;
+        font-size: 11px !important;
+    }
+
+    /* പോപ്പ്അപ്പ് വിൻഡോ (SweetAlert) മൊബൈലിൽ ഒതുങ്ങാൻ */
+    .swal2-popup {
+        width: 95% !important; /* സ്ക്രീനിൽ കൃത്യമായി നിൽക്കാൻ */
+        padding: 10px !important;
+    }
 }
     </style>
 </head>
