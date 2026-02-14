@@ -3471,165 +3471,279 @@ function downloadSpecificPDFByContent(type) {
             }
         });
         async function autoAdjustBudget() {
-            const budgetInput = document.getElementById('total-budget');
-            const targetPaise = Math.round(parseFloat(budgetInput.value) * 100);
-            if (!targetPaise || targetPaise <= 0) return Swal.fire({ title: "ബജറ്റ് നൽകുക!", icon: "warning" });
-            Swal.fire({ title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു, ദയവായി കാത്തിരിക്കുക...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-            await new Promise(r => setTimeout(r, 600));
-            const rows = Array.from(document.querySelectorAll('.med-row'));
-            let selected = [];
-            let unselected = [];
-            let currentTotalPaise = 0;
-            rows.forEach(row => {
-                const qtyInp = row.querySelector('.qty-input');
-                const ratePaise = Math.round(parseFloat(row.cells[3].innerText) * 100);
-                const qty = parseInt(qtyInp.value) || 0;
-                const item = { row, qty, ratePaise, input: qtyInp, name: row.cells[1].innerText };
-                if (qty > 0) { selected.push(item); currentTotalPaise += (qty * ratePaise); }
-                else { unselected.push(item); }
-            });
-            if (selected.length < 1) { Swal.close(); return Swal.fire({ title: "മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!", icon: "info" }); }
-            let ratio = targetPaise / currentTotalPaise;
-            currentTotalPaise = 0;
-            selected.forEach(item => {
-                item.qty = Math.floor(item.qty * ratio);
-                currentTotalPaise += (item.qty * item.ratePaise);
-            });
-            let limit = 0;
-            while (limit < 500) {
-                let diff = targetPaise - currentTotalPaise;
-                if (diff === 0) break;
-                let actionTaken = false;
-                if (diff > 0) {
-                    let bestToAdd = selected.filter(i => i.ratePaise <= diff).sort((a, b) => b.ratePaise - a.ratePaise)[0];
-                    if (bestToAdd) {
-                        bestToAdd.qty++;
-                        currentTotalPaise += bestToAdd.ratePaise;
-                        actionTaken = true;
-                    } else {
-                        for (let a of selected) {
-                            if (a.qty > 0) {
-                                for (let b of selected) {
-                                    let swapGain = b.ratePaise - a.ratePaise;
-                                    if (swapGain > 0 && swapGain <= diff) {
-                                        a.qty--; b.qty++;
-                                        currentTotalPaise += swapGain;
-                                        actionTaken = true; break;
-                                    }
-                                }
-                            }
-                            if (actionTaken) break;
-                        }
-                    }
-                } else {
-                    let absDiff = Math.abs(diff);
-                    let bestToRemove = selected.filter(i => i.qty > 0 && i.ratePaise <= absDiff).sort((a, b) => b.ratePaise - a.ratePaise)[0];
-                    if (bestToRemove) {
-                        bestToRemove.qty--;
-                        currentTotalPaise -= bestToRemove.ratePaise;
-                        actionTaken = true;
-                    }
-                }
-                if (!actionTaken) break;
-                limit++;
-            }
-let finalDiff = targetPaise - currentTotalPaise;
-            if (finalDiff > 500) {
-                Swal.close();
-                
-                // മാറ്റം: ഒരെണ്ണത്തിന് പകരം അനുയോജ്യമായ എല്ലാ മരുന്നുകളും കണ്ടെത്തുന്നു
-                let matchingMedicines = unselected.filter(i => i.ratePaise <= finalDiff).sort((a, b) => b.ratePaise - a.ratePaise);
-                
-                if (matchingMedicines.length > 0) {
-                    // ലിസ്റ്റ് വളരെ വലുതാകാതിരിക്കാൻ ആദ്യത്തെ 10 മരുന്നുകൾ മാത്രം എടുക്കുന്നു
-                    let topSuggestions = matchingMedicines.slice(0, 10);
-                    
-                    // SweetAlert-ൽ കാണിക്കാൻ പാകത്തിൽ Object ആക്കി മാറ്റുന്നു
-                    let optionsObj = {};
-                    topSuggestions.forEach((item, index) => {
-                        optionsObj[index] = `${item.name} - ₹ ${(item.ratePaise / 100).toFixed(2)}`;
-                    });
-
-                    // പുതിയ Dropdown ഉള്ള SweetAlert
-                    const result = await Swal.fire({
-                        title: 'ബജറ്റ് ഗ്യാപ്പ്!',
-                        html: `₹ <b>${(finalDiff / 100).toFixed(2)}</b> ബാക്കിയുണ്ട്.<br><br>ചേർക്കേണ്ട മരുന്ന് തിരഞ്ഞെടുക്കുക:`,
-                        icon: 'question',
-                        input: 'select',
-                        inputOptions: optionsObj,
-                        inputPlaceholder: 'ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക...',
-                        showCancelButton: true,
-                        confirmButtonText: 'ചേർക്കൂ',
-                        cancelButtonText: 'വേണ്ട',
-                        inputValidator: (value) => {
-                            if (!value) {
-                                return 'ദയവായി ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക!';
-                            }
-                        }
-                    });
-
-                    Swal.fire({
-                        title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു...',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
-                    });
-
-                    // യൂസർ ഒരു മരുന്ന് തിരഞ്ഞെടുത്താൽ ബാക്കി പഴയപോലെ തന്നെ വർക്ക് ചെയ്യും
-                    if (result.isConfirmed && result.value) {
-                        let suggestion = topSuggestions[result.value]; // തിരഞ്ഞെടുത്ത മരുന്ന്
-                        let addQty = Math.floor(finalDiff / suggestion.ratePaise);
-                        suggestion.qty = addQty;
-                        currentTotalPaise += (addQty * suggestion.ratePaise);
-                        selected.push(suggestion);
-                    }
-                    await new Promise(r => setTimeout(r, 400));
-                }
-            }
-            renderFinal(selected.filter(i => i.qty > 0), rows, currentTotalPaise, targetPaise);
+    const budgetInput = document.getElementById('total-budget');
+    const targetPaise = Math.round(parseFloat(budgetInput.value) * 100);
+    if (!targetPaise || targetPaise <= 0) return Swal.fire({ title: "ബജറ്റ് നൽകുക!", icon: "warning" });
+    
+    Swal.fire({ title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു, ദയവായി കാത്തിരിക്കുക...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+    await new Promise(r => setTimeout(r, 600));
+    
+    const rows = Array.from(document.querySelectorAll('.med-row'));
+    let selected = [];
+    let unselected = [];
+    let currentTotalPaise = 0;
+    let originalTotalPaise = 0; // പഴയ തുക ഓർമ്മിക്കാൻ
+    
+    rows.forEach(row => {
+        const qtyInp = row.querySelector('.qty-input');
+        const ratePaise = Math.round(parseFloat(row.cells[3].innerText) * 100);
+        const qty = parseInt(qtyInp.value) || 0;
+        
+        // oldQty കൂടി ചേർത്തു
+        const item = { row, oldQty: qty, qty, ratePaise, input: qtyInp, name: row.cells[1].innerText };
+        
+        if (qty > 0) { 
+            selected.push(item); 
+            currentTotalPaise += (qty * ratePaise); 
+            originalTotalPaise += (qty * ratePaise); // പഴയ തുക കൂട്ടിവെക്കുന്നു
+        } else { 
+            unselected.push(item); 
         }
-        function renderFinal(selected, rows, currentTotalPaise, targetPaise) {
-            let slNo = 1;
-            rows.forEach(row => {
-                const qtyInp = row.querySelector('.qty-input');
-                if (qtyInp) {
-                    qtyInp.value = "";
-                    qtyInp.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-                row.style.display = "none";
-                row.style.backgroundColor = "";
-            });
-            selected.forEach(item => {
-                item.input.value = item.qty;
-                item.input.dispatchEvent(new Event('input', { bubbles: true }));
-                item.row.cells[4].innerText = ((item.qty * item.ratePaise) / 100).toFixed(2);
-                item.row.style.display = "";
-                item.row.cells[0].innerText = slNo++;
-                item.row.style.backgroundColor = "#e8f5e9";
-            });
-            const finalTotal = (currentTotalPaise / 100).toFixed(2);
-            const finalBal = ((targetPaise - currentTotalPaise) / 100).toFixed(2);
-            document.getElementById('display-total').innerText = parseFloat(finalTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 });
-            const balDisp = document.getElementById('display-balance');
-            if (balDisp) {
-                balDisp.innerText = parseFloat(finalBal).toLocaleString('en-IN', { minimumFractionDigits: 2 });
-                const infoCard = balDisp.closest('.info-card');
-                if (infoCard) {
-                    infoCard.style.backgroundColor = finalBal < 0 ? "#e74c3c" : "#2980b9";
+    });
+    
+    if (selected.length < 1) { Swal.close(); return Swal.fire({ title: "മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!", icon: "info" }); }
+    
+    let ratio = targetPaise / currentTotalPaise;
+    currentTotalPaise = 0;
+    selected.forEach(item => {
+        item.qty = Math.floor(item.qty * ratio);
+        currentTotalPaise += (item.qty * item.ratePaise);
+    });
+    
+    let limit = 0;
+    while (limit < 500) {
+        let diff = targetPaise - currentTotalPaise;
+        if (diff === 0) break;
+        let actionTaken = false;
+        
+        if (diff > 0) {
+            let bestToAdd = selected.filter(i => i.ratePaise <= diff).sort((a, b) => b.ratePaise - a.ratePaise)[0];
+            if (bestToAdd) {
+                bestToAdd.qty++;
+                currentTotalPaise += bestToAdd.ratePaise;
+                actionTaken = true;
+            } else {
+                for (let a of selected) {
+                    if (a.qty > 0) {
+                        for (let b of selected) {
+                            let swapGain = b.ratePaise - a.ratePaise;
+                            if (swapGain > 0 && swapGain <= diff) {
+                                a.qty--; b.qty++;
+                                currentTotalPaise += swapGain;
+                                actionTaken = true; break;
+                            }
+                        }
+                    }
+                    if (actionTaken) break;
                 }
             }
-            const viewBtn = document.getElementById("view-btn");
-            if (viewBtn) {
-                viewBtn.innerText = "SHOW ALL";
-                viewBtn.style.backgroundColor = "#2ecc71";
+        } else {
+            let absDiff = Math.abs(diff);
+            let bestToRemove = selected.filter(i => i.qty > 0 && i.ratePaise <= absDiff).sort((a, b) => b.ratePaise - a.ratePaise)[0];
+            if (bestToRemove) {
+                bestToRemove.qty--;
+                currentTotalPaise -= bestToRemove.ratePaise;
+                actionTaken = true;
             }
-            saveDraft();
-            Swal.close();
+        }
+        if (!actionTaken) break;
+        limit++;
+    }
+
+    let finalDiff = targetPaise - currentTotalPaise;
+    if (finalDiff > 500) {
+        Swal.close();
+        let matchingMedicines = unselected.filter(i => i.ratePaise <= finalDiff).sort((a, b) => b.ratePaise - a.ratePaise);
+        
+        if (matchingMedicines.length > 0) {
+            let topSuggestions = matchingMedicines.slice(0, 10);
+            let optionsObj = {};
+            topSuggestions.forEach((item, index) => {
+                optionsObj[index] = `${item.name} - ₹ ${(item.ratePaise / 100).toFixed(2)}`;
+            });
+
+            const result = await Swal.fire({
+                title: 'ബജറ്റ് ഗ്യാപ്പ്!',
+                html: `₹ <b>${(finalDiff / 100).toFixed(2)}</b> ബാക്കിയുണ്ട്.<br><br>ചേർക്കേണ്ട മരുന്ന് തിരഞ്ഞെടുക്കുക:`,
+                icon: 'question',
+                input: 'select',
+                inputOptions: optionsObj,
+                inputPlaceholder: 'ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക...',
+                showCancelButton: true,
+                confirmButtonText: 'ചേർക്കൂ',
+                cancelButtonText: 'വേണ്ട',
+                inputValidator: (value) => {
+                    if (!value) return 'ദയവായി ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക!';
+                }
+            });
+
             Swal.fire({
-                title: finalBal == "0.00" ? "Perfect Alignment!" : "ക്രമീകരണം കഴിഞ്ഞു",
-                html: `ടോട്ടൽ: Rs. ${finalTotal}<br>ബാക്കി: Rs. ${finalBal}`,
-                icon: finalBal == "0.00" ? "success" : "info"
+                title: 'ബജറ്റ് ക്രമീകരിക്കുന്നു...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
             });
+
+            if (result.isConfirmed && result.value) {
+                let suggestion = topSuggestions[result.value]; 
+                suggestion.oldQty = 0; // പുതിയ മരുന്നിന് പഴയ എണ്ണം 0 ആണ്
+                let addQty = Math.floor(finalDiff / suggestion.ratePaise);
+                suggestion.qty = addQty;
+                currentTotalPaise += (addQty * suggestion.ratePaise);
+                selected.push(suggestion);
+            }
+            await new Promise(r => setTimeout(r, 400));
         }
+    }
+
+    // ==================================================
+    // ഓർഡർ സമ്മറി റിപ്പോർട്ട് നിർമ്മിക്കുന്നു
+    // ==================================================
+    let summaryRows = '';
+    let sl = 1;
+    // പണ്ടോ ഇപ്പോഴോ 0-ന് മുകളിലുള്ള എല്ലാ മരുന്നുകളും എടുക്കുന്നു
+    let finalSelected = selected.filter(i => i.qty > 0 || i.oldQty > 0);
+    
+    finalSelected.forEach(item => {
+        let isChanged = item.qty !== item.oldQty;
+        let changeIndicator = "";
+        
+        // കൂടിയാൽ പച്ച, കുറഞ്ഞാൽ ചുവപ്പ് അമ്പടയാളം
+        if (item.qty > item.oldQty) {
+            changeIndicator = ` <span style="color: #27ae60; font-size: 14px; font-weight: bold;">(↑)</span>`;
+        } else if (item.qty < item.oldQty) {
+            changeIndicator = ` <span style="color: #e74c3c; font-size: 14px; font-weight: bold;">(↓)</span>`;
+        }
+
+        // മാറ്റം വന്ന വരികൾക്ക് ഇളം മഞ്ഞ നിറം നൽകുന്നു
+        let rowBg = isChanged ? 'background-color: #fffae6;' : '';
+
+        summaryRows += `
+        <tr style="border-bottom: 1px solid #ddd; ${rowBg}">
+            <td style="padding: 6px 4px;">${sl++}</td>
+            <td style="padding: 6px 4px; word-break: break-word; line-height: 1.2;">${item.name}</td>
+            <td style="padding: 6px 4px; text-align:center;">${item.oldQty}</td>
+            <td style="padding: 6px 4px; text-align:center; font-weight:bold;">${item.qty}${changeIndicator}</td>
+        </tr>`;
+    });
+
+    const finalTotalDisp = (currentTotalPaise / 100).toFixed(2);
+    const oldTotalDisp = (originalTotalPaise / 100).toFixed(2);
+    
+    let summaryHtml = `
+    <div style="max-height: 55vh; overflow-y: auto; border: 1px solid #ccc; margin-bottom: 10px; border-radius: 4px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+            <thead style="position: sticky; top: 0; background: #1e3c72; color: white; z-index: 2;">
+                <tr>
+                    <th style="padding: 8px 4px; width: 10%;">SL</th>
+                    <th style="padding: 8px 4px; width: 55%;">ITEM</th>
+                    <th style="padding: 8px 4px; text-align:center; width: 15%;">OLD</th>
+                    <th style="padding: 8px 4px; text-align:center; width: 20%;">NEW</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${summaryRows}
+            </tbody>
+        </table>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; background: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+        <span style="color: #e74c3c;">പഴയ തുക:<br>₹ ${oldTotalDisp}</span>
+        <span style="color: #27ae60; text-align: right;">പുതിയ തുക:<br>₹ ${finalTotalDisp}</span>
+    </div>
+    `;
+
+    Swal.close(); // നിലവിലെ ലോഡിംഗ് ക്ലോസ് ചെയ്യുക
+    
+    // സമ്മറി റിപ്പോർട്ട് കാണിച്ച് അനുവാദം ചോദിക്കുന്നു
+    const confirmResult = await Swal.fire({
+        title: 'ബജറ്റ് അഡ്ജസ്റ്റ്മെൻ്റ് സമ്മറി',
+        html: summaryHtml,
+        width: 'min(95%, 600px)', 
+        showCancelButton: true,
+        confirmButtonColor: '#27ae60',
+        cancelButtonColor: '#7f8c8d',
+        confirmButtonText: 'മാറ്റങ്ങൾ സേവ് ചെയ്യുക',
+        cancelButtonText: 'തിരികെ പോവുക (Cancel)',
+        allowOutsideClick: false
+    });
+
+    if (confirmResult.isConfirmed) {
+        // യൂസർ സമ്മതിച്ചാൽ (Apply) മാത്രം ടേബിൾ അപ്ഡേറ്റ് ചെയ്യുന്നു
+        renderFinal(selected.filter(i => i.qty > 0), rows, currentTotalPaise, targetPaise);
+    } else {
+        // ക്യാൻസൽ ചെയ്താൽ മാറ്റങ്ങൾ ഒഴിവാക്കി പഴയ പടി നിൽക്കും
+        Swal.fire({
+            title: 'റദ്ദാക്കി', 
+            text: 'പഴയ മരുന്നുകൾ അതേപടി നിലനിർത്തിയിട്ടുണ്ട്.', 
+            icon: 'info',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+}
+function renderFinal(selected, rows, currentTotalPaise, targetPaise) {
+    let slNo = 1;
+    
+    // 1. ആദ്യം എല്ലാ വരികളും ഒളിപ്പിച്ചുവെക്കുന്നു (Hide all rows)
+    rows.forEach(row => {
+        const qtyInp = row.querySelector('.qty-input');
+        
+        // സെലക്ട് ചെയ്യാത്ത മരുന്നുകളുടെ എണ്ണം ബോക്സ് കാലിയാക്കുന്നു
+        if (qtyInp && !selected.find(s => s.row === row)) {
+            qtyInp.value = ""; 
+        }
+        
+        row.style.display = "none"; // വരി അദൃശ്യമാക്കുന്നു
+        row.style.backgroundColor = ""; 
+    });
+
+    // 2. തിരഞ്ഞെടുത്തവ മാത്രം സ്ക്രീനിൽ കാണിക്കുന്നു (Show selected only)
+    selected.forEach(item => {
+        item.input.value = item.qty;
+        
+        // തുക അപ്ഡേറ്റ് ചെയ്യുന്നു
+        item.row.cells[4].innerText = ((item.qty * item.ratePaise) / 100).toFixed(2);
+        
+        item.row.style.display = ""; // വരി സ്ക്രീനിൽ കാണിക്കുന്നു
+        item.row.cells[0].innerText = slNo++; // പുതിയ ക്രമനമ്പർ നൽകുന്നു
+        item.row.style.backgroundColor = "#e8f5e9"; // എളുപ്പം തിരിച്ചറിയാൻ ഇളം പച്ച നിറം
+    });
+
+    // 3. ആകെ തുകയും ബാക്കിയും താഴെ കാണിക്കാൻ
+    const finalTotal = (currentTotalPaise / 100).toFixed(2);
+    const finalBal = ((targetPaise - currentTotalPaise) / 100).toFixed(2);
+    
+    document.getElementById('display-total').innerText = parseFloat(finalTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+    
+    const balDisp = document.getElementById('display-balance');
+    if (balDisp) {
+        balDisp.innerText = parseFloat(finalBal).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+        const infoCard = balDisp.closest('.info-card');
+        if (infoCard) {
+            // ബാക്കി തുക മൈനസ് ആയാൽ ചുവപ്പ് നിറം, അല്ലെങ്കിൽ നീല
+            infoCard.style.backgroundColor = finalBal < 0 ? "#e74c3c" : "#2980b9";
+        }
+    }
+
+    // ==================================================
+    // 4. ബട്ടൺ "SHOW ALL" ആക്കി മാറ്റുന്നു
+    // ==================================================
+    const viewBtn = document.getElementById("view-btn");
+    if (viewBtn) {
+        viewBtn.innerText = "SHOW ALL"; 
+        viewBtn.style.backgroundColor = "#e67e22"; // വേറിട്ടുനിൽക്കാൻ ഒരു ഓറഞ്ച് നിറം
+    }
+
+    if (typeof saveDraft === "function") {
+        saveDraft(); // ഡാറ്റ സേവ് ചെയ്യുന്നു
+    }
+
+    // 5. ഫൈനൽ റിപ്പോർട്ട് അലേർട്ട്
+    Swal.fire({
+        title: finalBal == "0.00" ? "Perfect Alignment!" : "ക്രമീകരണം കഴിഞ്ഞു",
+        html: `ടോട്ടൽ: <b>Rs. ${finalTotal}</b><br>ബാക്കി: <b>Rs. ${finalBal}</b>`,
+        icon: finalBal == "0.00" ? "success" : "info"
+    });
+}
         function enterApp() {
             const screen = document.getElementById('welcome-screen');
             screen.style.transition = "opacity 0.5s ease";
