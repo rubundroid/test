@@ -15,7 +15,7 @@
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="description"
-        content="Generate Ayurveda medicine indents easily. An unofficial tool for private use to create Oushadhi medicine order lists and print layouts.">
+        content="Generate Ayurveda medicine indents easily. An unofficial tool for private use to create Oushadhi medicine orders and prints.">
     <meta property="og:title" content="Ayurveda Indent Maker - Create Medicine Orders">
     <meta property="og:description"
         content="A private tool to generate Ayurveda medicine indent lists for Oushadhi and other formats. Simple, fast, and print-friendly.">
@@ -3626,9 +3626,11 @@ function downloadSpecificPDFByContent(type) {
         </tr>`;
     });
 
-    const finalTotalDisp = (currentTotalPaise / 100).toFixed(2);
+   const finalTotalDisp = (currentTotalPaise / 100).toFixed(2);
     const oldTotalDisp = (originalTotalPaise / 100).toFixed(2);
-    
+    const targetDisp = (targetPaise / 100).toFixed(2); // ആകെ ബജറ്റ്
+    const balanceDisp = ((targetPaise - currentTotalPaise) / 100).toFixed(2); // ബാക്കി തുക
+
     let summaryHtml = `
     <div style="max-height: 55vh; overflow-y: auto; border: 1px solid #ccc; margin-bottom: 10px; border-radius: 4px;">
         <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
@@ -3645,9 +3647,16 @@ function downloadSpecificPDFByContent(type) {
             </tbody>
         </table>
     </div>
-    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; background: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-        <span style="color: #e74c3c;">പഴയ തുക:<br>₹ ${oldTotalDisp}</span>
-        <span style="color: #27ae60; text-align: right;">പുതിയ തുക:<br>₹ ${finalTotalDisp}</span>
+    
+    <div style="background: #f8f9fa; padding: 12px; border-radius: 5px; border: 1px solid #ddd; font-size: 13px; font-weight: bold;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 8px;">
+            <span style="color: #7f8c8d;">പഴയ തുക:<br>₹ ${oldTotalDisp}</span>
+            <span style="color: #2980b9; text-align: right;">പുതിയ തുക:<br>₹ ${finalTotalDisp}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <span style="color: #8e44ad;">ആകെ ബജറ്റ്:<br>₹ ${targetDisp}</span>
+            <span style="color: ${balanceDisp < 0 ? '#e74c3c' : '#27ae60'}; text-align: right;">ബാക്കി തുക:<br>₹ ${balanceDisp}</span>
+        </div>
     </div>
     `;
 
