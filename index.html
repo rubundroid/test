@@ -3205,12 +3205,15 @@ function downloadSpecificPDFByContent(type) {
         }
     });
 }
-        function saveDraft() {
+function saveDraft() {
             const draftData = {};
             const inputs = document.querySelectorAll('.qty-input');
             inputs.forEach((input, index) => {
                 if (input.value && parseFloat(input.value) > 0) {
-                    draftData[index] = input.value;
+                    const row = input.closest('tr');
+                    const nameCell = row.querySelector('.med-name');
+                    let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
+                    draftData[cleanName] = input.value;
                 }
             });
             const info = {
@@ -3221,7 +3224,7 @@ function downloadSpecificPDFByContent(type) {
             localStorage.setItem('rubun_draft', JSON.stringify(draftData));
             localStorage.setItem('rubun_info', JSON.stringify(info));
         }
-        window.onload = function () {
+window.onload = function () {
             if (typeof updateIndentDropdown === "function") {
                 updateIndentDropdown();
             }
@@ -3259,20 +3262,44 @@ function downloadSpecificPDFByContent(type) {
             const savedDraft = localStorage.getItem('rubun_draft');
             if (savedDraft) {
                 const draftData = JSON.parse(savedDraft);
-                const inputs = document.querySelectorAll('.qty-input');
-                Object.keys(draftData).forEach(index => {
-                    if (inputs[index]) {
-                        inputs[index].value = draftData[index];
-                        const row = inputs[index].closest('tr');
-                        if (row) {
-                            const rate = parseFloat(row.cells[3].innerText);
-                            const costField = row.querySelector('.row-cost');
-                            const qty = parseFloat(draftData[index]) || 0;
-                            costField.innerText = (qty * rate).toFixed(2);
-                            if (qty > 0) row.classList.add('row-active');
+                const rows = document.querySelectorAll('#product-body tr');
+                
+                // --- ഇവിടെയാണ് ഡ്രാഫ്റ്റ് ലോഡ് ചെയ്യുന്ന രീതി മാറ്റിയത് ---
+                Object.keys(draftData).forEach(savedKey => {
+                    let qty = parseFloat(draftData[savedKey]) || 0;
+                    if (qty > 0) {
+                        let targetRow = null;
+                        
+                        if (isNaN(savedKey)) {
+                            // പുതിയ രീതി: പേര് വെച്ച് സേവ് ചെയ്ത ഡ്രാഫ്റ്റ് ആണെങ്കിൽ
+                            rows.forEach(row => {
+                                let nameCell = row.querySelector('.med-name');
+                                if(nameCell) {
+                                    let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
+                                    if (cleanName === savedKey) {
+                                        targetRow = row;
+                                    }
+                                }
+                            });
+                        } else {
+                            // പഴയ രീതി: നമ്പർ വെച്ച് സേവ് ചെയ്ത ഡ്രാഫ്റ്റ് ആണെങ്കിൽ
+                            targetRow = rows[savedKey];
+                        }
+
+                        if (targetRow) {
+                            const inputField = targetRow.querySelector('.qty-input');
+                            if(inputField) {
+                                inputField.value = qty;
+                                targetRow.classList.add('row-active');
+                                const rate = parseFloat(targetRow.cells[3].innerText);
+                                const costField = targetRow.querySelector('.row-cost');
+                                costField.innerText = (qty * rate).toFixed(2);
+                            }
                         }
                     }
                 });
+                // ---------------------------------------------------
+                
                 if (typeof calculateAll === "function") calculateAll();
             }
         };
@@ -3347,7 +3374,7 @@ function downloadSpecificPDFByContent(type) {
                 }
             }
         }
-        function saveNewIndent() {
+ function saveNewIndent() {
             const nameInput = document.getElementById("newIndentName");
             const name = nameInput.value.trim();
             if (!name) {
@@ -3363,11 +3390,18 @@ function downloadSpecificPDFByContent(type) {
             const finalFileName = name + "_" + ts;
             const key = "IND_" + finalFileName;
             const data = {};
+            
+            // --- പുതിയ മാറ്റം: വരിയുടെ നമ്പറിന് പകരം പേര് വെച്ച് സേവ് ചെയ്യുന്നു ---
             document.querySelectorAll('.qty-input').forEach((input, index) => {
                 if (parseFloat(input.value) > 0) {
-                    data[index] = input.value;
+                    const row = input.closest('tr');
+                    const nameCell = row.querySelector('.med-name');
+                    let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
+                    data[cleanName] = input.value; 
                 }
             });
+            // -------------------------------------------------------------
+
             const fullData = {
                 fileName: finalFileName,
                 inst: document.getElementById("inst-details").value,
@@ -3389,7 +3423,7 @@ function downloadSpecificPDFByContent(type) {
             nameInput.value = "";
             Swal.fire("Saved!", "'" + finalFileName + "' സേവ് ചെയ്യുകയും ഡൗൺലോഡ് ചെയ്യുകയും ചെയ്തിരിക്കുന്നു.", "success");
         }
-        function loadSelectedIndent() {
+function loadSelectedIndent() {
             const key = document.getElementById("savedIndentsList").value;
             if (!key) {
                 return Swal.fire({ title: "Select a file!", icon: "warning" });
@@ -3424,18 +3458,38 @@ function downloadSpecificPDFByContent(type) {
                 row.cells[4].innerText = "0.00";
                 row.style.display = "none";
             });
-            for (let index in savedData.quantities) {
-                const row = rows[index];
-                if (row) {
-                    const inputField = row.querySelector('.qty-input');
-                    inputField.value = savedData.quantities[index];
-                    row.classList.add('row-active');
-                    row.style.display = "";
-                    row.cells[0].innerText = counter++;
-                    const rate = parseFloat(row.cells[3].innerText);
-                    row.cells[4].innerText = (parseFloat(inputField.value) * rate).toFixed(2);
+            
+            // --- പഴയതും പുതിയതും തിരിച്ചറിഞ്ഞ് ലോഡ് ചെയ്യുന്ന ഭാഗം ---
+            for (let savedKey in savedData.quantities) {
+                let qty = savedData.quantities[savedKey];
+                let targetRow = null;
+
+                if (isNaN(savedKey)) {
+                    // പുതിയ രീതി: savedKey എന്നത് മരുന്നിന്റെ പേരാണെങ്കിൽ (അക്ഷരങ്ങൾ ആണെങ്കിൽ)
+                    rows.forEach(row => {
+                        let nameCell = row.querySelector('.med-name');
+                        let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
+                        if (cleanName === savedKey) {
+                            targetRow = row;
+                        }
+                    });
+                } else {
+                    // പഴയ രീതി: savedKey എന്നത് വരിയുടെ നമ്പർ ആണെങ്കിൽ
+                    targetRow = rows[savedKey];
+                }
+
+                if (targetRow) {
+                    const inputField = targetRow.querySelector('.qty-input');
+                    inputField.value = qty;
+                    targetRow.classList.add('row-active');
+                    targetRow.style.display = "";
+                    targetRow.cells[0].innerText = counter++;
+                    const rate = parseFloat(targetRow.cells[3].innerText);
+                    targetRow.cells[4].innerText = (parseFloat(inputField.value) * rate).toFixed(2);
                 }
             }
+            // --------------------------------------------------------
+
             if (typeof calculateAll === "function") calculateAll();
             const viewBtn = document.getElementById("view-btn");
             if (viewBtn) {
@@ -3668,11 +3722,17 @@ function filterByCategory(start, end, typeName) {
         Swal.close();
         let matchingMedicines = unselected.filter(i => i.ratePaise <= finalDiff).sort((a, b) => b.ratePaise - a.ratePaise);
         
-        if (matchingMedicines.length > 0) {
+if (matchingMedicines.length > 0) {
             let topSuggestions = matchingMedicines.slice(0, 10);
             let optionsObj = {};
             topSuggestions.forEach((item, index) => {
-                optionsObj[index] = `${item.name} - ₹ ${(item.ratePaise / 100).toFixed(2)}`;
+                
+                // --- പുതിയ മാറ്റം: പേരിനൊപ്പമുള്ള ഐക്കണുകൾ ഒഴിവാക്കുന്നു ---
+                let cleanName = item.name.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
+                
+                // item.name ന് പകരം നമ്മൾ ക്ലീൻ ചെയ്ത cleanName കൊടുക്കുന്നു
+                optionsObj[index] = `${cleanName} - ₹ ${(item.ratePaise / 100).toFixed(2)}`;
+                
             });
 
             const result = await Swal.fire({
@@ -3729,11 +3789,11 @@ function filterByCategory(start, end, typeName) {
 
         // മാറ്റം വന്ന വരികൾക്ക് ഇളം മഞ്ഞ നിറം നൽകുന്നു
         let rowBg = isChanged ? 'background-color: #fffae6;' : '';
-
+ let cleanName = item.name.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
         summaryRows += `
         <tr style="border-bottom: 1px solid #ddd; ${rowBg}">
             <td style="padding: 6px 4px;">${sl++}</td>
-            <td style="padding: 6px 4px; word-break: break-word; line-height: 1.2;">${item.name}</td>
+            <td style="padding: 6px 4px; word-break: break-word; line-height: 1.2;">${cleanName}</td>
             <td style="padding: 6px 4px; text-align:center;">${item.oldQty}</td>
             <td style="padding: 6px 4px; text-align:center; font-weight:bold;">${item.qty}${changeIndicator}</td>
         </tr>`;
