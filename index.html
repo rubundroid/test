@@ -4756,76 +4756,154 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
       }
 
       // 4. ഡിലീറ്റ് ചെയ്യാനുള്ള ഫംഗ്ഷൻ (പുതിയത്)
-      function deleteCustomMedicine(index) {
-        if (confirm("ഈ മരുന്ന് ഡിലീറ്റ് ചെയ്യണമെന്ന് ഉറപ്പാണോ?")) {
-          let customMedicines =
-            JSON.parse(localStorage.getItem("customMedicines")) || [];
-          customMedicines.splice(index, 1);
-          localStorage.setItem(
-            "customMedicines",
-            JSON.stringify(customMedicines),
-          );
+function deleteCustomMedicine(index) {
+    if (!confirm("ഈ മരുന്ന് ലിസ്റ്റിൽ നിന്നും ഡിലീറ്റ് ചെയ്യണോ?")) return;
 
-          loadMedicines();
-          let currentType = document
-            .getElementById("typeBtn")
-            .innerText.replace(" ▾", "");
-          filterByCategory(0, 0, currentType);
-        }
-      }
+    // 1. നിലവിൽ ടൈപ്പ് ചെയ്തവ നഷ്ടപ്പെടാതിരിക്കാൻ ആദ്യം ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുന്നു!
+    if (typeof saveDraft === "function") saveDraft();
+
+    // 2. മരുന്ന് ഡിലീറ്റ് ചെയ്യുന്നു
+    let customMedicines = JSON.parse(localStorage.getItem('customMedicines')) || [];
+    customMedicines.splice(index, 1);
+    localStorage.setItem('customMedicines', JSON.stringify(customMedicines));
+
+    // 3. ടേബിൾ വീണ്ടും വരയ്ക്കുന്നു
+    if (typeof loadMedicines === "function") loadMedicines();
+
+    // 4. ടേബിൾ റീലോഡ് ആയതുകൊണ്ട്, ഡ്രാഫ്റ്റിലുള്ള എണ്ണം വീണ്ടും സ്ക്രീനിലേക്ക് തിരികെ കൊടുക്കുന്നു
+    const savedDraft = localStorage.getItem('rubun_draft');
+    if (savedDraft) {
+        const draftData = JSON.parse(savedDraft);
+        const rows = document.querySelectorAll('#product-body tr');
+        
+        Object.keys(draftData).forEach(savedKey => {
+            let qty = parseFloat(draftData[savedKey]) || 0;
+            if (qty > 0) {
+                let targetRow = null;
+                if (isNaN(savedKey)) {
+                    rows.forEach(row => {
+                        let nameCell = row.querySelector('.med-name');
+                        if(nameCell) {
+                            let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
+                            if (cleanName === savedKey) {
+                                targetRow = row;
+                            }
+                        }
+                    });
+                } else {
+                    targetRow = rows[savedKey];
+                }
+
+                if (targetRow) {
+                    const inputField = targetRow.querySelector('.qty-input');
+                    if(inputField) {
+                        inputField.value = qty;
+                        targetRow.classList.add('row-active');
+                        const rowRate = parseFloat(targetRow.cells[3].innerText);
+                        const costField = targetRow.querySelector('.row-cost');
+                        if(costField) costField.innerText = (qty * rowRate).toFixed(2);
+                    }
+                }
+            }
+        });
+        if (typeof calculateAll === "function") calculateAll();
+    }
+
+    // 5. ഡിലീറ്റ് ചെയ്ത ശേഷം വീണ്ടും NEW ADDED ലിസ്റ്റ് തന്നെ സ്ക്രീനിൽ കാണിക്കുന്നു
+    if (typeof filterByCategory === "function") filterByCategory(0, 0, 'NEW ADDED'); 
+    
+    let typeBtn = document.getElementById("typeBtn");
+    if(typeBtn) {
+        typeBtn.innerText = "NEW ADDED ▾";
+    }
+}
 
       // 5. മരുന്ന് സേവ് ചെയ്യാനും എഡിറ്റ് ചെയ്തത് അപ്ഡേറ്റ് ചെയ്യാനുമുള്ള ഫംഗ്ഷൻ
-      function saveCustomMedicine() {
-        let name = document.getElementById("customMedName").value;
+function saveCustomMedicine() {
+    // 1. നിലവിൽ ടൈപ്പ് ചെയ്തവ നഷ്ടപ്പെടാതിരിക്കാൻ ആദ്യം ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുന്നു!
+    if (typeof saveDraft === "function") saveDraft();
+    
+    let name = document.getElementById('customMedName').value;
+    let type = "NEW ADDED"; 
+    let rate = document.getElementById('customMedRate').value;
+    let gst = document.getElementById('customMedGST').value;
 
-        // --- പുതിയ മാറ്റം: യൂസർ സെലക്ട് ചെയ്യുന്നതിന് പകരം തനിയെ NEW ADDED എന്ന് കൊടുക്കുന്നു ---
-        let type = "NEW ADDED";
+    if(name === '' || rate === '') {
+        alert("Please enter Medicine Name and Rate!");
+        return;
+    }
 
-        let rate = document.getElementById("customMedRate").value;
-        let gst = document.getElementById("customMedGST").value;
+    let newMedicine = {
+        name: name + " *", 
+        type: type, 
+        rate: parseFloat(rate),
+        gst: parseFloat(gst),
+        isCustom: true 
+    };
 
-        if (name === "" || rate === "") {
-          alert("Please enter Medicine Name and Rate!");
-          return;
-        }
+    let customMedicines = JSON.parse(localStorage.getItem('customMedicines')) || [];
+    
+    if (typeof editIndex !== 'undefined' && editIndex > -1) {
+        customMedicines[editIndex] = newMedicine;
+        editIndex = -1; 
+    } else {
+        customMedicines.push(newMedicine);
+    }
+    
+    localStorage.setItem('customMedicines', JSON.stringify(customMedicines));
 
-        let newMedicine = {
-          name: name + " *",
-          type: type, // ഇവിടെ ഇനി എപ്പോഴും "NEW ADDED" എന്ന് വരും
-          rate: parseFloat(rate),
-          gst: parseFloat(gst),
-          isCustom: true,
-        };
+    closeAddModal();
+    
+    // 2. പുതിയ മരുന്ന് ഉൾപ്പെടെ ടേബിൾ വീണ്ടും വരയ്ക്കുന്നു
+    loadMedicines();
+    
+    // 3. ടേബിൾ റീലോഡ് ആയതുകൊണ്ട്, ഡ്രാഫ്റ്റിലുള്ള എണ്ണം വീണ്ടും സ്ക്രീനിലേക്ക് തിരികെ കൊടുക്കുന്നു
+    const savedDraft = localStorage.getItem('rubun_draft');
+    if (savedDraft) {
+        const draftData = JSON.parse(savedDraft);
+        const rows = document.querySelectorAll('#product-body tr');
+        
+        Object.keys(draftData).forEach(savedKey => {
+            let qty = parseFloat(draftData[savedKey]) || 0;
+            if (qty > 0) {
+                let targetRow = null;
+                if (isNaN(savedKey)) {
+                    rows.forEach(row => {
+                        let nameCell = row.querySelector('.med-name');
+                        if(nameCell) {
+                            let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
+                            if (cleanName === savedKey) {
+                                targetRow = row;
+                            }
+                        }
+                    });
+                } else {
+                    targetRow = rows[savedKey];
+                }
 
-        let customMedicines =
-          JSON.parse(localStorage.getItem("customMedicines")) || [];
-
-        if (editIndex > -1) {
-          // നിലവിലുള്ളത് എഡിറ്റ് ചെയ്യുകയാണെങ്കിൽ
-          customMedicines[editIndex] = newMedicine;
-          editIndex = -1;
-        } else {
-          // പുതിയത് ചേർക്കുകയാണെങ്കിൽ
-          customMedicines.push(newMedicine);
-        }
-
-        localStorage.setItem(
-          "customMedicines",
-          JSON.stringify(customMedicines),
-        );
-
-        closeAddModal();
-        loadMedicines();
-
-        // സേവ് ചെയ്ത ഉടനെ ആ പുതിയ മരുന്ന് കാണാൻ NEW ADDED കാറ്റഗറി തനിയെ തുറക്കുന്നു
-        filterByCategory(0, 0, "NEW ADDED");
-
-        // മുകളിലെ ഡ്രോപ്പ്ഡൗൺ ബട്ടണിലെ പേരും മാറ്റുന്നു
-        let typeBtn = document.getElementById("typeBtn");
-        if (typeBtn) {
-          typeBtn.innerText = "NEW ADDED ▾";
-        }
-      }
+                if (targetRow) {
+                    const inputField = targetRow.querySelector('.qty-input');
+                    if(inputField) {
+                        inputField.value = qty;
+                        targetRow.classList.add('row-active');
+                        const rowRate = parseFloat(targetRow.cells[3].innerText);
+                        const costField = targetRow.querySelector('.row-cost');
+                        if(costField) costField.innerText = (qty * rowRate).toFixed(2);
+                    }
+                }
+            }
+        });
+        if (typeof calculateAll === "function") calculateAll();
+    }
+    
+    // 4. എല്ലാം കഴിഞ്ഞ ശേഷം NEW ADDED ലിസ്റ്റ് കാണിക്കുന്നു
+    filterByCategory(0, 0, 'NEW ADDED'); 
+    
+    let typeBtn = document.getElementById("typeBtn");
+    if(typeBtn) {
+        typeBtn.innerText = "NEW ADDED ▾";
+    }
+}
     </script>
   </body>
 </html>
