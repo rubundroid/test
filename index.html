@@ -653,7 +653,6 @@
       /* 7. Footer & Contacts (Compact Grid) */
       .footer-contact {
         margin-top: 12px;
-        /* ഫൂട്ടർ മുകളിലേക്ക് അടുപ്പിച്ചു */
         font-size: 11px;
         color: #777;
         border-top: 1px solid #eee;
@@ -662,34 +661,31 @@
 
       .contact-grid {
         display: grid;
-        /* രണ്ട് കോളമായി തിരിക്കുന്നു (കൂടുതൽ ഒതുങ്ങാൻ) */
+        /* രണ്ട് കോളമായി കൃത്യം പകുതി വീതം തിരിക്കുന്നു (Side-by-side) */
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        margin-top: 8px;
+        gap: 10px;
+        margin-top: 10px;
       }
 
-      /* മൂന്നാമത്തെ ആളെ നടുക്ക് കൊണ്ടുവരാൻ */
-      .contact-grid > a:last-child {
-        grid-column: span 2;
-        /* ബാക്കിയുള്ള ആൾ വരി ഫുൾ എടുക്കും */
-        width: 60%;
-        /* പക്ഷെ നീളം കുറച്ച് */
-        margin: 0 auto;
-        /* നടുക്ക് നിൽക്കും */
-      }
+      /* (പഴയ മൂന്നാമത്തെ ആളുടെ കോഡ് പൂർണ്ണമായും ഒഴിവാക്കി) */
 
       .wa-chat-link {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        background: #ffffff;
-        color: #25d366;
+        background: #f9fdfa; /* ചെറിയൊരു പച്ച ബാക്ക്ഗ്രൗണ്ട് */
+        color: #27ae60;
         text-decoration: none;
-        padding: 6px 10px;
-        /* ബോക്സ് ചെറുതാക്കി */
+        padding: 8px 10px;
         border-radius: 8px;
         border: 1px solid #dcfce7;
+        transition: transform 0.2s;
+      }
+
+      .wa-chat-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       }
 
       .wa-chat-link:hover,
@@ -1301,22 +1297,6 @@
               <div class="contact-info">
                 <span class="contact-name">Sumesh T.K</span>
                 <span class="contact-number">9447596675</span>
-              </div>
-            </a>
-            <a
-              href="https://wa.me/919946479273?text=Hi%20Pratheesh,%20I%20need%20help%20with%20Indent%20Maker"
-              target="_blank"
-              class="wa-chat-link"
-            >
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-                width="20"
-                height="20"
-                alt="WA"
-              />
-              <div class="contact-info">
-                <span class="contact-name">Pratheesh M.P</span>
-                <span class="contact-number">9946479273</span>
               </div>
             </a>
           </div>
@@ -4756,154 +4736,173 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
       }
 
       // 4. ഡിലീറ്റ് ചെയ്യാനുള്ള ഫംഗ്ഷൻ (പുതിയത്)
-function deleteCustomMedicine(index) {
-    if (!confirm("ഈ മരുന്ന് ലിസ്റ്റിൽ നിന്നും ഡിലീറ്റ് ചെയ്യണോ?")) return;
+      function deleteCustomMedicine(index) {
+        if (!confirm("ഈ മരുന്ന് ലിസ്റ്റിൽ നിന്നും ഡിലീറ്റ് ചെയ്യണോ?")) return;
 
-    // 1. നിലവിൽ ടൈപ്പ് ചെയ്തവ നഷ്ടപ്പെടാതിരിക്കാൻ ആദ്യം ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുന്നു!
-    if (typeof saveDraft === "function") saveDraft();
+        // 1. നിലവിൽ ടൈപ്പ് ചെയ്തവ നഷ്ടപ്പെടാതിരിക്കാൻ ആദ്യം ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുന്നു!
+        if (typeof saveDraft === "function") saveDraft();
 
-    // 2. മരുന്ന് ഡിലീറ്റ് ചെയ്യുന്നു
-    let customMedicines = JSON.parse(localStorage.getItem('customMedicines')) || [];
-    customMedicines.splice(index, 1);
-    localStorage.setItem('customMedicines', JSON.stringify(customMedicines));
+        // 2. മരുന്ന് ഡിലീറ്റ് ചെയ്യുന്നു
+        let customMedicines =
+          JSON.parse(localStorage.getItem("customMedicines")) || [];
+        customMedicines.splice(index, 1);
+        localStorage.setItem(
+          "customMedicines",
+          JSON.stringify(customMedicines),
+        );
 
-    // 3. ടേബിൾ വീണ്ടും വരയ്ക്കുന്നു
-    if (typeof loadMedicines === "function") loadMedicines();
+        // 3. ടേബിൾ വീണ്ടും വരയ്ക്കുന്നു
+        if (typeof loadMedicines === "function") loadMedicines();
 
-    // 4. ടേബിൾ റീലോഡ് ആയതുകൊണ്ട്, ഡ്രാഫ്റ്റിലുള്ള എണ്ണം വീണ്ടും സ്ക്രീനിലേക്ക് തിരികെ കൊടുക്കുന്നു
-    const savedDraft = localStorage.getItem('rubun_draft');
-    if (savedDraft) {
-        const draftData = JSON.parse(savedDraft);
-        const rows = document.querySelectorAll('#product-body tr');
-        
-        Object.keys(draftData).forEach(savedKey => {
+        // 4. ടേബിൾ റീലോഡ് ആയതുകൊണ്ട്, ഡ്രാഫ്റ്റിലുള്ള എണ്ണം വീണ്ടും സ്ക്രീനിലേക്ക് തിരികെ കൊടുക്കുന്നു
+        const savedDraft = localStorage.getItem("rubun_draft");
+        if (savedDraft) {
+          const draftData = JSON.parse(savedDraft);
+          const rows = document.querySelectorAll("#product-body tr");
+
+          Object.keys(draftData).forEach((savedKey) => {
             let qty = parseFloat(draftData[savedKey]) || 0;
             if (qty > 0) {
-                let targetRow = null;
-                if (isNaN(savedKey)) {
-                    rows.forEach(row => {
-                        let nameCell = row.querySelector('.med-name');
-                        if(nameCell) {
-                            let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
-                            if (cleanName === savedKey) {
-                                targetRow = row;
-                            }
-                        }
-                    });
-                } else {
-                    targetRow = rows[savedKey];
-                }
-
-                if (targetRow) {
-                    const inputField = targetRow.querySelector('.qty-input');
-                    if(inputField) {
-                        inputField.value = qty;
-                        targetRow.classList.add('row-active');
-                        const rowRate = parseFloat(targetRow.cells[3].innerText);
-                        const costField = targetRow.querySelector('.row-cost');
-                        if(costField) costField.innerText = (qty * rowRate).toFixed(2);
+              let targetRow = null;
+              if (isNaN(savedKey)) {
+                rows.forEach((row) => {
+                  let nameCell = row.querySelector(".med-name");
+                  if (nameCell) {
+                    let cleanName = nameCell.childNodes[0].textContent
+                      .replace(/✏️/g, "")
+                      .replace(/🗑️/g, "")
+                      .replace(/\*/g, "")
+                      .trim();
+                    if (cleanName === savedKey) {
+                      targetRow = row;
                     }
-                }
-            }
-        });
-        if (typeof calculateAll === "function") calculateAll();
-    }
+                  }
+                });
+              } else {
+                targetRow = rows[savedKey];
+              }
 
-    // 5. ഡിലീറ്റ് ചെയ്ത ശേഷം വീണ്ടും NEW ADDED ലിസ്റ്റ് തന്നെ സ്ക്രീനിൽ കാണിക്കുന്നു
-    if (typeof filterByCategory === "function") filterByCategory(0, 0, 'NEW ADDED'); 
-    
-    let typeBtn = document.getElementById("typeBtn");
-    if(typeBtn) {
-        typeBtn.innerText = "NEW ADDED ▾";
-    }
-}
+              if (targetRow) {
+                const inputField = targetRow.querySelector(".qty-input");
+                if (inputField) {
+                  inputField.value = qty;
+                  targetRow.classList.add("row-active");
+                  const rowRate = parseFloat(targetRow.cells[3].innerText);
+                  const costField = targetRow.querySelector(".row-cost");
+                  if (costField)
+                    costField.innerText = (qty * rowRate).toFixed(2);
+                }
+              }
+            }
+          });
+          if (typeof calculateAll === "function") calculateAll();
+        }
+
+        // 5. ഡിലീറ്റ് ചെയ്ത ശേഷം വീണ്ടും NEW ADDED ലിസ്റ്റ് തന്നെ സ്ക്രീനിൽ കാണിക്കുന്നു
+        if (typeof filterByCategory === "function")
+          filterByCategory(0, 0, "NEW ADDED");
+
+        let typeBtn = document.getElementById("typeBtn");
+        if (typeBtn) {
+          typeBtn.innerText = "NEW ADDED ▾";
+        }
+      }
 
       // 5. മരുന്ന് സേവ് ചെയ്യാനും എഡിറ്റ് ചെയ്തത് അപ്ഡേറ്റ് ചെയ്യാനുമുള്ള ഫംഗ്ഷൻ
-function saveCustomMedicine() {
-    // 1. നിലവിൽ ടൈപ്പ് ചെയ്തവ നഷ്ടപ്പെടാതിരിക്കാൻ ആദ്യം ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുന്നു!
-    if (typeof saveDraft === "function") saveDraft();
-    
-    let name = document.getElementById('customMedName').value;
-    let type = "NEW ADDED"; 
-    let rate = document.getElementById('customMedRate').value;
-    let gst = document.getElementById('customMedGST').value;
+      function saveCustomMedicine() {
+        // 1. നിലവിൽ ടൈപ്പ് ചെയ്തവ നഷ്ടപ്പെടാതിരിക്കാൻ ആദ്യം ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുന്നു!
+        if (typeof saveDraft === "function") saveDraft();
 
-    if(name === '' || rate === '') {
-        alert("Please enter Medicine Name and Rate!");
-        return;
-    }
+        let name = document.getElementById("customMedName").value;
+        let type = "NEW ADDED";
+        let rate = document.getElementById("customMedRate").value;
+        let gst = document.getElementById("customMedGST").value;
 
-    let newMedicine = {
-        name: name + " *", 
-        type: type, 
-        rate: parseFloat(rate),
-        gst: parseFloat(gst),
-        isCustom: true 
-    };
+        if (name === "" || rate === "") {
+          alert("Please enter Medicine Name and Rate!");
+          return;
+        }
 
-    let customMedicines = JSON.parse(localStorage.getItem('customMedicines')) || [];
-    
-    if (typeof editIndex !== 'undefined' && editIndex > -1) {
-        customMedicines[editIndex] = newMedicine;
-        editIndex = -1; 
-    } else {
-        customMedicines.push(newMedicine);
-    }
-    
-    localStorage.setItem('customMedicines', JSON.stringify(customMedicines));
+        let newMedicine = {
+          name: name + " *",
+          type: type,
+          rate: parseFloat(rate),
+          gst: parseFloat(gst),
+          isCustom: true,
+        };
 
-    closeAddModal();
-    
-    // 2. പുതിയ മരുന്ന് ഉൾപ്പെടെ ടേബിൾ വീണ്ടും വരയ്ക്കുന്നു
-    loadMedicines();
-    
-    // 3. ടേബിൾ റീലോഡ് ആയതുകൊണ്ട്, ഡ്രാഫ്റ്റിലുള്ള എണ്ണം വീണ്ടും സ്ക്രീനിലേക്ക് തിരികെ കൊടുക്കുന്നു
-    const savedDraft = localStorage.getItem('rubun_draft');
-    if (savedDraft) {
-        const draftData = JSON.parse(savedDraft);
-        const rows = document.querySelectorAll('#product-body tr');
-        
-        Object.keys(draftData).forEach(savedKey => {
+        let customMedicines =
+          JSON.parse(localStorage.getItem("customMedicines")) || [];
+
+        if (typeof editIndex !== "undefined" && editIndex > -1) {
+          customMedicines[editIndex] = newMedicine;
+          editIndex = -1;
+        } else {
+          customMedicines.push(newMedicine);
+        }
+
+        localStorage.setItem(
+          "customMedicines",
+          JSON.stringify(customMedicines),
+        );
+
+        closeAddModal();
+
+        // 2. പുതിയ മരുന്ന് ഉൾപ്പെടെ ടേബിൾ വീണ്ടും വരയ്ക്കുന്നു
+        loadMedicines();
+
+        // 3. ടേബിൾ റീലോഡ് ആയതുകൊണ്ട്, ഡ്രാഫ്റ്റിലുള്ള എണ്ണം വീണ്ടും സ്ക്രീനിലേക്ക് തിരികെ കൊടുക്കുന്നു
+        const savedDraft = localStorage.getItem("rubun_draft");
+        if (savedDraft) {
+          const draftData = JSON.parse(savedDraft);
+          const rows = document.querySelectorAll("#product-body tr");
+
+          Object.keys(draftData).forEach((savedKey) => {
             let qty = parseFloat(draftData[savedKey]) || 0;
             if (qty > 0) {
-                let targetRow = null;
-                if (isNaN(savedKey)) {
-                    rows.forEach(row => {
-                        let nameCell = row.querySelector('.med-name');
-                        if(nameCell) {
-                            let cleanName = nameCell.childNodes[0].textContent.replace(/✏️/g, '').replace(/🗑️/g, '').replace(/\*/g, '').trim();
-                            if (cleanName === savedKey) {
-                                targetRow = row;
-                            }
-                        }
-                    });
-                } else {
-                    targetRow = rows[savedKey];
-                }
-
-                if (targetRow) {
-                    const inputField = targetRow.querySelector('.qty-input');
-                    if(inputField) {
-                        inputField.value = qty;
-                        targetRow.classList.add('row-active');
-                        const rowRate = parseFloat(targetRow.cells[3].innerText);
-                        const costField = targetRow.querySelector('.row-cost');
-                        if(costField) costField.innerText = (qty * rowRate).toFixed(2);
+              let targetRow = null;
+              if (isNaN(savedKey)) {
+                rows.forEach((row) => {
+                  let nameCell = row.querySelector(".med-name");
+                  if (nameCell) {
+                    let cleanName = nameCell.childNodes[0].textContent
+                      .replace(/✏️/g, "")
+                      .replace(/🗑️/g, "")
+                      .replace(/\*/g, "")
+                      .trim();
+                    if (cleanName === savedKey) {
+                      targetRow = row;
                     }
+                  }
+                });
+              } else {
+                targetRow = rows[savedKey];
+              }
+
+              if (targetRow) {
+                const inputField = targetRow.querySelector(".qty-input");
+                if (inputField) {
+                  inputField.value = qty;
+                  targetRow.classList.add("row-active");
+                  const rowRate = parseFloat(targetRow.cells[3].innerText);
+                  const costField = targetRow.querySelector(".row-cost");
+                  if (costField)
+                    costField.innerText = (qty * rowRate).toFixed(2);
                 }
+              }
             }
-        });
-        if (typeof calculateAll === "function") calculateAll();
-    }
-    
-    // 4. എല്ലാം കഴിഞ്ഞ ശേഷം NEW ADDED ലിസ്റ്റ് കാണിക്കുന്നു
-    filterByCategory(0, 0, 'NEW ADDED'); 
-    
-    let typeBtn = document.getElementById("typeBtn");
-    if(typeBtn) {
-        typeBtn.innerText = "NEW ADDED ▾";
-    }
-}
+          });
+          if (typeof calculateAll === "function") calculateAll();
+        }
+
+        // 4. എല്ലാം കഴിഞ്ഞ ശേഷം NEW ADDED ലിസ്റ്റ് കാണിക്കുന്നു
+        filterByCategory(0, 0, "NEW ADDED");
+
+        let typeBtn = document.getElementById("typeBtn");
+        if (typeBtn) {
+          typeBtn.innerText = "NEW ADDED ▾";
+        }
+      }
     </script>
   </body>
 </html>
