@@ -44,7 +44,1496 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<style>:root{--primary-color:#2c3e50;--accent-color:#3498db;--success-color:#27ae60;--danger-color:#e74c3c}body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;margin:0;padding:0;background-color:#f0f2f5;color:#333}.sticky-header-container{background:#fff;padding:15px;border-bottom:2px solid #ddd;box-sizing:border-box;width:100%}.header-inputs{display:flex;gap:20px;align-items:flex-start;width:100%}.input-wrapper{display:flex;flex-direction:column;min-width:0}.address-section{flex:1.5}.indent-section{flex:1}.input-label{font-size:13px;font-weight:700;color:#2c3e50;margin-bottom:5px;display:block}#inst-details{font-size:14px;border:1px solid #3498db;width:100%;border-radius:5px;padding:8px;box-sizing:border-box;resize:vertical;min-height:75px;font-family:inherit}#indent-select,#indent-type{width:100%;border:2px solid #3498db;border-radius:5px;font-weight:700;height:40px;font-size:13px;padding:0 10px;cursor:pointer;background:#fff;box-sizing:border-box}#indent-type{border-color:#e67e22;background-color:#fff9f4;margin-top:5px}@media (max-width:768px){.header-inputs{flex-direction:column;gap:15px}.address-section,.indent-section{width:100%;flex:none}#inst-details{min-height:60px}}.summary-buttons{display:flex;gap:10px;max-width:1200px;margin:15px auto;flex-wrap:wrap;justify-content:center}.info-card{padding:8px 10px;border-radius:5px;flex:1;min-width:110px;max-width:220px;text-align:center;color:#fff;font-weight:700;display:flex;flex-direction:column;justify-content:center;font-size:13px;white-space:normal;cursor:pointer}.btn-total,.btn-balance{flex:1.5;max-width:none;min-width:160px}.info-card:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 4px 10px rgb(0 0 0 / .2)}.btn-total{background-color:var(--success-color)}.btn-balance{background-color:var(--accent-color)}@media (max-width:768px){.summary-buttons{margin-left:20px!important;margin-right:20px!important;width:auto!important}}.table-container{max-height:75vh;overflow-y:auto;border:1px solid #ddd;margin:0 auto;max-width:1200px;background:#fff;padding-bottom:60px}table{width:100%;border-collapse:collapse;background:#fff}thead th{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:#fff;padding:12px 10px;text-transform:uppercase;font-size:13px;letter-spacing:.5px;position:sticky;top:0;z-index:50}td{padding:10px;border-bottom:1px solid #eee;font-size:14px;vertical-align:middle}#product-body td:nth-child(2){font-weight:700;color:#2c3e50}.qty-input{width:70px;padding:8px;text-align:center;border:1px solid #ccc;border-radius:4px;font-weight:700;font-size:15px}.row-active{background-color:#e8f8f5!important}.row-cost{font-weight:700;color:#2c3e50}#categoryMenu{display:none}#categoryMenu.show-grid{display:grid!important;gap:8px;background:#fff;border:1px solid #2c3e50;padding:15px;border-radius:10px;box-shadow:0 10px 25px rgb(0 0 0 / .3);z-index:9999}@media (min-width:769px){#categoryMenu.show-grid{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;grid-template-columns:repeat(4,1fr);z-index:3000;box-shadow:0 0 0 1000px rgb(0 0 0 / .5);max-height:90vh;overflow-y:auto}}@media (max-width:768px){#categoryMenu.show-grid{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:85%;max-width:350px;max-height:70vh;overflow-y:auto;grid-template-columns:repeat(2,1fr);box-shadow:0 0 0 1000px rgb(0 0 0 / .5)}}.cat-item{padding:10px;cursor:pointer;background:#f8f9fa;border:1px solid #ddd;text-align:center;font-size:11px;font-weight:700;border-radius:4px;transition:0.1s}.cat-item:hover{background-color:#3498db;color:#fff}#typeBtn{flex:1;min-height:32px}.search-container{display:flex;gap:15px;max-width:1200px;margin:15px auto;align-items:center}.styled-input{width:100%;height:45px;border-radius:25px;border:2px solid #2c3e50;padding:0 20px;font-size:15px;outline:none;box-sizing:border-box;transition:border-color 0.3s}.styled-input:focus{border-color:#16a085}.search-box-wrapper{flex:3}.rate-box-wrapper{flex:2;display:flex;gap:10px}.find-btn{height:45px;padding:0 25px;border-radius:25px;background-color:#2c3e50;color:#fff;border:none;font-weight:700;cursor:pointer;transition:transform 0.2s;white-space:nowrap}.find-btn:active{transform:scale(.95)}@media (max-width:768px){.search-container{display:flex;flex-direction:column;gap:10px;width:auto;margin:0 20px}.search-box-wrapper{width:100%}.search-box-wrapper input{width:100%!important;box-sizing:border-box}.rate-box-wrapper{display:flex!important;flex-direction:row!important;width:100%!important;gap:8px;align-items:center}.rate-box-wrapper input{flex:1!important;width:auto!important;min-width:0;margin:0!important}.find-btn{width:auto!important;flex-shrink:0;padding:0 20px;margin:0!important;white-space:nowrap}}#welcome-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);display:flex;justify-content:center;align-items:center;padding:10px;z-index:9999;box-sizing:border-box;backdrop-filter:blur(5px)}.welcome-card{background:rgb(255 255 255 / .96);padding:20px;border-radius:20px;box-shadow:0 15px 40px rgb(0 0 0 / .5);max-width:450px;width:100%;max-height:95vh;overflow-y:auto;text-align:center;border:1px solid rgb(255 255 255 / .3)}.welcome-card::-webkit-scrollbar{width:0;background:#fff0}.welcome-card h1{color:#1e3c72;margin:0 0 2px 0;font-size:24px;font-weight:800;text-transform:uppercase}.developer-info{color:#555;font-size:12px;margin-bottom:12px;line-height:1.3}.update-note{background:#fff8e1;color:#856404;padding:8px 12px;border-radius:8px;margin-bottom:12px;font-size:12px;border-left:4px solid #ffc107;text-align:left}.help-content{text-align:left;background:#f1f5f9;padding:12px;border-radius:12px;margin-bottom:12px}.help-content h3{color:#2c3e50;margin:0 0 5px 0;font-size:14px;border-bottom:1px solid #3498db;display:inline-block}.help-content ul{padding-left:15px;margin:0;color:#444;font-size:12px;line-height:1.5}.action-buttons{display:flex;flex-direction:column;gap:8px;margin-top:5px}.enter-btn,.help-theme-btn{width:100%;padding:12px;font-size:15px;font-weight:700;border-radius:50px;cursor:pointer;border:none;box-shadow:0 4px 10px rgb(0 0 0 / .1)}.enter-btn{background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:#fff}.help-theme-btn{background:#fff;color:#333;border:1px solid #ddd}.footer-contact{margin-top:12px;font-size:11px;color:#777;border-top:1px solid #eee;padding-top:10px}.contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.wa-chat-link{display:flex;align-items:center;justify-content:center;gap:8px;background:#f9fdfa;color:#27ae60;text-decoration:none;padding:8px 10px;border-radius:8px;border:1px solid #dcfce7;transition:transform 0.2s}.wa-chat-link:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgb(0 0 0 / .05)}.wa-chat-link:hover,.wa-chat-link:active{background:#25d366;color:#fff;transform:translateY(-2px);box-shadow:0 5px 15px rgb(37 211 102 / .3)}.wa-chat-link:hover .contact-number,.wa-chat-link:active .contact-number{color:#e8f5e9}.contact-info{text-align:left;line-height:1.1}.contact-name{font-weight:700;font-size:12px}.contact-number{font-size:10px;color:#666}.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgb(0 0 0 / .8);display:none;justify-content:center;align-items:center;z-index:10000;padding:20px;box-sizing:border-box;backdrop-filter:blur(5px)}.modal-content{background:#fff;width:100%;max-width:500px;max-height:85vh;border-radius:20px;position:relative;box-shadow:0 25px 50px rgb(0 0 0 / .5);display:flex;flex-direction:column;animation:zoomIn 0.3s ease-out}.close-modal{position:absolute;right:15px;top:10px;font-size:30px;font-weight:700;cursor:pointer;color:#e74c3c;background:#fff;border-radius:50%;padding:0 8px;z-index:10}.modal-scroll-area{padding:20px;overflow-y:auto;text-align:left;font-size:14px;line-height:1.6;color:#333}@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@keyframes zoomIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}@media (max-width:480px){.welcome-card,.modal-content{padding:20px 15px!important;width:92%!important}.welcome-card h1{font-size:24px}.app-btn{padding:14px;font-size:15px}}#medicineTable thead th{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:#fff;padding:12px 10px;font-size:14px;text-transform:uppercase;border:none;position:sticky;top:0;z-index:100}.tab-btn{flex:1;padding:10px;border:none;background:#ecf0f1;cursor:pointer;font-weight:700;border-bottom:3px solid #fff0}.tab-btn.active{background:#fff;border-bottom:3px solid #27ae60;color:#27ae60}.summary-content{display:none}.summary-content.active{display:block}#pdfPreviewContent table{font-size:13px}.tab-btn{font-size:12px;outline:none}.file-manager-container{display:flex;align-items:flex-end;justify-content:center;gap:20px;padding:15px 0;flex-wrap:wrap;border-top:1px solid #eee;margin-top:10px}.fm-group{display:flex;flex-direction:column;gap:5px}.fm-row{display:flex;gap:5px}.fm-label{font-size:12px;font-weight:700;color:#2c3e50;margin-bottom:2px}.hidden-label{visibility:hidden}.budget-input{width:160px;border:2px solid #27ae60;border-radius:4px;padding:5px 8px;height:38px;font-weight:700;font-size:14px;color:#27ae60;box-sizing:border-box}.fm-input{height:38px;padding:5px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box}#savedIndentsList{min-width:200px}.btn-action{height:38px;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:4px;color:#fff;cursor:pointer;padding:0 15px;font-size:13px;font-weight:700;text-transform:uppercase}.btn-load{background-color:#27ae60}.btn-del{background-color:#c0392b}.btn-json{background-color:#2980b9}.btn-import{background-color:#7f8c8d;margin-bottom:0}.fm-separator{width:1px;height:40px;background-color:#e0e0e0;margin:0 5px}@media (max-width:768px){.file-manager-container{flex-direction:column;align-items:stretch;gap:15px;margin-top:15px;margin-bottom:20px!important;width:auto;padding:0 15px}.budget-input{width:100%!important;height:40px}.fm-row{display:flex;width:100%;gap:10px}.fm-input{flex:1;width:auto;min-width:0}.btn-action{padding:0 10px;white-space:nowrap}.fm-separator,.hidden-label{display:none}.fm-group{width:100%}}@media (max-width:768px){*,*:before,*:after{box-sizing:border-box!important}.table-container,.pdf-section,#pdfPreviewContent{width:100%!important;padding:0!important;margin:0 auto!important;overflow-x:hidden!important}table{table-layout:fixed!important;width:100%!important;max-width:100%!important;border-collapse:collapse;margin:0 auto;background-color:#fff}th,td{border:1px solid #ccc;padding:6px 3px!important;font-size:11px!important;vertical-align:middle;word-wrap:break-word!important;overflow-wrap:break-word!important;white-space:normal!important;min-width:0!important}thead th{background-color:#1e3c72;color:#fff;text-align:center;font-weight:700}#medicineTable th:nth-child(1),#medicineTable td:nth-child(1){display:none!important}#medicineTable th:nth-child(2),#medicineTable td:nth-child(2){width:52%!important;text-align:left}#medicineTable th:nth-child(3),#medicineTable td:nth-child(3){width:16%!important;text-align:center}#medicineTable th:nth-child(4),#medicineTable td:nth-child(4){width:16%!important;text-align:right}#medicineTable th:nth-child(5),#medicineTable td:nth-child(5){width:16%!important;text-align:right;font-weight:700}.qty-input{width:100%;max-width:45px;text-align:center;padding:4px 0;font-size:11px;border:1px solid #999;border-radius:3px}.preview-table th:nth-child(1),.preview-table td:nth-child(1){width:60%!important;text-align:left}.preview-table th:nth-child(2),.preview-table td:nth-child(2){width:15%!important;text-align:center}.preview-table th:nth-child(3),.preview-table td:nth-child(3){width:25%!important;text-align:right}#pdfModal>div{width:95%!important;margin:5% auto!important;padding:10px!important;box-sizing:border-box!important}.summary-table{table-layout:fixed!important;width:100%!important}.summary-table th:nth-child(1),.summary-table td:nth-child(1){width:50%!important;text-align:left;font-weight:700;font-size:11px!important}.summary-table th:nth-child(2),.summary-table td:nth-child(2){width:15%!important;text-align:center;font-size:11px!important}.summary-table th:nth-child(3),.summary-table td:nth-child(3){width:35%!important;text-align:right;font-size:11px!important}.swal2-popup{width:95%!important;padding:10px!important}}.floating-btn{position:fixed;bottom:30px;right:30px;background-color:#2c3e50;color:#fff;border:none;border-radius:50%;width:60px;height:60px;font-size:35px;box-shadow:2px 4px 10px rgb(0 0 0 / .3);cursor:pointer;z-index:1000}</style></head><body><div id="welcome-screen"><div class="welcome-card"><h1>INDENT MAKER</h1><p class="developer-info" style=" font-size: 0.85em; color: #666; line-height: 1.4; text-align: center; margin-top: 15px; padding: 0 10px; " ><strong>Disclaimer:</strong> This is a privately developed free utility tool to help generate indents or orders. This is NOT an official app of the Government of Kerala or the Department of ISM, NAM or AYUSH. </p><div class="update-note"> ⚠️ ഇതിലെ ഔഷധങ്ങളുടെ വില <strong>07-11-2025</strong>-ലെ ഔഷധി GST ഉള്‍പ്പെടെയുള്ള നിരക്ക് പ്രകാരം ക്രമീകരിച്ചിട്ടുള്ളതാണ്. </div><div class="help-content"><h3>ഉപയോഗക്രമം (Help Guide)</h3><ul><li><strong>Step 1:</strong> സ്ഥാപനവിവരങ്ങളും ബജറ്റും നൽകുക.</li><li><strong>Step 2:</strong> ആവശ്യമായ മരുന്നുകളുടെ എണ്ണം (Qty) രേഖപ്പെടുത്തുക. </li><li><strong>Step 3:</strong> 'AUTO FILL' ബട്ടൺ ഉപയോഗിച്ച് ബജറ്റ് തുകയിലേക്ക്‌ മരുന്നുകളുടെ എണ്ണം ക്രമീകരിക്കാം. </li><li><strong>Step 4:</strong> 'SAVE COMBINED / SPLIT PDF' ബട്ടൺ വഴി ഇൻഡന്‍റ് ഡൗൺലോഡ് ചെയ്യാം. </li></ul></div><div class="action-buttons"><button class="enter-btn" onclick="enterApp()"> ENTER INDENT MAKER 🚀 </button><button class="enter-btn help-theme-btn" onclick="toggleHelp()"> 📖 HELP GUIDE (കൂടുതൽ അറിയാൻ) </button></div><div class="footer-contact"> Technical Assistance and Suggestions<br /><div class="contact-grid"><a href="https://wa.me/919605081081?text=Hi%20Ramakrishnan,%20I%20need%20help%20with%20Indent%20Maker" target="_blank" class="wa-chat-link" ><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20" height="20" alt="WA" /><div class="contact-info"><span class="contact-name">Ramakrishnan K</span><span class="contact-number">9605081081</span></div></a><a href="https://wa.me/919447596675?text=Hi%20Sumesh,%20I%20need%20help%20with%20Indent%20Maker" target="_blank" class="wa-chat-link" ><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20" height="20" alt="WA" /><div class="contact-info"><span class="contact-name">Sumesh T.K</span><span class="contact-number">9447596675</span></div></a></div></div></div></div><div id="help-modal" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="toggleHelp()">&times;</span><h2 style=" color: #1e3c72; border-bottom: 2px solid #3498db; padding-bottom: 10px; font-size: 20px; text-align: center; " > ഇൻഡന്‍റ് മേക്കർ - സഹായി </h2><div class="modal-scroll-area" style="padding: 10px; text-align: left; overflow-y: auto" ><p style="font-weight: bold; color: #2c3e50"> 1. സ്ഥാപനത്തിന്‍റെ വിവരങ്ങൾ നൽകുക (Header Section) </p><ul style="list-style-type: none; padding-left: 10px"><li> • <b>Institution Name & Address:</b> സ്ഥാപനത്തിന്‍റെ പേരും വിലാസവും കൃത്യമായി നൽകുക. ഇത് പിഡിഎഫിന്റെ മുകളിൽ വിലാസമായി വരും. </li><li> • <b>Indent Type:</b> ഇൻഡന്‍റ് ഏത് വിഭാഗത്തിൽ പെടുന്നു എന്ന് രേഖപ്പെടുത്തുക (ഉദാ: Term-1, LSGD, NAM). </li><li> • <b>Total Budget:</b> അനുവദിച്ചിട്ടുള്ള ആകെ തുക ഇവിടെ ടൈപ്പ് ചെയ്യുക. </li></ul><p style="font-weight: bold; color: #2c3e50"> 2. ഇൻഡന്റുകൾ JSON ആയി സേവ് ചെയ്യാനും ലോഡ് ചെയ്യാനും </p><p> നിങ്ങൾ തയ്യാറാക്കുന്ന ഇൻഡന്റുകൾ JSON ആയി ഡൌണ്‍ലോഡ് ചെയ്തു സൂക്ഷിച്ചു വെക്കാം. ഒരേ സമയം ഒന്നിൽ കൂടുതൽ ഇൻഡന്റുകൾ തയ്യാറാക്കാൻ വിവിധ ബ്രൗസറുകൾ ഉപയോഗിക്കാം. </p><ul style="list-style-type: none; padding-left: 10px"><li>• <b>JSON:</b> ഒരു ഫയൽ പേര് നൽകി JSON ബട്ടൺ അമർത്തുക.</li><li>• <b>LOAD:</b> JSON സേവ് ചെയ്തവ ലിസ്റ്റിൽ നിന്നും എടുക്കാം.</li><li>• <b>DEL:</b> JSON ആവശ്യമില്ലാത്തവ നീക്കം ചെയ്യാം.</li><li>• <b>IMPORT:</b> JSON സേവ് ചെയ്തവ വീണ്ടും ഉപയോഗിക്കാം.</li></ul><p style="font-weight: bold; color: #2c3e50"> 3. മരുന്നുകൾ തിരഞ്ഞെടുക്കാൻ </p><ul style="list-style-type: none; padding-left: 10px"><li> • <b>🔍 Search:</b> മരുന്നിന്റെ പേര് ടൈപ്പ് ചെയ്ത് കണ്ടെത്താം. </li><li> • <b>🔍 Rate Search:</b> വിലയുടെ അടിസ്ഥാനത്തിൽ തിരയാം (ഉദാ: 40-50). </li><li>• <b>TYPE:</b> വിഭാഗം തിരിച്ച് (അരിഷ്ടം, തൈലം) കാണാൻ.</li></ul><p style="font-weight: bold; color: #2c3e50"> 4. ബജറ്റ് ക്രമീകരണം (Smart Tools) </p><ul style="list-style-type: none; padding-left: 10px"><li> • <b>AUTO FILL:</b> ബജറ്റിന് അനുയോജ്യമായ രീതിയിൽ എണ്ണം ക്രമീകരിച്ച് ബാലൻസ് പൂജ്യമാക്കാൻ സഹായിക്കുന്നു. </li><li> • <b>SHOW SELECTED:</b> തിരഞ്ഞെടുത്ത മരുന്നുകൾ മാത്രം കാണാൻ. </li></ul><p style="font-weight: bold; color: #2c3e50"> 5. പിഡിഎഫ് റിപ്പോർട്ട് </p><ul style="list-style-type: none; padding-left: 10px"><li> • <b>SAVE COMBINED PDF:</b> എല്ലാ മരുന്നുകളുടെയും ഒരുമിച്ചുള്ള PDF ഡൌണ്‍ലോഡ് ചെയ്യുന്നതിന്. </li><li> • <b>SAVE SPLIT PDF:</b> കഷായ ചൂർണ്ണങ്ങളും മറ്റുള്ളവയും പ്രത്യേകം PDF ഡൌണ്‍ലോഡ് ചെയ്യുന്നതിന്. </li></ul><p style="font-weight: bold; color: #2c3e50">6. റീസെറ്റ് (Reset)</p><p>പുതിയ ഇൻഡന്‍റ് തുടങ്ങാൻ RESET ബട്ടൺ ഉപയോഗിക്കാം.</p><div style=" background: #e8f4fd; padding: 10px; border-radius: 5px; font-size: 13px; margin-top: 15px; " ><b>💡 പ്രായോഗിക നിർദ്ദേശങ്ങൾ:</b><br /> • ഓരോ മാറ്റവും തനിയെ സേവ് (Draft) ചെയ്യപ്പെടുന്നു.<br /> • AUTO FILL ഉപയോഗിക്കുന്നതിന് മുൻപ് കുറഞ്ഞത് രണ്ട് മരുന്നുകളെങ്കിലും തിരഞ്ഞെടുക്കുക.<br /></div></div></div></div><div class="sticky-header-container"><div class="header-inputs"><div class="input-wrapper address-section"><label class="input-label">Institution Name & Address:</label><textarea id="inst-details" rows="2" placeholder="Name of institution...,&#10;District...,&#10;Localbody..." oninput="saveDraft()" ></textarea></div><div class="input-wrapper indent-section"><label class="input-label">Indent Type:</label><div class="select-group"><select id="indent-select" onchange="updateIndentInput(this.value)" ></select><input type="text" id="indent-type" placeholder="Type here..." oninput="saveDraft()" style="display: none" /></div></div></div></div><div class="file-manager-container"><div class="fm-group budget-group"><label class="fm-label">Total Budget (₹):</label><input type="number" id="total-budget" class="budget-input" placeholder="Enter Amount" oninput=" calculateAll(); saveDraft(); " /></div><div class="fm-separator"></div><div class="fm-group load-group"><label class="fm-label hidden-label">Select Indent</label><div class="fm-row"><select id="savedIndentsList" class="fm-input"><option value="">-- Select a saved indent --</option></select><button onclick="loadSelectedIndent()" class="btn-action btn-load"> LOAD </button><button onclick="deleteSelectedIndent()" class="btn-action btn-del"> DEL </button></div></div><div class="fm-separator"></div><div class="fm-group save-group"><label class="fm-label hidden-label">File Name</label><div class="fm-row"><input type="text" id="newIndentName" placeholder="File Name" class="fm-input" /><button onclick="saveNewIndent()" class="btn-action btn-json"> JSON ↓ </button><label for="importJsonFile" class="btn-action btn-import"> IMPORT 📂 </label><input type="file" id="importJsonFile" accept=".json" style="display: none" onchange="importJsonData(this)" /></div></div></div><div class="search-container"><div class="search-box-wrapper" style="position: relative"><input type="text" id="medicineSearch" class="styled-input" placeholder="🔍 Search medicines here..." onkeyup="filterMedicines()" /><span id="clearSearch" onclick="clearSearchInput()" style=" position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #e74c3c; display: none; font-weight: bold; font-size: 18px; " > ✖ </span></div><div class="rate-box-wrapper" style="display: flex; align-items: center; gap: 5px" ><div style="position: relative; flex: 1"><input type="text" id="rateRange" class="styled-input" placeholder="🔍 Rate: 40-50" onkeyup="checkRateInput()" style="width: 100%; padding-right: 25px" /><span id="clearRate" onclick="clearRateInput()" style=" position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #e74c3c; display: none; font-weight: bold; font-size: 16px; " > ✖ </span></div><button class="find-btn" onclick="filterByRate()">FIND</button></div></div><div class="summary-buttons" style="max-width: 1200px; margin-top: 15px"><button class="info-card" style="background-color: #e74c3c; cursor: pointer" onclick="resetForm()" > RESET </button><button class="info-card btn-pdf" style="background: #8e44ad; cursor: pointer" onclick="downloadSplitPDF()" > SAVE ↓ SPLIT PDF (KC/Prep) </button><button class="info-card" style="background: #2980b9; cursor: pointer" onclick="downloadCombinedPDF()" > SAVE ↓ COMBINED PDF </button><button class="info-card" style="background: #16a085; cursor: pointer" onclick="autoAdjustBudget()" > AUTO FILL </button><button id="view-btn" class="info-card" style="background-color: #f39c12; cursor: pointer" onclick="toggleView()" > SHOW SELECTED </button><button id="typeBtn" class="info-card" style="background: #2c3e50; cursor: pointer; width: 100%" onclick="toggleCategoryMenu()" > TYPE ▾ </button><div id="categoryMenu"><div class="cat-item" onclick="filterByCategory(0, 0, 'ALL')">ALL</div><div class="cat-item" onclick="filterByCategory(0, 0, 'ARISHTASAVAM')"> ARISHTASAVAM </div><div class="cat-item" onclick="filterByCategory(0, 0, 'BHASMAM')"> BHASMAM </div><div class="cat-item" onclick="filterByCategory(0, 0, 'CHOORNAM')"> CHOORNAM </div><div class="cat-item" onclick="filterByCategory(0, 0, 'GHRUTHAM')"> GHRUTHAM </div><div class="cat-item" onclick="filterByCategory(0, 0, 'GULIKA')"> GULIKA </div><div class="cat-item" onclick="filterByCategory(0, 0, 'KASHAYAM')"> KASHAYAM </div><div class="cat-item" onclick="filterByCategory(0, 0, 'KC')">KC</div><div class="cat-item" onclick="filterByCategory(0, 0, 'KSC')">KSC</div><div class="cat-item" onclick="filterByCategory(0, 0, 'LEHYAM')"> LEHYAM </div><div class="cat-item" onclick="filterByCategory(0, 0, 'OINTMENT')"> OINTMENT </div><div class="cat-item" onclick="filterByCategory(0, 0, 'RASAKRIYA')"> RASAKRIYA </div><div class="cat-item" onclick="filterByCategory(0, 0, 'SYRUP')"> SYRUP </div><div class="cat-item" onclick="filterByCategory(0, 0, 'THAILAM')"> THAILAM </div><div class="cat-item" onclick="filterByCategory(0, 0, 'NEW ADDED')"> NEWLY ADDED </div></div><div class="info-card btn-total"><span class="card-label">Total</span><span class="card-value">₹ <span id="display-total">0.00</span></span></div><div class="info-card btn-balance"><span class="card-label">Balance</span><span class="card-value">₹ <span id="display-balance">0.00</span></span></div></div><div class="table-container"><table id="medicineTable"><thead><tr><th style="width: 50px; text-align: center">SL</th><th style="text-align: left; padding-left: 15px">Medicine Name</th><th style="width: 100px; text-align: center">Qty</th><th style="width: 120px; text-align: right">Rate+GST</th><th style="width: 120px; text-align: right">Cost</th></tr></thead><tbody id="product-body"></tbody></table></div><div id="pdfModal" style=" display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); " ><div style=" background-color: #fefefe; margin: 2% auto; padding: 20px; border: 1px solid #888; width: 95%; max-width: 600px; max-height: 90%; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; " ><div style=" display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 10px; " ><h3 id="modalTitle" style="margin: 0; color: #2c3e50; font-size: 18px" > Order Summary </h3><button onclick="document.getElementById('pdfModal').style.display = 'none'" style=" background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; " > X </button></div><div id="pdfPreviewContent" style="flex: 1; overflow-y: auto; padding-bottom: 10px" ></div></div></div><button id="addCustomBtn" class="floating-btn" onclick="openNewMedicineModal()" style="display: none" > + </button><div id="customMedicineModal" style=" display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); align-items: center; justify-content: center; " ><div style=" background: white; padding: 20px; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); position: relative; box-sizing: border-box; " ><div style=" display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; " ><h2 style="margin: 0; font-size: 1.2rem">Add New Medicine</h2><span class="close-btn" onclick="closeAddModal()" style="cursor: pointer; font-size: 25px; line-height: 1; color: red" >&times;</span ></div><label style="font-weight: bold; font-size: 0.9rem" >Medicine Name:</label ><input type="text" id="customMedName" placeholder="E.g., New Kashayam" style=" width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; " /><label style="font-weight: bold; font-size: 0.9rem" >Rate without GST (₹):</label ><input type="number" id="customMedRate" placeholder="Rate" style=" width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; " /><label style="font-weight: bold; font-size: 0.9rem">GST %:</label><select id="customMedGST" style=" width: 100%; margin-bottom: 20px; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; " ><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option></select><button onclick="saveCustomMedicine()" style=" width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; " > Save Medicine </button></div></div>    <script>
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --accent-color: #3498db;
+        --success-color: #27ae60;
+        --danger-color: #e74c3c;
+      }
+      body {
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5;
+        color: #333;
+      }
+      .sticky-header-container {
+        background: #fff;
+        padding: 15px;
+        border-bottom: 2px solid #ddd;
+        box-sizing: border-box;
+        width: 100%;
+      }
+      .header-inputs {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        width: 100%;
+      }
+      .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .address-section {
+        flex: 1.5;
+      }
+      .indent-section {
+        flex: 1;
+      }
+      .input-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+        display: block;
+      }
+      #inst-details {
+        font-size: 14px;
+        border: 1px solid #3498db;
+        width: 100%;
+        border-radius: 5px;
+        padding: 8px;
+        box-sizing: border-box;
+        resize: vertical;
+        min-height: 75px;
+        font-family: inherit;
+      }
+      #indent-select,
+      #indent-type {
+        width: 100%;
+        border: 2px solid #3498db;
+        border-radius: 5px;
+        font-weight: 700;
+        height: 40px;
+        font-size: 13px;
+        padding: 0 10px;
+        cursor: pointer;
+        background: #fff;
+        box-sizing: border-box;
+      }
+      #indent-type {
+        border-color: #e67e22;
+        background-color: #fff9f4;
+        margin-top: 5px;
+      }
+      @media (max-width: 768px) {
+        .header-inputs {
+          flex-direction: column;
+          gap: 15px;
+        }
+        .address-section,
+        .indent-section {
+          width: 100%;
+          flex: none;
+        }
+        #inst-details {
+          min-height: 60px;
+        }
+      }
+      .summary-buttons {
+        display: flex;
+        gap: 10px;
+        max-width: 1200px;
+        margin: 15px auto;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .info-card {
+        padding: 8px 10px;
+        border-radius: 5px;
+        flex: 1;
+        min-width: 110px;
+        max-width: 220px;
+        text-align: center;
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 13px;
+        white-space: normal;
+        cursor: pointer;
+      }
+      .btn-total,
+      .btn-balance {
+        flex: 1.5;
+        max-width: none;
+        min-width: 160px;
+      }
+      .info-card:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 4px 10px rgb(0 0 0 / 0.2);
+      }
+      .btn-total {
+        background-color: var(--success-color);
+      }
+      .btn-balance {
+        background-color: var(--accent-color);
+      }
+      @media (max-width: 768px) {
+        .summary-buttons {
+          margin-left: 20px !important;
+          margin-right: 20px !important;
+          width: auto !important;
+        }
+      }
+      .table-container {
+        max-height: 75vh;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        margin: 0 auto;
+        max-width: 1200px;
+        background: #fff;
+        padding-bottom: 60px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+      }
+      thead th {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: #fff;
+        padding: 12px 10px;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+      #product-body td:nth-child(2) {
+        font-weight: 700;
+        color: #2c3e50;
+      }
+      .qty-input {
+        width: 70px;
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .row-active {
+        background-color: #e8f8f5 !important;
+      }
+      .row-cost {
+        font-weight: 700;
+        color: #2c3e50;
+      }
+      #categoryMenu {
+        display: none;
+      }
+      #categoryMenu.show-grid {
+        display: grid !important;
+        gap: 8px;
+        background: #fff;
+        border: 1px solid #2c3e50;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgb(0 0 0 / 0.3);
+        z-index: 9999;
+      }
+      @media (min-width: 769px) {
+        #categoryMenu.show-grid {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 500px;
+          grid-template-columns: repeat(4, 1fr);
+          z-index: 3000;
+          box-shadow: 0 0 0 1000px rgb(0 0 0 / 0.5);
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+      }
+      @media (max-width: 768px) {
+        #categoryMenu.show-grid {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 85%;
+          max-width: 350px;
+          max-height: 70vh;
+          overflow-y: auto;
+          grid-template-columns: repeat(2, 1fr);
+          box-shadow: 0 0 0 1000px rgb(0 0 0 / 0.5);
+        }
+      }
+      .cat-item {
+        padding: 10px;
+        cursor: pointer;
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 4px;
+        transition: 0.1s;
+      }
+      .cat-item:hover {
+        background-color: #3498db;
+        color: #fff;
+      }
+      #typeBtn {
+        flex: 1;
+        min-height: 32px;
+      }
+      .search-container {
+        display: flex;
+        gap: 15px;
+        max-width: 1200px;
+        margin: 15px auto;
+        align-items: center;
+      }
+      .styled-input {
+        width: 100%;
+        height: 45px;
+        border-radius: 25px;
+        border: 2px solid #2c3e50;
+        padding: 0 20px;
+        font-size: 15px;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+      }
+      .styled-input:focus {
+        border-color: #16a085;
+      }
+      .search-box-wrapper {
+        flex: 3;
+      }
+      .rate-box-wrapper {
+        flex: 2;
+        display: flex;
+        gap: 10px;
+      }
+      .find-btn {
+        height: 45px;
+        padding: 0 25px;
+        border-radius: 25px;
+        background-color: #2c3e50;
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s;
+        white-space: nowrap;
+      }
+      .find-btn:active {
+        transform: scale(0.95);
+      }
+      @media (max-width: 768px) {
+        .search-container {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          width: auto;
+          margin: 0 20px;
+        }
+        .search-box-wrapper {
+          width: 100%;
+        }
+        .search-box-wrapper input {
+          width: 100% !important;
+          box-sizing: border-box;
+        }
+        .rate-box-wrapper {
+          display: flex !important;
+          flex-direction: row !important;
+          width: 100% !important;
+          gap: 8px;
+          align-items: center;
+        }
+        .rate-box-wrapper input {
+          flex: 1 !important;
+          width: auto !important;
+          min-width: 0;
+          margin: 0 !important;
+        }
+        .find-btn {
+          width: auto !important;
+          flex-shrink: 0;
+          padding: 0 20px;
+          margin: 0 !important;
+          white-space: nowrap;
+        }
+      }
+      #welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          #0f2027 0%,
+          #203a43 50%,
+          #2c5364 100%
+        );
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        z-index: 9999;
+        box-sizing: border-box;
+        backdrop-filter: blur(5px);
+      }
+      .welcome-card {
+        background: rgb(255 255 255 / 0.96);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgb(0 0 0 / 0.5);
+        max-width: 450px;
+        width: 100%;
+        max-height: 95vh;
+        overflow-y: auto;
+        text-align: center;
+        border: 1px solid rgb(255 255 255 / 0.3);
+      }
+      .welcome-card::-webkit-scrollbar {
+        width: 0;
+        background: #fff0;
+      }
+      .welcome-card h1 {
+        color: #1e3c72;
+        margin: 0 0 2px 0;
+        font-size: 24px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .developer-info {
+        color: #555;
+        font-size: 12px;
+        margin-bottom: 12px;
+        line-height: 1.3;
+      }
+      .update-note {
+        background: #fff8e1;
+        color: #856404;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        font-size: 12px;
+        border-left: 4px solid #ffc107;
+        text-align: left;
+      }
+      .help-content {
+        text-align: left;
+        background: #f1f5f9;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+      }
+      .help-content h3 {
+        color: #2c3e50;
+        margin: 0 0 5px 0;
+        font-size: 14px;
+        border-bottom: 1px solid #3498db;
+        display: inline-block;
+      }
+      .help-content ul {
+        padding-left: 15px;
+        margin: 0;
+        color: #444;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 5px;
+      }
+      .enter-btn,
+      .help-theme-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        border-radius: 50px;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
+      }
+      .enter-btn {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: #fff;
+      }
+      .help-theme-btn {
+        background: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+      }
+      .footer-contact {
+        margin-top: 12px;
+        font-size: 11px;
+        color: #777;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+      }
+      .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .wa-chat-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #f9fdfa;
+        color: #27ae60;
+        text-decoration: none;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #dcfce7;
+        transition: transform 0.2s;
+      }
+      .wa-chat-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgb(0 0 0 / 0.05);
+      }
+      .wa-chat-link:hover,
+      .wa-chat-link:active {
+        background: #25d366;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgb(37 211 102 / 0.3);
+      }
+      .wa-chat-link:hover .contact-number,
+      .wa-chat-link:active .contact-number {
+        color: #e8f5e9;
+      }
+      .contact-info {
+        text-align: left;
+        line-height: 1.1;
+      }
+      .contact-name {
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .contact-number {
+        font-size: 10px;
+        color: #666;
+      }
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgb(0 0 0 / 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        padding: 20px;
+        box-sizing: border-box;
+        backdrop-filter: blur(5px);
+      }
+      .modal-content {
+        background: #fff;
+        width: 100%;
+        max-width: 500px;
+        max-height: 85vh;
+        border-radius: 20px;
+        position: relative;
+        box-shadow: 0 25px 50px rgb(0 0 0 / 0.5);
+        display: flex;
+        flex-direction: column;
+        animation: zoomIn 0.3s ease-out;
+      }
+      .close-modal {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        font-size: 30px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #e74c3c;
+        background: #fff;
+        border-radius: 50%;
+        padding: 0 8px;
+        z-index: 10;
+      }
+      .modal-scroll-area {
+        padding: 20px;
+        overflow-y: auto;
+        text-align: left;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes zoomIn {
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      @media (max-width: 480px) {
+        .welcome-card,
+        .modal-content {
+          padding: 20px 15px !important;
+          width: 92% !important;
+        }
+        .welcome-card h1 {
+          font-size: 24px;
+        }
+        .app-btn {
+          padding: 14px;
+          font-size: 15px;
+        }
+      }
+      #medicineTable thead th {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: #fff;
+        padding: 12px 10px;
+        font-size: 14px;
+        text-transform: uppercase;
+        border: none;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background: #ecf0f1;
+        cursor: pointer;
+        font-weight: 700;
+        border-bottom: 3px solid #fff0;
+      }
+      .tab-btn.active {
+        background: #fff;
+        border-bottom: 3px solid #27ae60;
+        color: #27ae60;
+      }
+      .summary-content {
+        display: none;
+      }
+      .summary-content.active {
+        display: block;
+      }
+      #pdfPreviewContent table {
+        font-size: 13px;
+      }
+      .tab-btn {
+        font-size: 12px;
+        outline: none;
+      }
+      .file-manager-container {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 20px;
+        padding: 15px 0;
+        flex-wrap: wrap;
+        border-top: 1px solid #eee;
+        margin-top: 10px;
+      }
+      .fm-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .fm-row {
+        display: flex;
+        gap: 5px;
+      }
+      .fm-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 2px;
+      }
+      .hidden-label {
+        visibility: hidden;
+      }
+      .budget-input {
+        width: 160px;
+        border: 2px solid #27ae60;
+        border-radius: 4px;
+        padding: 5px 8px;
+        height: 38px;
+        font-weight: 700;
+        font-size: 14px;
+        color: #27ae60;
+        box-sizing: border-box;
+      }
+      .fm-input {
+        height: 38px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      #savedIndentsList {
+        min-width: 200px;
+      }
+      .btn-action {
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        padding: 0 15px;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .btn-load {
+        background-color: #27ae60;
+      }
+      .btn-del {
+        background-color: #c0392b;
+      }
+      .btn-json {
+        background-color: #2980b9;
+      }
+      .btn-import {
+        background-color: #7f8c8d;
+        margin-bottom: 0;
+      }
+      .fm-separator {
+        width: 1px;
+        height: 40px;
+        background-color: #e0e0e0;
+        margin: 0 5px;
+      }
+      @media (max-width: 768px) {
+        .file-manager-container {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 15px;
+          margin-top: 15px;
+          margin-bottom: 20px !important;
+          width: auto;
+          padding: 0 15px;
+        }
+        .budget-input {
+          width: 100% !important;
+          height: 40px;
+        }
+        .fm-row {
+          display: flex;
+          width: 100%;
+          gap: 10px;
+        }
+        .fm-input {
+          flex: 1;
+          width: auto;
+          min-width: 0;
+        }
+        .btn-action {
+          padding: 0 10px;
+          white-space: nowrap;
+        }
+        .fm-separator,
+        .hidden-label {
+          display: none;
+        }
+        .fm-group {
+          width: 100%;
+        }
+      }
+      @media (max-width: 768px) {
+        *,
+        *:before,
+        *:after {
+          box-sizing: border-box !important;
+        }
+        .table-container,
+        .pdf-section,
+        #pdfPreviewContent {
+          width: 100% !important;
+          padding: 0 !important;
+          margin: 0 auto !important;
+          overflow-x: hidden !important;
+        }
+        table {
+          table-layout: fixed !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          border-collapse: collapse;
+          margin: 0 auto;
+          background-color: #fff;
+        }
+        th,
+        td {
+          border: 1px solid #ccc;
+          padding: 6px 3px !important;
+          font-size: 11px !important;
+          vertical-align: middle;
+          word-wrap: break-word !important;
+          overflow-wrap: break-word !important;
+          white-space: normal !important;
+          min-width: 0 !important;
+        }
+        thead th {
+          background-color: #1e3c72;
+          color: #fff;
+          text-align: center;
+          font-weight: 700;
+        }
+        #medicineTable th:nth-child(1),
+        #medicineTable td:nth-child(1) {
+          display: none !important;
+        }
+        #medicineTable th:nth-child(2),
+        #medicineTable td:nth-child(2) {
+          width: 52% !important;
+          text-align: left;
+        }
+        #medicineTable th:nth-child(3),
+        #medicineTable td:nth-child(3) {
+          width: 16% !important;
+          text-align: center;
+        }
+        #medicineTable th:nth-child(4),
+        #medicineTable td:nth-child(4) {
+          width: 16% !important;
+          text-align: right;
+        }
+        #medicineTable th:nth-child(5),
+        #medicineTable td:nth-child(5) {
+          width: 16% !important;
+          text-align: right;
+          font-weight: 700;
+        }
+        .qty-input {
+          width: 100%;
+          max-width: 45px;
+          text-align: center;
+          padding: 4px 0;
+          font-size: 11px;
+          border: 1px solid #999;
+          border-radius: 3px;
+        }
+        .preview-table th:nth-child(1),
+        .preview-table td:nth-child(1) {
+          width: 60% !important;
+          text-align: left;
+        }
+        .preview-table th:nth-child(2),
+        .preview-table td:nth-child(2) {
+          width: 15% !important;
+          text-align: center;
+        }
+        .preview-table th:nth-child(3),
+        .preview-table td:nth-child(3) {
+          width: 25% !important;
+          text-align: right;
+        }
+        #pdfModal > div {
+          width: 95% !important;
+          margin: 5% auto !important;
+          padding: 10px !important;
+          box-sizing: border-box !important;
+        }
+        .summary-table {
+          table-layout: fixed !important;
+          width: 100% !important;
+        }
+        .summary-table th:nth-child(1),
+        .summary-table td:nth-child(1) {
+          width: 50% !important;
+          text-align: left;
+          font-weight: 700;
+          font-size: 11px !important;
+        }
+        .summary-table th:nth-child(2),
+        .summary-table td:nth-child(2) {
+          width: 15% !important;
+          text-align: center;
+          font-size: 11px !important;
+        }
+        .summary-table th:nth-child(3),
+        .summary-table td:nth-child(3) {
+          width: 35% !important;
+          text-align: right;
+          font-size: 11px !important;
+        }
+        .swal2-popup {
+          width: 95% !important;
+          padding: 10px !important;
+        }
+      }
+      .floating-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: #2c3e50;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 35px;
+        box-shadow: 2px 4px 10px rgb(0 0 0 / 0.3);
+        cursor: pointer;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="welcome-screen">
+      <div class="welcome-card">
+        <h1>INDENT MAKER</h1>
+        <p
+          class="developer-info"
+          style="
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.4;
+            text-align: center;
+            margin-top: 15px;
+            padding: 0 10px;
+          "
+        >
+          <strong>Disclaimer:</strong> This is a privately developed free
+          utility tool to help generate indents or orders. This is NOT an
+          official app of the Government of Kerala or the Department of ISM, NAM
+          or AYUSH.
+        </p>
+        <div class="update-note">
+          ⚠️ ഇതിലെ ഔഷധങ്ങളുടെ വില <strong>07-11-2025</strong>-ലെ ഔഷധി GST
+          ഉള്‍പ്പെടെയുള്ള നിരക്ക് പ്രകാരം ക്രമീകരിച്ചിട്ടുള്ളതാണ്.
+        </div>
+        <div class="help-content">
+          <h3>ഉപയോഗക്രമം (Help Guide)</h3>
+          <ul>
+            <li><strong>Step 1:</strong> സ്ഥാപനവിവരങ്ങളും ബജറ്റും നൽകുക.</li>
+            <li>
+              <strong>Step 2:</strong> ആവശ്യമായ മരുന്നുകളുടെ എണ്ണം (Qty)
+              രേഖപ്പെടുത്തുക.
+            </li>
+            <li>
+              <strong>Step 3:</strong> 'AUTO FILL' ബട്ടൺ ഉപയോഗിച്ച് ബജറ്റ്
+              തുകയിലേക്ക്‌ മരുന്നുകളുടെ എണ്ണം ക്രമീകരിക്കാം.
+            </li>
+            <li>
+              <strong>Step 4:</strong> 'SAVE COMBINED / SPLIT PDF' ബട്ടൺ വഴി
+              ഇൻഡന്‍റ് ഡൗൺലോഡ് ചെയ്യാം.
+            </li>
+          </ul>
+        </div>
+        <div class="action-buttons">
+          <button class="enter-btn" onclick="enterApp()">
+            ENTER INDENT MAKER 🚀</button
+          ><button class="enter-btn help-theme-btn" onclick="toggleHelp()">
+            📖 HELP GUIDE (കൂടുതൽ അറിയാൻ)
+          </button>
+        </div>
+        <div class="footer-contact">
+          Technical Assistance and Suggestions<br />
+          <div class="contact-grid">
+            <a
+              href="https://wa.me/919605081081?text=Hi%20Ramakrishnan,%20I%20need%20help%20with%20Indent%20Maker"
+              target="_blank"
+              class="wa-chat-link"
+              ><img
+                src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                width="20"
+                height="20"
+                alt="WA"
+              />
+              <div class="contact-info">
+                <span class="contact-name">Ramakrishnan K</span
+                ><span class="contact-number">9605081081</span>
+              </div></a
+            ><a
+              href="https://wa.me/919447596675?text=Hi%20Sumesh,%20I%20need%20help%20with%20Indent%20Maker"
+              target="_blank"
+              class="wa-chat-link"
+              ><img
+                src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                width="20"
+                height="20"
+                alt="WA"
+              />
+              <div class="contact-info">
+                <span class="contact-name">Sumesh T.K</span
+                ><span class="contact-number">9447596675</span>
+              </div></a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="help-modal" class="modal-overlay">
+      <div class="modal-content">
+        <span class="close-modal" onclick="toggleHelp()">&times;</span>
+        <h2
+          style="
+            color: #1e3c72;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 20px;
+            text-align: center;
+          "
+        >
+          ഇൻഡന്‍റ് മേക്കർ - സഹായി
+        </h2>
+        <div
+          class="modal-scroll-area"
+          style="padding: 10px; text-align: left; overflow-y: auto"
+        >
+          <p style="font-weight: bold; color: #2c3e50">
+            1. സ്ഥാപനത്തിന്‍റെ വിവരങ്ങൾ നൽകുക (Header Section)
+          </p>
+          <ul style="list-style-type: none; padding-left: 10px">
+            <li>
+              • <b>Institution Name & Address:</b> സ്ഥാപനത്തിന്‍റെ പേരും
+              വിലാസവും കൃത്യമായി നൽകുക. ഇത് പിഡിഎഫിന്റെ മുകളിൽ വിലാസമായി വരും.
+            </li>
+            <li>
+              • <b>Indent Type:</b> ഇൻഡന്‍റ് ഏത് വിഭാഗത്തിൽ പെടുന്നു എന്ന്
+              രേഖപ്പെടുത്തുക (ഉദാ: Term-1, LSGD, NAM).
+            </li>
+            <li>
+              • <b>Total Budget:</b> അനുവദിച്ചിട്ടുള്ള ആകെ തുക ഇവിടെ ടൈപ്പ്
+              ചെയ്യുക.
+            </li>
+          </ul>
+          <p style="font-weight: bold; color: #2c3e50">
+            2. ഇൻഡന്റുകൾ JSON ആയി സേവ് ചെയ്യാനും ലോഡ് ചെയ്യാനും
+          </p>
+          <p>
+            നിങ്ങൾ തയ്യാറാക്കുന്ന ഇൻഡന്റുകൾ JSON ആയി ഡൌണ്‍ലോഡ് ചെയ്തു സൂക്ഷിച്ചു
+            വെക്കാം. ഒരേ സമയം ഒന്നിൽ കൂടുതൽ ഇൻഡന്റുകൾ തയ്യാറാക്കാൻ വിവിധ
+            ബ്രൗസറുകൾ ഉപയോഗിക്കാം.
+          </p>
+          <ul style="list-style-type: none; padding-left: 10px">
+            <li>• <b>JSON:</b> ഒരു ഫയൽ പേര് നൽകി JSON ബട്ടൺ അമർത്തുക.</li>
+            <li>• <b>LOAD:</b> JSON സേവ് ചെയ്തവ ലിസ്റ്റിൽ നിന്നും എടുക്കാം.</li>
+            <li>• <b>DEL:</b> JSON ആവശ്യമില്ലാത്തവ നീക്കം ചെയ്യാം.</li>
+            <li>• <b>IMPORT:</b> JSON സേവ് ചെയ്തവ വീണ്ടും ഉപയോഗിക്കാം.</li>
+          </ul>
+          <p style="font-weight: bold; color: #2c3e50">
+            3. മരുന്നുകൾ തിരഞ്ഞെടുക്കാൻ
+          </p>
+          <ul style="list-style-type: none; padding-left: 10px">
+            <li>
+              • <b>🔍 Search:</b> മരുന്നിന്റെ പേര് ടൈപ്പ് ചെയ്ത് കണ്ടെത്താം.
+            </li>
+            <li>
+              • <b>🔍 Rate Search:</b> വിലയുടെ അടിസ്ഥാനത്തിൽ തിരയാം (ഉദാ:
+              40-50).
+            </li>
+            <li>• <b>TYPE:</b> വിഭാഗം തിരിച്ച് (അരിഷ്ടം, തൈലം) കാണാൻ.</li>
+          </ul>
+          <p style="font-weight: bold; color: #2c3e50">
+            4. ബജറ്റ് ക്രമീകരണം (Smart Tools)
+          </p>
+          <ul style="list-style-type: none; padding-left: 10px">
+            <li>
+              • <b>AUTO FILL:</b> ബജറ്റിന് അനുയോജ്യമായ രീതിയിൽ എണ്ണം
+              ക്രമീകരിച്ച് ബാലൻസ് പൂജ്യമാക്കാൻ സഹായിക്കുന്നു.
+            </li>
+            <li>
+              • <b>SHOW SELECTED:</b> തിരഞ്ഞെടുത്ത മരുന്നുകൾ മാത്രം കാണാൻ.
+            </li>
+          </ul>
+          <p style="font-weight: bold; color: #2c3e50">
+            5. പിഡിഎഫ് റിപ്പോർട്ട്
+          </p>
+          <ul style="list-style-type: none; padding-left: 10px">
+            <li>
+              • <b>SAVE COMBINED PDF:</b> എല്ലാ മരുന്നുകളുടെയും ഒരുമിച്ചുള്ള PDF
+              ഡൌണ്‍ലോഡ് ചെയ്യുന്നതിന്.
+            </li>
+            <li>
+              • <b>SAVE SPLIT PDF:</b> കഷായ ചൂർണ്ണങ്ങളും മറ്റുള്ളവയും പ്രത്യേകം
+              PDF ഡൌണ്‍ലോഡ് ചെയ്യുന്നതിന്.
+            </li>
+          </ul>
+          <p style="font-weight: bold; color: #2c3e50">6. റീസെറ്റ് (Reset)</p>
+          <p>പുതിയ ഇൻഡന്‍റ് തുടങ്ങാൻ RESET ബട്ടൺ ഉപയോഗിക്കാം.</p>
+          <div
+            style="
+              background: #e8f4fd;
+              padding: 10px;
+              border-radius: 5px;
+              font-size: 13px;
+              margin-top: 15px;
+            "
+          >
+            <b>💡 പ്രായോഗിക നിർദ്ദേശങ്ങൾ:</b><br />
+            • ഓരോ മാറ്റവും തനിയെ സേവ് (Draft) ചെയ്യപ്പെടുന്നു.<br />
+            • AUTO FILL ഉപയോഗിക്കുന്നതിന് മുൻപ് കുറഞ്ഞത് രണ്ട് മരുന്നുകളെങ്കിലും
+            തിരഞ്ഞെടുക്കുക.<br />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sticky-header-container">
+      <div class="header-inputs">
+        <div class="input-wrapper address-section">
+          <label class="input-label">Institution Name & Address:</label
+          ><textarea
+            id="inst-details"
+            rows="2"
+            placeholder="Name of institution...,&#10;District...,&#10;Localbody..."
+            oninput="saveDraft()"
+          ></textarea>
+        </div>
+        <div class="input-wrapper indent-section">
+          <label class="input-label">Indent Type:</label>
+          <div class="select-group">
+            <select
+              id="indent-select"
+              onchange="updateIndentInput(this.value)"
+            ></select
+            ><input
+              type="text"
+              id="indent-type"
+              placeholder="Type here..."
+              oninput="saveDraft()"
+              style="display: none"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="file-manager-container">
+      <div class="fm-group budget-group">
+        <label class="fm-label">Total Budget (₹):</label
+        ><input
+          type="number"
+          id="total-budget"
+          class="budget-input"
+          placeholder="Enter Amount"
+          oninput="
+            calculateAll();
+            saveDraft();
+          "
+        />
+      </div>
+      <div class="fm-separator"></div>
+      <div class="fm-group load-group">
+        <label class="fm-label hidden-label">Select Indent</label>
+        <div class="fm-row">
+          <select id="savedIndentsList" class="fm-input">
+            <option value="">-- Select a saved indent --</option></select
+          ><button onclick="loadSelectedIndent()" class="btn-action btn-load">
+            LOAD</button
+          ><button onclick="deleteSelectedIndent()" class="btn-action btn-del">
+            DEL
+          </button>
+        </div>
+      </div>
+      <div class="fm-separator"></div>
+      <div class="fm-group save-group">
+        <label class="fm-label hidden-label">File Name</label>
+        <div class="fm-row">
+          <input
+            type="text"
+            id="newIndentName"
+            placeholder="File Name"
+            class="fm-input"
+          /><button onclick="saveNewIndent()" class="btn-action btn-json">
+            JSON ↓</button
+          ><label for="importJsonFile" class="btn-action btn-import">
+            IMPORT 📂 </label
+          ><input
+            type="file"
+            id="importJsonFile"
+            accept=".json"
+            style="display: none"
+            onchange="importJsonData(this)"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="search-container">
+      <div class="search-box-wrapper" style="position: relative">
+        <input
+          type="text"
+          id="medicineSearch"
+          class="styled-input"
+          placeholder="🔍 Search medicines here..."
+          onkeyup="filterMedicines()"
+        /><span
+          id="clearSearch"
+          onclick="clearSearchInput()"
+          style="
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #e74c3c;
+            display: none;
+            font-weight: bold;
+            font-size: 18px;
+          "
+        >
+          ✖
+        </span>
+      </div>
+      <div
+        class="rate-box-wrapper"
+        style="display: flex; align-items: center; gap: 5px"
+      >
+        <div style="position: relative; flex: 1">
+          <input
+            type="text"
+            id="rateRange"
+            class="styled-input"
+            placeholder="🔍 Rate: 40-50"
+            onkeyup="checkRateInput()"
+            style="width: 100%; padding-right: 25px"
+          /><span
+            id="clearRate"
+            onclick="clearRateInput()"
+            style="
+              position: absolute;
+              right: 8px;
+              top: 50%;
+              transform: translateY(-50%);
+              cursor: pointer;
+              color: #e74c3c;
+              display: none;
+              font-weight: bold;
+              font-size: 16px;
+            "
+          >
+            ✖
+          </span>
+        </div>
+        <button class="find-btn" onclick="filterByRate()">FIND</button>
+      </div>
+    </div>
+    <div class="summary-buttons" style="max-width: 1200px; margin-top: 15px">
+      <button
+        class="info-card"
+        style="background-color: #e74c3c; cursor: pointer"
+        onclick="resetForm()"
+      >
+        RESET</button
+      ><button
+        class="info-card btn-pdf"
+        style="background: #8e44ad; cursor: pointer"
+        onclick="downloadSplitPDF()"
+      >
+        SAVE ↓ SPLIT PDF (KC/Prep)</button
+      ><button
+        class="info-card"
+        style="background: #2980b9; cursor: pointer"
+        onclick="downloadCombinedPDF()"
+      >
+        SAVE ↓ COMBINED PDF</button
+      ><button
+        class="info-card"
+        style="background: #16a085; cursor: pointer"
+        onclick="autoAdjustBudget()"
+      >
+        AUTO FILL</button
+      ><button
+        id="view-btn"
+        class="info-card"
+        style="background-color: #f39c12; cursor: pointer"
+        onclick="toggleView()"
+      >
+        SHOW SELECTED</button
+      ><button
+        id="typeBtn"
+        class="info-card"
+        style="background: #2c3e50; cursor: pointer; width: 100%"
+        onclick="toggleCategoryMenu()"
+      >
+        TYPE ▾
+      </button>
+      <div id="categoryMenu">
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'ALL')">ALL</div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'ARISHTASAVAM')">
+          ARISHTASAVAM
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'BHASMAM')">
+          BHASMAM
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'CHOORNAM')">
+          CHOORNAM
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'GHRUTHAM')">
+          GHRUTHAM
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'GULIKA')">
+          GULIKA
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'KASHAYAM')">
+          KASHAYAM
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'KC')">KC</div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'KSC')">KSC</div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'LEHYAM')">
+          LEHYAM
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'OINTMENT')">
+          OINTMENT
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'RASAKRIYA')">
+          RASAKRIYA
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'SYRUP')">
+          SYRUP
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'THAILAM')">
+          THAILAM
+        </div>
+        <div class="cat-item" onclick="filterByCategory(0, 0, 'NEW ADDED')">
+          NEWLY ADDED
+        </div>
+      </div>
+      <div class="info-card btn-total">
+        <span class="card-label">Total</span
+        ><span class="card-value">₹ <span id="display-total">0.00</span></span>
+      </div>
+      <div class="info-card btn-balance">
+        <span class="card-label">Balance</span
+        ><span class="card-value"
+          >₹ <span id="display-balance">0.00</span></span
+        >
+      </div>
+    </div>
+    <div class="table-container">
+      <table id="medicineTable">
+        <thead>
+          <tr>
+            <th style="width: 50px; text-align: center">SL</th>
+            <th style="text-align: left; padding-left: 15px">Medicine Name</th>
+            <th style="width: 100px; text-align: center">Qty</th>
+            <th style="width: 120px; text-align: right">Rate+GST</th>
+            <th style="width: 120px; text-align: right">Cost</th>
+          </tr>
+        </thead>
+        <tbody id="product-body"></tbody>
+      </table>
+    </div>
+    <div
+      id="pdfModal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+      "
+    >
+      <div
+        style="
+          background-color: #fefefe;
+          margin: 2% auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 95%;
+          max-width: 600px;
+          max-height: 90%;
+          border-radius: 8px;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+          "
+        >
+          <h3
+            id="modalTitle"
+            style="margin: 0; color: #2c3e50; font-size: 18px"
+          >
+            Order Summary
+          </h3>
+          <button
+            onclick="document.getElementById('pdfModal').style.display = 'none'"
+            style="
+              background: #e74c3c;
+              color: white;
+              border: none;
+              padding: 8px 15px;
+              border-radius: 4px;
+              cursor: pointer;
+              font-weight: bold;
+              font-size: 16px;
+            "
+          >
+            X
+          </button>
+        </div>
+        <div
+          id="pdfPreviewContent"
+          style="flex: 1; overflow-y: auto; padding-bottom: 10px"
+        ></div>
+      </div>
+    </div>
+    <button
+      id="addCustomBtn"
+      class="floating-btn"
+      onclick="openNewMedicineModal()"
+      style="display: none"
+    >
+      +
+    </button>
+    <div
+      id="customMedicineModal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 20px;
+          width: 90%;
+          max-width: 400px;
+          border-radius: 8px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+          position: relative;
+          box-sizing: border-box;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+          "
+        >
+          <h2 style="margin: 0; font-size: 1.2rem">Add New Medicine</h2>
+          <span
+            class="close-btn"
+            onclick="closeAddModal()"
+            style="cursor: pointer; font-size: 25px; line-height: 1; color: red"
+            >&times;</span
+          >
+        </div>
+        <label style="font-weight: bold; font-size: 0.9rem"
+          >Medicine Name:</label
+        ><input
+          type="text"
+          id="customMedName"
+          placeholder="E.g., New Kashayam"
+          style="
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+          "
+        /><label style="font-weight: bold; font-size: 0.9rem"
+          >Rate without GST (₹):</label
+        ><input
+          type="number"
+          id="customMedRate"
+          placeholder="Rate"
+          style="
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+          "
+        /><label style="font-weight: bold; font-size: 0.9rem">GST %:</label
+        ><select
+          id="customMedGST"
+          style="
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+          "
+        >
+          <option value="0">0%</option>
+          <option value="5">5%</option>
+          <option value="12">12%</option></select
+        ><button
+          onclick="saveCustomMedicine()"
+          style="
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+          "
+        >
+          Save Medicine
+        </button>
+      </div>
+    </div>
+    <script>
+      (function autoUpdateCache() {
+        const currentAppVersion = "2.0";
+        const savedAppVersion = localStorage.getItem("indentMakerVersion");
+
+        if (savedAppVersion !== currentAppVersion) {
+          localStorage.setItem("indentMakerVersion", currentAppVersion);
+          const newUrl = window.location.pathname + "?v=" + currentAppVersion;
+          window.location.replace(newUrl);
+        }
+      })();
       const rawData = `
 ARISHTASAVAM	ABAYARISHTAM 200ML	25
 ARISHTASAVAM	ABAYARISHTAM 450ML	50
@@ -969,7 +2458,22 @@ THAILAM	VILLYAMPACHOTTYADI THAILAM 100ML	101
 THAILAM	VILLYAMPACHOTTYADI THAILAM 200ML	88
 THAILAM	VILLYAMPACHOTTYADI THAILAM 450ML	196
 `;
-let editIndex=-1;function loadMedicines(){const tbody=document.getElementById("product-body");let htmlBuffer="";let indexCount=1;const lines=rawData.trim().split("\n");lines.forEach((line)=>{const trimmedLine=line.trim();if(!trimmedLine)return;const parts=trimmedLine.split(/\s+/);if(parts.length>=3){const type=parts[0];const baseRate=parseFloat(parts[parts.length-1]);const name=parts.slice(1,parts.length-1).join(" ");const rateWithGST=baseRate*1.05;htmlBuffer+=`
+      let editIndex = -1;
+      function loadMedicines() {
+        const tbody = document.getElementById("product-body");
+        let htmlBuffer = "";
+        let indexCount = 1;
+        const lines = rawData.trim().split("\n");
+        lines.forEach((line) => {
+          const trimmedLine = line.trim();
+          if (!trimmedLine) return;
+          const parts = trimmedLine.split(/\s+/);
+          if (parts.length >= 3) {
+            const type = parts[0];
+            const baseRate = parseFloat(parts[parts.length - 1]);
+            const name = parts.slice(1, parts.length - 1).join(" ");
+            const rateWithGST = baseRate * 1.05;
+            htmlBuffer += `
             <tr class="med-row" data-type="${type}">
                 <td style="text-align: center;">${indexCount}</td>
                 <td class="med-name" style="padding-left: 15px;">${name}</td>
@@ -978,7 +2482,16 @@ let editIndex=-1;function loadMedicines(){const tbody=document.getElementById("p
                 </td>
                 <td style="text-align: right; padding-right: 10px;">${rateWithGST.toFixed(2)}</td>
                 <td class="row-cost" style="text-align: right; font-weight: bold; padding-right: 10px;">0.00</td>
-            </tr>`;indexCount++}});let customMedicines=JSON.parse(localStorage.getItem("customMedicines"))||[];customMedicines.forEach((med,idx)=>{let gstMultiplier=1+med.gst/100;let rateWithGST=med.rate*gstMultiplier;htmlBuffer+=`
+            </tr>`;
+            indexCount++;
+          }
+        });
+        let customMedicines =
+          JSON.parse(localStorage.getItem("customMedicines")) || [];
+        customMedicines.forEach((med, idx) => {
+          let gstMultiplier = 1 + med.gst / 100;
+          let rateWithGST = med.rate * gstMultiplier;
+          htmlBuffer += `
         <tr class="med-row custom-med" data-type="${med.type}">
             <td style="text-align: center;">${indexCount}</td>
             <td class="med-name" style="padding-left: 15px; color: #d35400;">
@@ -993,50 +2506,472 @@ let editIndex=-1;function loadMedicines(){const tbody=document.getElementById("p
             </td>
             <td style="text-align: right; padding-right: 10px;">${rateWithGST.toFixed(2)}</td>
             <td class="row-cost" style="text-align: right; font-weight: bold; padding-right: 10px;">0.00</td>
-        </tr>`;indexCount++});tbody.innerHTML=htmlBuffer}
-function updateRow(input){const row=input.closest("tr");const qty=parseFloat(input.value)||0;const rate=parseFloat(row.cells[3].innerText);const costField=row.querySelector(".row-cost");costField.innerText=(qty*rate).toFixed(2);if(qty>0){row.classList.add("row-active")}else{row.classList.remove("row-active")}
-calculateAll()}
-function calculateAll(){let total=0;const costs=document.querySelectorAll(".row-cost");costs.forEach((cell)=>{total+=parseFloat(cell.innerText.replace(/,/g,""))||0});const budget=parseFloat(document.getElementById("total-budget").value)||0;const balance=budget-total;document.getElementById("display-total").innerText=total.toLocaleString("en-IN",{minimumFractionDigits:2});const balanceDisplay=document.getElementById("display-balance");balanceDisplay.innerText=balance.toLocaleString("en-IN",{minimumFractionDigits:2,});const infoCard=balanceDisplay.closest(".info-card");if(infoCard){infoCard.style.backgroundColor=balance<0?"#e74c3c":"#2980b9"}}
-let searchTimeout;function filterMedicines(){const searchInput=document.getElementById("medicineSearch");const input=searchInput.value.toLowerCase().trim();const rows=document.querySelectorAll(".med-row");const clearBtn=document.getElementById("clearSearch");if(clearBtn){clearBtn.style.display=input.length>0?"block":"none"}
-let searchSlNo=1;window.requestAnimationFrame(()=>{rows.forEach((row)=>{const name=row.cells[1].textContent.toLowerCase();const label=row.getAttribute("data-visible-type");const isVisibleType=label==="true"||label===null;if(isVisibleType&&name.includes(input)){row.style.display="";row.cells[0].innerText=searchSlNo++}else{row.style.display="none"}})})}
-function clearSearchInput(){const inputField=document.getElementById("medicineSearch");inputField.value="";filterMedicines();inputField.focus()}
-function getSelectedItems(){const items=[];document.querySelectorAll("#product-body tr").forEach((row)=>{const qtyInp=row.querySelector(".qty-input");const qty=parseFloat(qtyInp.value)||0;const rate=parseFloat(row.cells[3].innerText)||0;const type=row.getAttribute("data-type")||"";const slNo=parseInt(row.cells[0].innerText);if(qty>0){const calculatedCost=qty*rate;items.push({sl:slNo,name:row.cells[1].innerText,qty:qty,rate:rate.toFixed(2),cost:calculatedCost.toFixed(2),type:type,})}});return items}
-async function downloadSplitPDF(){window.isSplitMode=!0;let safeQueue=[];const pdfModal=document.getElementById("pdfModal");if(pdfModal){pdfModal.style.transition="none";pdfModal.style.opacity="0"}
-if(typeof Swal!=="undefined"){Swal.fire({title:"Generating PDFs...",text:"Please wait a moment",allowOutsideClick:!1,showConfirmButton:!1,didOpen:()=>{Swal.showLoading()},})}
-const viewBtn=document.getElementById("view-btn");if(viewBtn&&viewBtn.innerText.includes("SHOW ALL")){toggleView()}
-if(typeof filterByCategory==="function"){filterByCategory(0,9999,"ALL")}
-await new Promise((r)=>setTimeout(r,200));const allData=getSelectedItems();if(allData.length===0){if(typeof Swal!=="undefined")Swal.close();if(pdfModal)pdfModal.style.opacity="1";return alert("ദയവായി മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!")}
-let totalKC=0;let totalPrep=0;const groupKC=allData.filter((item)=>{if(item.type==="KC"||item.type==="KSC"){totalKC+=parseFloat(item.cost)||0;return!0}
-return!1});const groupPrepared=allData.filter((item)=>{if(item.type!=="KC"&&item.type!=="KSC"){totalPrep+=parseFloat(item.cost)||0;return!0}
-return!1});const summaryText=`KC+KSC Rs. ${totalKC.toFixed(2)} + Prepared Rs. ${totalPrep.toFixed(2)} = Rs. ${(totalKC + totalPrep).toFixed(2)}`;const indentType=document.getElementById("indent-type").value||"Indent";const safeType=indentType.replace(/\//g,"-");if(groupKC.length>0){const fileNameKC=`${safeType}_KC_KSC`;let promiseKC=createSinglePDF(groupKC,"Kashaya Choornam (KC+KSC)",fileNameKC,summaryText,);let check1=setInterval(()=>{if(window.resolveCurrentPDF){window.resolveCurrentPDF();window.resolveCurrentPDF=null;clearInterval(check1)}},100);await promiseKC;if(typeof pdfQueue!=="undefined"&&pdfQueue.length>0){safeQueue.push(pdfQueue[pdfQueue.length-1])}}
-if(groupPrepared.length>0){const fileNamePrep=`${safeType}_PREP_Medicines`;let promisePrep=createSinglePDF(groupPrepared,"Prepared Medicines",fileNamePrep,summaryText,);let check2=setInterval(()=>{if(window.resolveCurrentPDF){window.resolveCurrentPDF();window.resolveCurrentPDF=null;clearInterval(check2)}},100);await promisePrep;if(typeof pdfQueue!=="undefined"&&pdfQueue.length>0){safeQueue.push(pdfQueue[pdfQueue.length-1])}}
-pdfQueue=safeQueue;setTimeout(()=>{if(typeof renderPreviewTable==="function"){renderPreviewTable(groupKC.length>0?"KC":"PREPARED")}
-if(typeof filterByCategory==="function"){filterByCategory(0,0,"ALL")}
-const mainBtn=document.getElementById("typeBtn");if(mainBtn)mainBtn.innerText="TYPE ▾";if(pdfModal){pdfModal.style.transition="opacity 0.3s ease";pdfModal.style.opacity="1"}
-if(typeof Swal!=="undefined")Swal.close();},600)}
-async function downloadCombinedPDF(){window.isSplitMode=!1;pdfQueue=[];const secondaryBtn=document.getElementById("summarySecondaryBtn");if(secondaryBtn){secondaryBtn.innerText="EDIT MORE";secondaryBtn.style.backgroundColor="#e67e22";secondaryBtn.onclick=closePDFModal}
-const indentType=document.getElementById("indent-type").value||"Full_Indent";const safeType=indentType.replace(/\//g,"-");const fileNameFull=`${safeType}_Full_Indent`;const allData=getSelectedItems();if(allData.length===0)
-return alert("ദയവായി മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!");await createSinglePDF(allData,"Medicine Indent (Full List)",fileNameFull,"",)}
-function createSinglePDF(dataArray,subTitle,fileName,summaryText){pdfQueue=[];const{jsPDF}=window.jspdf;const doc=new jsPDF();const inst=document.getElementById("inst-details").value||"Institution .....................";const type=document.getElementById("indent-type").value||"................";const budget=document.getElementById("total-budget").value||"0.00";let totalTaxableValue=0;let totalSGST=0;let totalCGST=0;let subTotalKC=0;let subTotalPrep=0;const tableRows=dataArray.map((item,index)=>{const costWithGST=parseFloat(item.cost)||0;const rateWithGST=parseFloat(item.rate)||0;if(item.sl>=418&&item.sl<=567){subTotalKC+=costWithGST}else{subTotalPrep+=costWithGST}
-const taxableRate=rateWithGST/1.05;const taxableCost=costWithGST/1.05;const totalGST=costWithGST-taxableCost;totalTaxableValue+=taxableCost;totalSGST+=totalGST/2;totalCGST+=totalGST/2;let cleanName=item.name.replace(/✏️/g,"").replace(/🗑️/g,"").trim();return[index+1,cleanName,item.qty,taxableRate.toFixed(2),taxableCost.toFixed(2),]});doc.setFillColor(255,255,255);doc.rect(0,0,210,25,"F");doc.setTextColor(44,62,80);doc.setFontSize(16);doc.setFont("helvetica","bold");doc.text(`${type.toUpperCase()} MEDICINE INDENT`,105,12,{align:"center",});doc.setFontSize(11);doc.text(subTitle,105,19,{align:"center"});doc.setLineWidth(0.5);doc.setDrawColor(0,0,0);doc.line(10,26,200,26);doc.setTextColor(0,0,0);doc.setFontSize(10);doc.setFont("helvetica","bold");doc.text("Institution Details:",14,35);doc.setFont("helvetica","normal");doc.text(doc.splitTextToSize(inst,100),14,40);doc.setFont("helvetica","bold");doc.text(`Budget: Rs. ${budget}`,140,35);const today=new Date();const formattedDate=today.getDate().toString().padStart(2,"0")+"-"+(today.getMonth()+1).toString().padStart(2,"0")+"-"+today.getFullYear();doc.text(`Date: ${formattedDate}`,140,41);doc.autoTable({head:[["SL No","Medicine Name","Qty","Rate (Excl.GST)","Cost (Excl.GST)",],],body:tableRows,startY:55,theme:"grid",headStyles:{fillColor:[44,62,80],textColor:[255,255,255],halign:"center",lineColor:[255,255,255],lineWidth:0.2,},bodyStyles:{textColor:[0,0,0],},columnStyles:{0:{halign:"center",cellWidth:12},2:{halign:"center",cellWidth:20},3:{halign:"right",cellWidth:35},4:{halign:"right",cellWidth:40},},styles:{fontSize:9,cellPadding:3,lineColor:[139,69,19],neWidth:0.3,},});let finalY=doc.lastAutoTable.finalY+10;const grandTotal=totalTaxableValue+totalSGST+totalCGST;if(finalY>240){doc.addPage();finalY=25}
-doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(`Total Taxable Value: Rs. ${totalTaxableValue.toFixed(2)}`,196,finalY,{align:"right"},);finalY+=5;doc.text(`SGST (2.5%): Rs. ${totalSGST.toFixed(2)}`,196,finalY,{align:"right",});finalY+=5;doc.text(`CGST (2.5%): Rs. ${totalCGST.toFixed(2)}`,196,finalY,{align:"right",});finalY+=7;doc.setFont("helvetica","bold");doc.setFontSize(10);let totalLabel="GRAND TOTAL";if(subTitle.includes("KC")){totalLabel="KC+KSC GRAND TOTAL"}else if(subTitle.includes("Prepared")){totalLabel="PREPARED MEDICINE GRAND TOTAL"}
-doc.text(`${totalLabel} (INCL. GST): Rs. ${grandTotal.toFixed(2)}`,196,finalY,{align:"right"},);if(summaryText){finalY+=7;doc.setFontSize(9);doc.setFont("helvetica","bold");doc.text(summaryText,196,finalY,{align:"right"})}
-finalY+=7;doc.setFontSize(8);doc.setFont("helvetica","bold");doc.text(`* This indent is prepared for the budget of Rs. ${budget}`,196,finalY,{align:"right"},);const totalPages=doc.internal.getNumberOfPages();for(let i=1;i<=totalPages;i++){doc.setPage(i);doc.setFontSize(10);doc.setTextColor(150);doc.text(`Page ${i} of ${totalPages}`,doc.internal.pageSize.getWidth()/2,doc.internal.pageSize.getHeight()-10,{align:"center"},)}
-showPDFPreview("",fileName,doc);return new Promise((resolve)=>{window.resolveCurrentPDF=resolve})}
-let currentDoc=null;let currentFileName="";let pdfQueue=[];let currentPreviewType="ALL";function showPDFPreview(blobURL,fileName,doc){pdfQueue.push({doc:doc,name:fileName});if(window.isSplitMode){if(fileName.toUpperCase().includes("KC")){currentPreviewType="KC"}else{currentPreviewType="PREPARED"}}else{currentPreviewType="ALL"}
-renderPreviewTable(currentPreviewType)}
-function renderPreviewTable(type){const modal=document.getElementById("pdfModal");const previewArea=document.getElementById("pdfPreviewContent");previewArea.innerHTML="";const rows=document.querySelectorAll(".med-row");let subTotal=0;let tableRows="";let itemCount=0;rows.forEach((row)=>{const qty=parseFloat(row.querySelector(".qty-input").value)||0;if(qty>0){const rowType=row.getAttribute("data-type");const isKCItem=rowType==="KC"||rowType==="KSC";let shouldShow=!1;if(type==="ALL")shouldShow=!0;else if(type==="KC"&&isKCItem)shouldShow=!0;else if(type==="PREPARED"&&!isKCItem)shouldShow=!0;if(shouldShow){itemCount++;const nameCell=row.querySelector(".med-name");const name=nameCell.childNodes[0].textContent.trim();const cost=parseFloat(row.querySelector(".row-cost").innerText.replace(/,/g,""),)||0;subTotal+=cost;tableRows+=`
+        </tr>`;
+          indexCount++;
+        });
+        tbody.innerHTML = htmlBuffer;
+      }
+      function updateRow(input) {
+        const row = input.closest("tr");
+        const qty = parseFloat(input.value) || 0;
+        const rate = parseFloat(row.cells[3].innerText);
+        const costField = row.querySelector(".row-cost");
+        costField.innerText = (qty * rate).toFixed(2);
+        if (qty > 0) {
+          row.classList.add("row-active");
+        } else {
+          row.classList.remove("row-active");
+        }
+        calculateAll();
+      }
+      function calculateAll() {
+        let total = 0;
+        const costs = document.querySelectorAll(".row-cost");
+        costs.forEach((cell) => {
+          total += parseFloat(cell.innerText.replace(/,/g, "")) || 0;
+        });
+        const budget =
+          parseFloat(document.getElementById("total-budget").value) || 0;
+        const balance = budget - total;
+        document.getElementById("display-total").innerText =
+          total.toLocaleString("en-IN", { minimumFractionDigits: 2 });
+        const balanceDisplay = document.getElementById("display-balance");
+        balanceDisplay.innerText = balance.toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+        });
+        const infoCard = balanceDisplay.closest(".info-card");
+        if (infoCard) {
+          infoCard.style.backgroundColor = balance < 0 ? "#e74c3c" : "#2980b9";
+        }
+      }
+      let searchTimeout;
+      function filterMedicines() {
+        const searchInput = document.getElementById("medicineSearch");
+        const input = searchInput.value.toLowerCase().trim();
+        const rows = document.querySelectorAll(".med-row");
+        const clearBtn = document.getElementById("clearSearch");
+        if (clearBtn) {
+          clearBtn.style.display = input.length > 0 ? "block" : "none";
+        }
+        let searchSlNo = 1;
+        window.requestAnimationFrame(() => {
+          rows.forEach((row) => {
+            const name = row.cells[1].textContent.toLowerCase();
+            const label = row.getAttribute("data-visible-type");
+            const isVisibleType = label === "true" || label === null;
+            if (isVisibleType && name.includes(input)) {
+              row.style.display = "";
+              row.cells[0].innerText = searchSlNo++;
+            } else {
+              row.style.display = "none";
+            }
+          });
+        });
+      }
+      function clearSearchInput() {
+        const inputField = document.getElementById("medicineSearch");
+        inputField.value = "";
+        filterMedicines();
+        inputField.focus();
+      }
+      function getSelectedItems() {
+        const items = [];
+        document.querySelectorAll("#product-body tr").forEach((row) => {
+          const qtyInp = row.querySelector(".qty-input");
+          const qty = parseFloat(qtyInp.value) || 0;
+          const rate = parseFloat(row.cells[3].innerText) || 0;
+          const type = row.getAttribute("data-type") || "";
+          const slNo = parseInt(row.cells[0].innerText);
+          if (qty > 0) {
+            const calculatedCost = qty * rate;
+            items.push({
+              sl: slNo,
+              name: row.cells[1].innerText,
+              qty: qty,
+              rate: rate.toFixed(2),
+              cost: calculatedCost.toFixed(2),
+              type: type,
+            });
+          }
+        });
+        return items;
+      }
+      async function downloadSplitPDF() {
+        window.isSplitMode = !0;
+        let safeQueue = [];
+        const pdfModal = document.getElementById("pdfModal");
+        if (pdfModal) {
+          pdfModal.style.transition = "none";
+          pdfModal.style.opacity = "0";
+        }
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            title: "Generating PDFs...",
+            text: "Please wait a moment",
+            allowOutsideClick: !1,
+            showConfirmButton: !1,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+        }
+        const viewBtn = document.getElementById("view-btn");
+        if (viewBtn && viewBtn.innerText.includes("SHOW ALL")) {
+          toggleView();
+        }
+        if (typeof filterByCategory === "function") {
+          filterByCategory(0, 9999, "ALL");
+        }
+        await new Promise((r) => setTimeout(r, 200));
+        const allData = getSelectedItems();
+        if (allData.length === 0) {
+          if (typeof Swal !== "undefined") Swal.close();
+          if (pdfModal) pdfModal.style.opacity = "1";
+          return alert("ദയവായി മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!");
+        }
+        let totalKC = 0;
+        let totalPrep = 0;
+        const groupKC = allData.filter((item) => {
+          if (item.type === "KC" || item.type === "KSC") {
+            totalKC += parseFloat(item.cost) || 0;
+            return !0;
+          }
+          return !1;
+        });
+        const groupPrepared = allData.filter((item) => {
+          if (item.type !== "KC" && item.type !== "KSC") {
+            totalPrep += parseFloat(item.cost) || 0;
+            return !0;
+          }
+          return !1;
+        });
+        const summaryText = `KC+KSC Rs. ${totalKC.toFixed(2)} + Prepared Rs. ${totalPrep.toFixed(2)} = Rs. ${(totalKC + totalPrep).toFixed(2)}`;
+        const indentType =
+          document.getElementById("indent-type").value || "Indent";
+        const safeType = indentType.replace(/\//g, "-");
+        if (groupKC.length > 0) {
+          const fileNameKC = `${safeType}_KC_KSC`;
+          let promiseKC = createSinglePDF(
+            groupKC,
+            "Kashaya Choornam (KC+KSC)",
+            fileNameKC,
+            summaryText,
+          );
+          let check1 = setInterval(() => {
+            if (window.resolveCurrentPDF) {
+              window.resolveCurrentPDF();
+              window.resolveCurrentPDF = null;
+              clearInterval(check1);
+            }
+          }, 100);
+          await promiseKC;
+          if (typeof pdfQueue !== "undefined" && pdfQueue.length > 0) {
+            safeQueue.push(pdfQueue[pdfQueue.length - 1]);
+          }
+        }
+        if (groupPrepared.length > 0) {
+          const fileNamePrep = `${safeType}_PREP_Medicines`;
+          let promisePrep = createSinglePDF(
+            groupPrepared,
+            "Prepared Medicines",
+            fileNamePrep,
+            summaryText,
+          );
+          let check2 = setInterval(() => {
+            if (window.resolveCurrentPDF) {
+              window.resolveCurrentPDF();
+              window.resolveCurrentPDF = null;
+              clearInterval(check2);
+            }
+          }, 100);
+          await promisePrep;
+          if (typeof pdfQueue !== "undefined" && pdfQueue.length > 0) {
+            safeQueue.push(pdfQueue[pdfQueue.length - 1]);
+          }
+        }
+        pdfQueue = safeQueue;
+        setTimeout(() => {
+          if (typeof renderPreviewTable === "function") {
+            renderPreviewTable(groupKC.length > 0 ? "KC" : "PREPARED");
+          }
+          if (typeof filterByCategory === "function") {
+            filterByCategory(0, 0, "ALL");
+          }
+          const mainBtn = document.getElementById("typeBtn");
+          if (mainBtn) mainBtn.innerText = "TYPE ▾";
+          if (pdfModal) {
+            pdfModal.style.transition = "opacity 0.3s ease";
+            pdfModal.style.opacity = "1";
+          }
+          if (typeof Swal !== "undefined") Swal.close();
+        }, 600);
+      }
+      async function downloadCombinedPDF() {
+        window.isSplitMode = !1;
+        pdfQueue = [];
+        const secondaryBtn = document.getElementById("summarySecondaryBtn");
+        if (secondaryBtn) {
+          secondaryBtn.innerText = "EDIT MORE";
+          secondaryBtn.style.backgroundColor = "#e67e22";
+          secondaryBtn.onclick = closePDFModal;
+        }
+        const indentType =
+          document.getElementById("indent-type").value || "Full_Indent";
+        const safeType = indentType.replace(/\//g, "-");
+        const fileNameFull = `${safeType}_Full_Indent`;
+        const allData = getSelectedItems();
+        if (allData.length === 0)
+          return alert("ദയവായി മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!");
+        await createSinglePDF(
+          allData,
+          "Medicine Indent (Full List)",
+          fileNameFull,
+          "",
+        );
+      }
+      function createSinglePDF(dataArray, subTitle, fileName, summaryText) {
+        pdfQueue = [];
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const inst =
+          document.getElementById("inst-details").value ||
+          "Institution .....................";
+        const type =
+          document.getElementById("indent-type").value || "................";
+        const budget = document.getElementById("total-budget").value || "0.00";
+        let totalTaxableValue = 0;
+        let totalSGST = 0;
+        let totalCGST = 0;
+        let subTotalKC = 0;
+        let subTotalPrep = 0;
+        const tableRows = dataArray.map((item, index) => {
+          const costWithGST = parseFloat(item.cost) || 0;
+          const rateWithGST = parseFloat(item.rate) || 0;
+          if (item.sl >= 418 && item.sl <= 567) {
+            subTotalKC += costWithGST;
+          } else {
+            subTotalPrep += costWithGST;
+          }
+          const taxableRate = rateWithGST / 1.05;
+          const taxableCost = costWithGST / 1.05;
+          const totalGST = costWithGST - taxableCost;
+          totalTaxableValue += taxableCost;
+          totalSGST += totalGST / 2;
+          totalCGST += totalGST / 2;
+          let cleanName = item.name
+            .replace(/✏️/g, "")
+            .replace(/🗑️/g, "")
+            .trim();
+          return [
+            index + 1,
+            cleanName,
+            item.qty,
+            taxableRate.toFixed(2),
+            taxableCost.toFixed(2),
+          ];
+        });
+        doc.setFillColor(255, 255, 255);
+        doc.rect(0, 0, 210, 25, "F");
+        doc.setTextColor(44, 62, 80);
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${type.toUpperCase()} MEDICINE INDENT`, 105, 12, {
+          align: "center",
+        });
+        doc.setFontSize(11);
+        doc.text(subTitle, 105, 19, { align: "center" });
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(0, 0, 0);
+        doc.line(10, 26, 200, 26);
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("Institution Details:", 14, 35);
+        doc.setFont("helvetica", "normal");
+        doc.text(doc.splitTextToSize(inst, 100), 14, 40);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Budget: Rs. ${budget}`, 140, 35);
+        const today = new Date();
+        const formattedDate =
+          today.getDate().toString().padStart(2, "0") +
+          "-" +
+          (today.getMonth() + 1).toString().padStart(2, "0") +
+          "-" +
+          today.getFullYear();
+        doc.text(`Date: ${formattedDate}`, 140, 41);
+        doc.autoTable({
+          head: [
+            [
+              "SL No",
+              "Medicine Name",
+              "Qty",
+              "Rate (Excl.GST)",
+              "Cost (Excl.GST)",
+            ],
+          ],
+          body: tableRows,
+          startY: 55,
+          theme: "grid",
+          headStyles: {
+            fillColor: [44, 62, 80],
+            textColor: [255, 255, 255],
+            halign: "center",
+            lineColor: [255, 255, 255],
+            lineWidth: 0.2,
+          },
+          bodyStyles: { textColor: [0, 0, 0] },
+          columnStyles: {
+            0: { halign: "center", cellWidth: 12 },
+            2: { halign: "center", cellWidth: 20 },
+            3: { halign: "right", cellWidth: 35 },
+            4: { halign: "right", cellWidth: 40 },
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 3,
+            lineColor: [139, 69, 19],
+            neWidth: 0.3,
+          },
+        });
+        let finalY = doc.lastAutoTable.finalY + 10;
+        const grandTotal = totalTaxableValue + totalSGST + totalCGST;
+        if (finalY > 240) {
+          doc.addPage();
+          finalY = 25;
+        }
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.text(
+          `Total Taxable Value: Rs. ${totalTaxableValue.toFixed(2)}`,
+          196,
+          finalY,
+          { align: "right" },
+        );
+        finalY += 5;
+        doc.text(`SGST (2.5%): Rs. ${totalSGST.toFixed(2)}`, 196, finalY, {
+          align: "right",
+        });
+        finalY += 5;
+        doc.text(`CGST (2.5%): Rs. ${totalCGST.toFixed(2)}`, 196, finalY, {
+          align: "right",
+        });
+        finalY += 7;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        let totalLabel = "GRAND TOTAL";
+        if (subTitle.includes("KC")) {
+          totalLabel = "KC+KSC GRAND TOTAL";
+        } else if (subTitle.includes("Prepared")) {
+          totalLabel = "PREPARED MEDICINE GRAND TOTAL";
+        }
+        doc.text(
+          `${totalLabel} (INCL. GST): Rs. ${grandTotal.toFixed(2)}`,
+          196,
+          finalY,
+          { align: "right" },
+        );
+        if (summaryText) {
+          finalY += 7;
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "bold");
+          doc.text(summaryText, 196, finalY, { align: "right" });
+        }
+        finalY += 7;
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.text(
+          `* This indent is prepared for the budget of Rs. ${budget}`,
+          196,
+          finalY,
+          { align: "right" },
+        );
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(10);
+          doc.setTextColor(150);
+          doc.text(
+            `Page ${i} of ${totalPages}`,
+            doc.internal.pageSize.getWidth() / 2,
+            doc.internal.pageSize.getHeight() - 10,
+            { align: "center" },
+          );
+        }
+        showPDFPreview("", fileName, doc);
+        return new Promise((resolve) => {
+          window.resolveCurrentPDF = resolve;
+        });
+      }
+      let currentDoc = null;
+      let currentFileName = "";
+      let pdfQueue = [];
+      let currentPreviewType = "ALL";
+      function showPDFPreview(blobURL, fileName, doc) {
+        pdfQueue.push({ doc: doc, name: fileName });
+        if (window.isSplitMode) {
+          if (fileName.toUpperCase().includes("KC")) {
+            currentPreviewType = "KC";
+          } else {
+            currentPreviewType = "PREPARED";
+          }
+        } else {
+          currentPreviewType = "ALL";
+        }
+        renderPreviewTable(currentPreviewType);
+      }
+      function renderPreviewTable(type) {
+        const modal = document.getElementById("pdfModal");
+        const previewArea = document.getElementById("pdfPreviewContent");
+        previewArea.innerHTML = "";
+        const rows = document.querySelectorAll(".med-row");
+        let subTotal = 0;
+        let tableRows = "";
+        let itemCount = 0;
+        rows.forEach((row) => {
+          const qty = parseFloat(row.querySelector(".qty-input").value) || 0;
+          if (qty > 0) {
+            const rowType = row.getAttribute("data-type");
+            const isKCItem = rowType === "KC" || rowType === "KSC";
+            let shouldShow = !1;
+            if (type === "ALL") shouldShow = !0;
+            else if (type === "KC" && isKCItem) shouldShow = !0;
+            else if (type === "PREPARED" && !isKCItem) shouldShow = !0;
+            if (shouldShow) {
+              itemCount++;
+              const nameCell = row.querySelector(".med-name");
+              const name = nameCell.childNodes[0].textContent.trim();
+              const cost =
+                parseFloat(
+                  row.querySelector(".row-cost").innerText.replace(/,/g, ""),
+                ) || 0;
+              subTotal += cost;
+              tableRows += `
                 <tr style="border-bottom: 1px solid #eee;">
 <td style="border: 1px solid #ddd; padding: 6px 4px; word-break: break-word; line-height: 1.2; text-align: left;">${name}</td>
 <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-weight: bold;">${qty}</td>
 <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: right;">${cost.toFixed(2)}</td>
-                </tr>`}}});let sectionTitle="",sectionColor="#2c3e50",actionButtons="";if(type==="ALL"){sectionTitle="COMBINED ORDER LIST";sectionColor="#2c3e50";actionButtons=`
+                </tr>`;
+            }
+          }
+        });
+        let sectionTitle = "",
+          sectionColor = "#2c3e50",
+          actionButtons = "";
+        if (type === "ALL") {
+          sectionTitle = "COMBINED ORDER LIST";
+          sectionColor = "#2c3e50";
+          actionButtons = `
         <div style="margin-top: 10px;">
              <button onclick="downloadSpecificPDF(0)" 
                 style="width: 100%; padding: 12px; background: #2980b9; color: white; border: none; font-weight: bold; border-radius: 5px;">
                 SAVE / DOWNLOAD PDF ↓
             </button>
-        </div>`}else{if(type==="KC"){sectionTitle="KASHAYA CHOORNAM (KC)";sectionColor="#8e44ad";actionButtons=`
+        </div>`;
+        } else {
+          if (type === "KC") {
+            sectionTitle = "KASHAYA CHOORNAM (KC)";
+            sectionColor = "#8e44ad";
+            actionButtons = `
             <div style="display: flex; gap: 8px; margin-top: 10px;">
                 <button onclick="downloadSpecificPDFByContent('KC')" 
                     style="flex: 1; padding: 12px; background: #8e44ad; color: white; border: none; font-weight: bold; border-radius: 5px;">
@@ -1046,7 +2981,11 @@ function renderPreviewTable(type){const modal=document.getElementById("pdfModal"
                     style="flex: 1; padding: 12px; background: #27ae60; color: white; border: none; font-weight: bold; border-radius: 5px;">
                     VIEW PREPARED →
                 </button>
-            </div>`}else{sectionTitle="PREPARED MEDICINES";sectionColor="#27ae60";actionButtons=`
+            </div>`;
+          } else {
+            sectionTitle = "PREPARED MEDICINES";
+            sectionColor = "#27ae60";
+            actionButtons = `
             <div style="display: flex; gap: 8px; margin-top: 10px;">
                  <button onclick="renderPreviewTable('KC')" 
                     style="flex: 1; padding: 12px; background: #8e44ad; color: white; border: none; font-weight: bold; border-radius: 5px;">
@@ -1056,8 +2995,10 @@ function renderPreviewTable(type){const modal=document.getElementById("pdfModal"
                     style="flex: 1; padding: 12px; background: #27ae60; color: white; border: none; font-weight: bold; border-radius: 5px;">
                     SAVE PREP. PDF ↓
                 </button>
-            </div>`}}
-previewArea.innerHTML=`
+            </div>`;
+          }
+        }
+        previewArea.innerHTML = `
     <div class="pdf-section" style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #fff; width: 100%;">
         <div style="background: ${sectionColor}; color: white; padding: 10px; font-weight: bold; display: flex; justify-content: space-between; font-size: 14px; position: sticky; top: 0; z-index: 10;">
             <span>${sectionTitle} (${itemCount})</span>
@@ -1076,20 +3017,190 @@ previewArea.innerHTML=`
             </table>
         </div>
         <div style="padding: 8px;">${actionButtons}</div>
-    </div>`;modal.style.display="block";const mainDownloadBtn=document.querySelector('button[onclick="downloadActualPDF()"]',);if(mainDownloadBtn)mainDownloadBtn.style.display="none"}
-function downloadSpecificPDFByContent(type){let targetIndex=-1;for(let i=pdfQueue.length-1;i>=0;i--){let fileName=pdfQueue[i].name.toUpperCase();if(type==="KC"){if(fileName.includes("KC")&&!fileName.includes("PREP")){targetIndex=i;break}}else if(type==="PREPARED"){if(fileName.includes("PREP")){targetIndex=i;break}}}
-if(targetIndex===-1&&pdfQueue.length>=2){if(type==="KC"){targetIndex=pdfQueue.length-2}else if(type==="PREPARED"){targetIndex=pdfQueue.length-1}}
-if(targetIndex!==-1&&pdfQueue[targetIndex]){downloadSpecificPDF(targetIndex)}else{let availableFiles=pdfQueue.map((p)=>p.name).join(" | ");alert("അറിയിപ്പ്: "+type+" ഫയൽ കണ്ടെത്താൻ കഴിഞ്ഞില്ല. നിലവിലുള്ള ഫയലുകൾ: "+availableFiles,)}}
-function downloadSpecificPDF(index){const item=pdfQueue[index];if(item&&item.doc){const instFull=document.getElementById("inst-details").value||"INDENT";const instFirstLine=instFull.split("\n")[0].substring(0,15).trim().replace(/\s+/g,"_");const now=new Date();const timeStamp=`${String(now.getDate()).padStart(2, "0")}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getFullYear()).slice(-2)}-${String(now.getHours()).padStart(2, "0")}-${String(now.getSeconds()).padStart(2, "0")}-${String(now.getMilliseconds()).padStart(3, "0")}`;const finalFileName=`${instFirstLine}_${item.name}_${timeStamp}.pdf`;item.doc.save(finalFileName)}}
-function switchTab(index){document.querySelectorAll(".tab-btn").forEach((b)=>b.classList.remove("active"));document.querySelectorAll(".summary-content").forEach((c)=>c.classList.remove("active"));const selectedBtn=document.getElementById(`tab-btn-${index}`);selectedBtn.classList.add("active");document.getElementById(`tab-content-${index}`).classList.add("active");const downloadBtn=document.querySelector('button[onclick="downloadActualPDF()"]',);if(downloadBtn){downloadBtn.innerText=`DOWNLOAD ${selectedBtn.innerText.split(" (")[0]}`}}
-function downloadActualPDF(){const activeTabBtn=document.querySelector(".tab-btn.active");if(!activeTabBtn)return;const index=parseInt(activeTabBtn.id.replace("tab-btn-",""));const item=pdfQueue[index];if(item&&item.doc){const instFull=document.getElementById("inst-details").value||"INDENT";const instFirstLine=instFull.split("\n")[0].substring(0,15).trim().replace(/\s+/g,"_");const now=new Date();const d=String(now.getDate()).padStart(2,"0");const m=String(now.getMonth()+1).padStart(2,"0");const y=String(now.getFullYear()).slice(-2);const h=String(now.getHours()).padStart(2,"0");const s=String(now.getSeconds()).padStart(2,"0");const ms=String(now.getMilliseconds()).padStart(3,"0");const timeStamp=`${d}-${m}-${y}-${h}-${s}-${ms}`;const finalFileName=`${instFirstLine}_${item.name}_${timeStamp}.pdf`;item.doc.save(finalFileName)}}
-function closePDFModal(){document.getElementById("pdfModal").style.display="none";pdfQueue=[];if(typeof filterByCategory==="function"){filterByCategory(0,0,"ALL")}
-const mainBtn=document.getElementById("typeBtn");if(mainBtn)mainBtn.innerText="TYPE ▾";if(window.resolveCurrentPDF){window.resolveCurrentPDF();window.resolveCurrentPDF=null}}
-function toggleView(){const viewBtn=document.getElementById("view-btn");const isShowingSelected=viewBtn&&viewBtn.innerText.includes("SHOW ALL");if(isShowingSelected){filterByCategory(0,0,"ALL");updateButtonUI(!1)}else{showSummaryGrid((mode)=>{const rows=document.querySelectorAll("#product-body tr");let counter=1;if(mode==="SELECTED"){rows.forEach((row)=>{const qtyInput=row.querySelector(".qty-input");const qty=parseFloat(qtyInput.value)||0;if(qty>0){row.style.display="";row.cells[0].innerText=counter++;row.setAttribute("data-visible-type","true")}else{row.style.display="none";row.setAttribute("data-visible-type","false")}});updateButtonUI(!0)}else{filterByCategory(0,0,"ALL");updateButtonUI(!1)}})}}
-function updateButtonUI(isShowingSelected){const viewBtn=document.getElementById("view-btn");if(!viewBtn)return;if(isShowingSelected){viewBtn.innerText="SHOW ALL";viewBtn.style.backgroundColor="#2ecc71"}else{viewBtn.innerText="SHOW SELECTED";viewBtn.style.backgroundColor="#f39c12"}}
-function showSummaryGrid(callback){const rows=document.querySelectorAll("#product-body tr");let summary={};let totalItems=0;let grandTotal=0;rows.forEach((row)=>{const qty=parseFloat(row.querySelector(".qty-input").value)||0;if(qty>0){let catName=row.getAttribute("data-type")||"NEW ADDED";const amount=parseFloat(row.cells[4].innerText.replace(/,/g,""))||0;if(!summary[catName]){summary[catName]={count:0,total:0}}
-summary[catName].count+=1;summary[catName].total+=amount;totalItems+=1;grandTotal+=amount}});if(totalItems===0){return Swal.fire("അറിയിപ്പ്","മരുന്നുകളൊന്നും തിരഞ്ഞെടുത്തിട്ടില്ല!","info",)}
-let gridHtml=`
+    </div>`;
+        modal.style.display = "block";
+        const mainDownloadBtn = document.querySelector(
+          'button[onclick="downloadActualPDF()"]',
+        );
+        if (mainDownloadBtn) mainDownloadBtn.style.display = "none";
+      }
+      function downloadSpecificPDFByContent(type) {
+        let targetIndex = -1;
+        for (let i = pdfQueue.length - 1; i >= 0; i--) {
+          let fileName = pdfQueue[i].name.toUpperCase();
+          if (type === "KC") {
+            if (fileName.includes("KC") && !fileName.includes("PREP")) {
+              targetIndex = i;
+              break;
+            }
+          } else if (type === "PREPARED") {
+            if (fileName.includes("PREP")) {
+              targetIndex = i;
+              break;
+            }
+          }
+        }
+        if (targetIndex === -1 && pdfQueue.length >= 2) {
+          if (type === "KC") {
+            targetIndex = pdfQueue.length - 2;
+          } else if (type === "PREPARED") {
+            targetIndex = pdfQueue.length - 1;
+          }
+        }
+        if (targetIndex !== -1 && pdfQueue[targetIndex]) {
+          downloadSpecificPDF(targetIndex);
+        } else {
+          let availableFiles = pdfQueue.map((p) => p.name).join(" | ");
+          alert(
+            "അറിയിപ്പ്: " +
+              type +
+              " ഫയൽ കണ്ടെത്താൻ കഴിഞ്ഞില്ല. നിലവിലുള്ള ഫയലുകൾ: " +
+              availableFiles,
+          );
+        }
+      }
+      function downloadSpecificPDF(index) {
+        const item = pdfQueue[index];
+        if (item && item.doc) {
+          const instFull =
+            document.getElementById("inst-details").value || "INDENT";
+          const instFirstLine = instFull
+            .split("\n")[0]
+            .substring(0, 15)
+            .trim()
+            .replace(/\s+/g, "_");
+          const now = new Date();
+          const timeStamp = `${String(now.getDate()).padStart(2, "0")}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getFullYear()).slice(-2)}-${String(now.getHours()).padStart(2, "0")}-${String(now.getSeconds()).padStart(2, "0")}-${String(now.getMilliseconds()).padStart(3, "0")}`;
+          const finalFileName = `${instFirstLine}_${item.name}_${timeStamp}.pdf`;
+          item.doc.save(finalFileName);
+        }
+      }
+      function switchTab(index) {
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document
+          .querySelectorAll(".summary-content")
+          .forEach((c) => c.classList.remove("active"));
+        const selectedBtn = document.getElementById(`tab-btn-${index}`);
+        selectedBtn.classList.add("active");
+        document.getElementById(`tab-content-${index}`).classList.add("active");
+        const downloadBtn = document.querySelector(
+          'button[onclick="downloadActualPDF()"]',
+        );
+        if (downloadBtn) {
+          downloadBtn.innerText = `DOWNLOAD ${selectedBtn.innerText.split(" (")[0]}`;
+        }
+      }
+      function downloadActualPDF() {
+        const activeTabBtn = document.querySelector(".tab-btn.active");
+        if (!activeTabBtn) return;
+        const index = parseInt(activeTabBtn.id.replace("tab-btn-", ""));
+        const item = pdfQueue[index];
+        if (item && item.doc) {
+          const instFull =
+            document.getElementById("inst-details").value || "INDENT";
+          const instFirstLine = instFull
+            .split("\n")[0]
+            .substring(0, 15)
+            .trim()
+            .replace(/\s+/g, "_");
+          const now = new Date();
+          const d = String(now.getDate()).padStart(2, "0");
+          const m = String(now.getMonth() + 1).padStart(2, "0");
+          const y = String(now.getFullYear()).slice(-2);
+          const h = String(now.getHours()).padStart(2, "0");
+          const s = String(now.getSeconds()).padStart(2, "0");
+          const ms = String(now.getMilliseconds()).padStart(3, "0");
+          const timeStamp = `${d}-${m}-${y}-${h}-${s}-${ms}`;
+          const finalFileName = `${instFirstLine}_${item.name}_${timeStamp}.pdf`;
+          item.doc.save(finalFileName);
+        }
+      }
+      function closePDFModal() {
+        document.getElementById("pdfModal").style.display = "none";
+        pdfQueue = [];
+        if (typeof filterByCategory === "function") {
+          filterByCategory(0, 0, "ALL");
+        }
+        const mainBtn = document.getElementById("typeBtn");
+        if (mainBtn) mainBtn.innerText = "TYPE ▾";
+        if (window.resolveCurrentPDF) {
+          window.resolveCurrentPDF();
+          window.resolveCurrentPDF = null;
+        }
+      }
+      function toggleView() {
+        const viewBtn = document.getElementById("view-btn");
+        const isShowingSelected =
+          viewBtn && viewBtn.innerText.includes("SHOW ALL");
+        if (isShowingSelected) {
+          filterByCategory(0, 0, "ALL");
+          updateButtonUI(!1);
+        } else {
+          showSummaryGrid((mode) => {
+            const rows = document.querySelectorAll("#product-body tr");
+            let counter = 1;
+            if (mode === "SELECTED") {
+              rows.forEach((row) => {
+                const qtyInput = row.querySelector(".qty-input");
+                const qty = parseFloat(qtyInput.value) || 0;
+                if (qty > 0) {
+                  row.style.display = "";
+                  row.cells[0].innerText = counter++;
+                  row.setAttribute("data-visible-type", "true");
+                } else {
+                  row.style.display = "none";
+                  row.setAttribute("data-visible-type", "false");
+                }
+              });
+              updateButtonUI(!0);
+            } else {
+              filterByCategory(0, 0, "ALL");
+              updateButtonUI(!1);
+            }
+          });
+        }
+      }
+      function updateButtonUI(isShowingSelected) {
+        const viewBtn = document.getElementById("view-btn");
+        if (!viewBtn) return;
+        if (isShowingSelected) {
+          viewBtn.innerText = "SHOW ALL";
+          viewBtn.style.backgroundColor = "#2ecc71";
+        } else {
+          viewBtn.innerText = "SHOW SELECTED";
+          viewBtn.style.backgroundColor = "#f39c12";
+        }
+      }
+      function showSummaryGrid(callback) {
+        const rows = document.querySelectorAll("#product-body tr");
+        let summary = {};
+        let totalItems = 0;
+        let grandTotal = 0;
+        rows.forEach((row) => {
+          const qty = parseFloat(row.querySelector(".qty-input").value) || 0;
+          if (qty > 0) {
+            let catName = row.getAttribute("data-type") || "NEW ADDED";
+            const amount =
+              parseFloat(row.cells[4].innerText.replace(/,/g, "")) || 0;
+            if (!summary[catName]) {
+              summary[catName] = { count: 0, total: 0 };
+            }
+            summary[catName].count += 1;
+            summary[catName].total += amount;
+            totalItems += 1;
+            grandTotal += amount;
+          }
+        });
+        if (totalItems === 0) {
+          return Swal.fire(
+            "അറിയിപ്പ്",
+            "മരുന്നുകളൊന്നും തിരഞ്ഞെടുത്തിട്ടില്ല!",
+            "info",
+          );
+        }
+        let gridHtml = `
     <div class="table-container">
         <table class="summary-table" style="width:100%; border-collapse: collapse; font-size: 13px; text-align: left; border: 1px solid #ddd;">
             <thead>
@@ -1099,13 +3210,16 @@ let gridHtml=`
                     <th style="padding: 10px; text-align: right;">Amount</th>
                 </tr>
             </thead>
-            <tbody>`;for(let cat in summary){gridHtml+=`
+            <tbody>`;
+        for (let cat in summary) {
+          gridHtml += `
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${cat}</td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${summary[cat].count}</td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">₹${summary[cat].total.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
-        </tr>`}
-gridHtml+=`
+        </tr>`;
+        }
+        gridHtml += `
             </tbody>
             <tfoot style="font-weight: bold; background: #f8f9fa;">
                 <tr>
@@ -1115,61 +3229,700 @@ gridHtml+=`
                 </tr>
             </tfoot>
         </table>
-    </div>`;Swal.fire({title:'<span style="color: #1e3c72;">ഇൻഡന്‍റ് സമ്മറി</span>',html:gridHtml,width:"auto",confirmButtonText:"കാണിക്കുക (Show List)",confirmButtonColor:"#27ae60",showCancelButton:!0,cancelButtonText:"തിരുത്തുക",focusConfirm:!1,}).then((result)=>{if(result.isConfirmed){callback("SELECTED")}else{callback("ALL")}})}
-function saveDraft(){const draftData={};const inputs=document.querySelectorAll(".qty-input");inputs.forEach((input,index)=>{if(input.value&&parseFloat(input.value)>0){const row=input.closest("tr");const nameCell=row.querySelector(".med-name");let cleanName=nameCell.childNodes[0].textContent.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();draftData[cleanName]=input.value}});const info={details:document.getElementById("inst-details").value,budget:document.getElementById("total-budget").value,type:document.getElementById("indent-type").value,};localStorage.setItem("rubun_draft",JSON.stringify(draftData));localStorage.setItem("rubun_info",JSON.stringify(info))}
-window.onload=function(){if(typeof updateIndentDropdown==="function"){updateIndentDropdown()}
-if(typeof setupIndentTypeLogic==="function"){setupIndentTypeLogic()}
-if(typeof loadMedicines==="function"){loadMedicines()}
-const savedInfo=localStorage.getItem("rubun_info");if(savedInfo){const info=JSON.parse(savedInfo);document.getElementById("inst-details").value=info.details||"";document.getElementById("total-budget").value=info.budget||"";const input=document.getElementById("indent-type");const select=document.getElementById("indent-select");if(info.type&&input&&select){input.value=info.type;let exists=!1;for(let i=0;i<select.options.length;i++){if(select.options[i].value===info.type){select.value=info.type;exists=!0;break}}
-if(!exists&&info.type!==""){select.value="user-input";input.style.display="block"}else{input.style.display="none"}}}
-const savedDraft=localStorage.getItem("rubun_draft");if(savedDraft){const draftData=JSON.parse(savedDraft);const rows=document.querySelectorAll("#product-body tr");Object.keys(draftData).forEach((savedKey)=>{let qty=parseFloat(draftData[savedKey])||0;if(qty>0){let targetRow=null;if(isNaN(savedKey)){rows.forEach((row)=>{let nameCell=row.querySelector(".med-name");if(nameCell){let cleanName=nameCell.childNodes[0].textContent.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();if(cleanName===savedKey){targetRow=row}}})}else{targetRow=rows[savedKey]}
-if(targetRow){const inputField=targetRow.querySelector(".qty-input");if(inputField){inputField.value=qty;targetRow.classList.add("row-active");const rate=parseFloat(targetRow.cells[3].innerText);const costField=targetRow.querySelector(".row-cost");costField.innerText=(qty*rate).toFixed(2)}}}});if(typeof calculateAll==="function")calculateAll();}};function resetForm(){if(confirm("നിങ്ങൾ ഉറപ്പായും ഈ ഇൻഡന്‍റ് പൂർണ്ണമായും ഒഴിവാക്കാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?",)){localStorage.removeItem("rubun_draft");localStorage.removeItem("rubun_info");document.getElementById("inst-details").value="";document.getElementById("total-budget").value="";const input=document.getElementById("indent-type");const select=document.getElementById("indent-select");input.value="";if(select){select.selectedIndex=0;input.value=select.value}
-input.style.display="none";if(document.getElementById("newIndentName"))
-document.getElementById("newIndentName").value="";if(document.getElementById("savedIndentsList"))
-document.getElementById("savedIndentsList").value="";document.querySelectorAll(".qty-input").forEach((input)=>(input.value=""));document.querySelectorAll(".row-cost").forEach((td)=>(td.innerText="0.00"));document.querySelectorAll("tr").forEach((tr)=>tr.classList.remove("row-active"));if(typeof calculateAll==="function"){calculateAll()}
-alert("വിവരങ്ങൾ ക്ലിയർ ചെയ്തിരിക്കുന്നു.");location.reload()}}
-function filterByRate(){const rangeInput=document.getElementById("rateRange").value.trim();const rows=document.getElementById("product-body").getElementsByClassName("med-row");if(!rangeInput){for(let row of rows){const slNo=parseInt(row.cells[0].textContent);row.style.display=slNo>=currentMin&&slNo<=currentMax?"":"none"}
-return}
-const[minRate,maxRate]=rangeInput.split("-").map(Number);if(isNaN(minRate)||isNaN(maxRate)){alert("Please enter a valid range (Example: 40-50)");return}
-for(let i=0;i<rows.length;i++){const slNo=parseInt(rows[i].cells[0].textContent);const rate=parseFloat(rows[i].cells[3].textContent);if(slNo>=currentMin&&slNo<=currentMax&&rate>=minRate&&rate<=maxRate){rows[i].style.display="";rows[i].style.backgroundColor="#fff9c4"}else{rows[i].style.display="none"}}
-setTimeout(()=>{for(let row of rows){if(!row.classList.contains("row-active"))
-row.style.backgroundColor=""}},4000)}
-function updateIndentDropdown(){const dropdown=document.getElementById("savedIndentsList");dropdown.innerHTML='<option value="">-- Select a saved indent --</option>';for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key.startsWith("IND_")){const option=document.createElement("option");option.value=key;option.text=key.replace("IND_","");dropdown.add(option)}}}
-function saveNewIndent(){const nameInput=document.getElementById("newIndentName");const name=nameInput.value.trim();if(!name){Swal.fire("Attention!","ദയവായി ഒരു പേര് നൽകുക!","warning");return}
-const now=new Date();const ts=now.getFullYear().toString().slice(-2)+("0"+(now.getMonth()+1)).slice(-2)+("0"+now.getDate()).slice(-2)+"_"+("0"+now.getHours()).slice(-2)+("0"+now.getMinutes()).slice(-2);const finalFileName=name+"_"+ts;const key="IND_"+finalFileName;const data={};document.querySelectorAll(".qty-input").forEach((input)=>{if(parseFloat(input.value)>0){const row=input.closest("tr");const nameCell=row.querySelector(".med-name");let cleanName=nameCell.childNodes[0].textContent.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();data[cleanName]=input.value}});const savedCustomMed=JSON.parse(localStorage.getItem("customMedicines"))||[];const fullData={fileName:finalFileName,inst:document.getElementById("inst-details").value,budget:document.getElementById("total-budget").value,type:document.getElementById("indent-type").value,quantities:data,customData:savedCustomMed,};localStorage.setItem(key,JSON.stringify(fullData));const blob=new Blob([JSON.stringify(fullData,null,2)],{type:"application/json",});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=finalFileName+".json";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);if(typeof updateIndentDropdown==="function")updateIndentDropdown();nameInput.value="";Swal.fire("Saved!","'"+finalFileName+"' സേവ് ചെയ്യുകയും ഡൗൺലോഡ് ചെയ്യുകയും ചെയ്തിരിക്കുന്നു.","success",)}
-function loadSelectedIndent(){const key=document.getElementById("savedIndentsList").value;if(!key){return Swal.fire({title:"Select a file!",icon:"warning"})}
-if(typeof loadMedicines==="function")loadMedicines();const savedData=JSON.parse(localStorage.getItem(key));document.getElementById("inst-details").value=savedData.inst||"";document.getElementById("total-budget").value=savedData.budget||"";const input=document.getElementById("indent-type");const select=document.getElementById("indent-select");const val=savedData.type||"";input.value=val;let exists=!1;for(let i=0;i<select.options.length;i++){if(select.options[i].value===val){select.value=val;exists=!0;break}}
-if(!exists&&val!==""){select.value="user-input";input.style.display="block"}else{input.style.display="none"}
-const rows=document.querySelectorAll("#product-body tr");let counter=1;rows.forEach((row)=>{const inputField=row.querySelector(".qty-input");if(inputField)inputField.value="";row.classList.remove("row-active");if(row.cells[4])row.cells[4].innerText="0.00";row.style.display="none"});for(let savedKey in savedData.quantities){let qty=savedData.quantities[savedKey];let targetRow=null;if(isNaN(savedKey)){rows.forEach((row)=>{let nameCell=row.querySelector(".med-name");if(nameCell){let cleanName=nameCell.childNodes[0].textContent.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();if(cleanName===savedKey){targetRow=row}}})}else{targetRow=rows[savedKey]}
-if(targetRow){const inputField=targetRow.querySelector(".qty-input");if(inputField){inputField.value=qty;targetRow.classList.add("row-active");targetRow.style.display="";targetRow.cells[0].innerText=counter++;const rate=parseFloat(targetRow.cells[3].innerText);targetRow.cells[4].innerText=(parseFloat(inputField.value)*rate).toFixed(2)}}}
-if(typeof calculateAll==="function")calculateAll();const viewBtn=document.getElementById("view-btn");if(viewBtn){viewBtn.innerText="SHOW ALL";viewBtn.style.backgroundColor="#2ecc71"}
-saveDraft();Swal.fire({title:"Loaded!",text:"ഇൻഡന്‍റ് ലോഡ് ചെയ്തിരിക്കുന്നു.",icon:"success",timer:1500,showConfirmButton:!1,})}
-function deleteSelectedIndent(){const key=document.getElementById("savedIndentsList").value;if(!key)return;if(confirm("ഈ ഇൻഡന്‍റ് സ്ഥിരമായി ഡിലീറ്റ് ചെയ്യണോ?")){localStorage.removeItem(key);updateIndentDropdown();alert("ഡിലീറ്റ് ചെയ്തു.")}}
-function importJsonData(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){try{const data=JSON.parse(e.target.result);const fileName=data.fileName||"Imported_Indent_"+new Date().getTime();const key="IND_"+fileName;if(data.customData&&data.customData.length>0){let existingCustomMeds=JSON.parse(localStorage.getItem("customMedicines"))||[];let isUpdated=!1;data.customData.forEach((importedMed)=>{let exists=existingCustomMeds.find((med)=>med.name===importedMed.name,);if(!exists){importedMed.type="NEW ADDED";existingCustomMeds.push(importedMed);isUpdated=!0}});if(isUpdated){localStorage.setItem("customMedicines",JSON.stringify(existingCustomMeds),);if(typeof loadMedicines==="function")loadMedicines();}}
-localStorage.setItem(key,JSON.stringify(data));if(typeof updateIndentDropdown==="function")
-updateIndentDropdown();document.getElementById("savedIndentsList").value=key;Swal.fire({title:"Import Success!",text:"ഫയൽ വിജയകരമായി ചേർത്തു. ഇനി LOAD ബട്ടൺ അമർത്താം.",icon:"success",});input.value=""}catch(error){Swal.fire("Error!","ഈ ഫയൽ ഇൻഡന്‍റ് മേക്കറിന് അനുയോജ്യമല്ല.","error",)}};reader.readAsText(file)}
-let currentMin=0;let currentMax=9999;function filterByCategory(start,end,typeName){const rows=document.querySelectorAll(".med-row");let newSlNo=1;const searchInp=document.getElementById("medicineSearch");if(searchInp)searchInp.value="";rows.forEach((row)=>{const medType=row.getAttribute("data-type");if(typeName==="ALL"||medType===typeName){row.style.display="";row.cells[0].innerText=newSlNo++;row.setAttribute("data-visible-type","true")}else{row.style.display="none";row.setAttribute("data-visible-type","false")}});const menu=document.getElementById("categoryMenu");if(menu){menu.style.display="none";menu.classList.remove("show-grid")}
-const mainBtn=document.getElementById("typeBtn");if(mainBtn){mainBtn.innerText=typeName==="ALL"?"TYPE ▾":typeName+" ▾"}
-const addBtn=document.getElementById("addCustomBtn");if(addBtn){if(typeName==="ALL"){addBtn.style.display="none"}else{addBtn.style.display="block"}}}
-function toggleCategoryMenu(){const menu=document.getElementById("categoryMenu");if(menu.style.display==="grid"||menu.classList.contains("show-grid")){menu.style.display="none";menu.classList.remove("show-grid")}else{menu.style.display="grid";menu.classList.add("show-grid")}}
-const inputField=document.getElementById("inst-details");const formID="1FAIpQLSd5X69WBI4gCtzYrfM6Cl9mz_AZ7pceQa1N7PVFtdD24stQMw";const entryLocation="entry.819565876";const entryEvent="entry.281654567";const entryInstitution="entry.1879993025";async function trackUser(currentName){const today=new Date().toISOString().slice(0,10);const lastDate=localStorage.getItem("last_track_date");const lastType=localStorage.getItem("last_track_type");const isNewDay=lastDate!==today;const isUpgrade=lastType==="unknown"&&currentName!=="Not Provided";if(isNewDay||isUpgrade){console.log("Tracking started for: "+currentName);let userLocation="Unknown";try{const geoResponse=await fetch("https://ipapi.co/json/");const geoData=await geoResponse.json();if(geoData.city&&geoData.region){userLocation=`${geoData.city}, ${geoData.region}`}}catch(error){console.log("Location fetch failed, using default.")}
-const trackerUrl=`https://docs.google.com/forms/d/e/${formID}/formResponse?usp=pp_url&${entryEvent}=AutoTracked&${entryLocation}=${encodeURIComponent(userLocation)}&${entryInstitution}=${encodeURIComponent(currentName)}&submit=Submit`;fetch(trackerUrl,{method:"POST",mode:"no-cors",}).then(()=>{localStorage.setItem("last_track_date",today);if(currentName!=="Not Provided"){localStorage.setItem("last_track_type","named")}else{localStorage.setItem("last_track_type","unknown")}
-console.log("Successfully tracked: "+currentName)}).catch((e)=>console.log("Tracking error: ",e))}else{console.log("Skipped: Already tracked properly for today.")}}
-window.addEventListener("load",()=>{const val=inputField.value.trim();trackUser(val?val:"Not Provided")});inputField.addEventListener("blur",()=>{const instName=inputField.value.trim();if(instName){trackUser(instName)}});async function autoAdjustBudget(){const budgetInput=document.getElementById("total-budget");const targetPaise=Math.round(parseFloat(budgetInput.value)*100);if(!targetPaise||targetPaise<=0)
-return Swal.fire({title:"ബജറ്റ് നൽകുക!",icon:"warning"});Swal.fire({title:"ബജറ്റ് ക്രമീകരിക്കുന്നു, ദയവായി കാത്തിരിക്കുക...",allowOutsideClick:!1,didOpen:()=>{Swal.showLoading()},});await new Promise((r)=>setTimeout(r,600));const rows=Array.from(document.querySelectorAll(".med-row"));let selected=[];let unselected=[];let currentTotalPaise=0;let originalTotalPaise=0;rows.forEach((row)=>{const qtyInp=row.querySelector(".qty-input");const ratePaise=Math.round(parseFloat(row.cells[3].innerText)*100,);const qty=parseInt(qtyInp.value)||0;const item={row,oldQty:qty,qty,ratePaise,input:qtyInp,name:row.cells[1].innerText,};if(qty>0){selected.push(item);currentTotalPaise+=qty*ratePaise;originalTotalPaise+=qty*ratePaise}else{unselected.push(item)}});if(selected.length<1){Swal.close();return Swal.fire({title:"മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!",icon:"info",})}
-let ratio=targetPaise/currentTotalPaise;currentTotalPaise=0;selected.forEach((item)=>{item.qty=Math.floor(item.qty*ratio);currentTotalPaise+=item.qty*item.ratePaise});let limit=0;while(limit<500){let diff=targetPaise-currentTotalPaise;if(diff===0)break;let actionTaken=!1;if(diff>0){let bestToAdd=selected.filter((i)=>i.ratePaise<=diff).sort((a,b)=>b.ratePaise-a.ratePaise)[0];if(bestToAdd){bestToAdd.qty++;currentTotalPaise+=bestToAdd.ratePaise;actionTaken=!0}else{for(let a of selected){if(a.qty>0){for(let b of selected){let swapGain=b.ratePaise-a.ratePaise;if(swapGain>0&&swapGain<=diff){a.qty--;b.qty++;currentTotalPaise+=swapGain;actionTaken=!0;break}}}
-if(actionTaken)break}}}else{let absDiff=Math.abs(diff);let bestToRemove=selected.filter((i)=>i.qty>0&&i.ratePaise<=absDiff).sort((a,b)=>b.ratePaise-a.ratePaise)[0];if(bestToRemove){bestToRemove.qty--;currentTotalPaise-=bestToRemove.ratePaise;actionTaken=!0}}
-if(!actionTaken)break;limit++}
-let finalDiff=targetPaise-currentTotalPaise;if(finalDiff>500){Swal.close();let matchingMedicines=unselected.filter((i)=>i.ratePaise<=finalDiff).sort((a,b)=>b.ratePaise-a.ratePaise);if(matchingMedicines.length>0){let topSuggestions=matchingMedicines.slice(0,10);let optionsObj={};topSuggestions.forEach((item,index)=>{let cleanName=item.name.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();optionsObj[index]=`${cleanName} - ₹ ${(item.ratePaise / 100).toFixed(2)}`});const result=await Swal.fire({title:"ബജറ്റ് ഗ്യാപ്പ്!",html:`₹ <b>${(finalDiff / 100).toFixed(2)}</b> ബാക്കിയുണ്ട്.<br><br>ചേർക്കേണ്ട മരുന്ന് തിരഞ്ഞെടുക്കുക:`,icon:"question",input:"select",inputOptions:optionsObj,inputPlaceholder:"ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക...",showCancelButton:!0,confirmButtonText:"ചേർക്കൂ",cancelButtonText:"വേണ്ട",inputValidator:(value)=>{if(!value)return"ദയവായി ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക!"},});Swal.fire({title:"ബജറ്റ് ക്രമീകരിക്കുന്നു...",allowOutsideClick:!1,didOpen:()=>{Swal.showLoading()},});if(result.isConfirmed&&result.value){let suggestion=topSuggestions[result.value];suggestion.oldQty=0;let addQty=Math.floor(finalDiff/suggestion.ratePaise);suggestion.qty=addQty;currentTotalPaise+=addQty*suggestion.ratePaise;selected.push(suggestion)}
-await new Promise((r)=>setTimeout(r,400))}}
-let summaryRows="";let sl=1;let finalSelected=selected.filter((i)=>i.qty>0||i.oldQty>0);finalSelected.forEach((item)=>{let isChanged=item.qty!==item.oldQty;let changeIndicator="";if(item.qty>item.oldQty){changeIndicator=` <span style="color: #27ae60; font-size: 14px; font-weight: bold;">(↑)</span>`}else if(item.qty<item.oldQty){changeIndicator=` <span style="color: #e74c3c; font-size: 14px; font-weight: bold;">(↓)</span>`}
-let rowBg=isChanged?"background-color: #fffae6;":"";let cleanName=item.name.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();summaryRows+=`
+    </div>`;
+        Swal.fire({
+          title: '<span style="color: #1e3c72;">ഇൻഡന്‍റ് സമ്മറി</span>',
+          html: gridHtml,
+          width: "auto",
+          confirmButtonText: "കാണിക്കുക (Show List)",
+          confirmButtonColor: "#27ae60",
+          showCancelButton: !0,
+          cancelButtonText: "തിരുത്തുക",
+          focusConfirm: !1,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            callback("SELECTED");
+          } else {
+            callback("ALL");
+          }
+        });
+      }
+      function saveDraft() {
+        const draftData = {};
+        const inputs = document.querySelectorAll(".qty-input");
+        inputs.forEach((input, index) => {
+          if (input.value && parseFloat(input.value) > 0) {
+            const row = input.closest("tr");
+            const nameCell = row.querySelector(".med-name");
+            let cleanName = nameCell.childNodes[0].textContent
+              .replace(/✏️/g, "")
+              .replace(/🗑️/g, "")
+              .replace(/\*/g, "")
+              .trim();
+            draftData[cleanName] = input.value;
+          }
+        });
+        const info = {
+          details: document.getElementById("inst-details").value,
+          budget: document.getElementById("total-budget").value,
+          type: document.getElementById("indent-type").value,
+        };
+        localStorage.setItem("rubun_draft", JSON.stringify(draftData));
+        localStorage.setItem("rubun_info", JSON.stringify(info));
+      }
+      window.onload = function () {
+        if (typeof updateIndentDropdown === "function") {
+          updateIndentDropdown();
+        }
+        if (typeof setupIndentTypeLogic === "function") {
+          setupIndentTypeLogic();
+        }
+        if (typeof loadMedicines === "function") {
+          loadMedicines();
+        }
+        const savedInfo = localStorage.getItem("rubun_info");
+        if (savedInfo) {
+          const info = JSON.parse(savedInfo);
+          document.getElementById("inst-details").value = info.details || "";
+          document.getElementById("total-budget").value = info.budget || "";
+          const input = document.getElementById("indent-type");
+          const select = document.getElementById("indent-select");
+          if (info.type && input && select) {
+            input.value = info.type;
+            let exists = !1;
+            for (let i = 0; i < select.options.length; i++) {
+              if (select.options[i].value === info.type) {
+                select.value = info.type;
+                exists = !0;
+                break;
+              }
+            }
+            if (!exists && info.type !== "") {
+              select.value = "user-input";
+              input.style.display = "block";
+            } else {
+              input.style.display = "none";
+            }
+          }
+        }
+        const savedDraft = localStorage.getItem("rubun_draft");
+        if (savedDraft) {
+          const draftData = JSON.parse(savedDraft);
+          const rows = document.querySelectorAll("#product-body tr");
+          Object.keys(draftData).forEach((savedKey) => {
+            let qty = parseFloat(draftData[savedKey]) || 0;
+            if (qty > 0) {
+              let targetRow = null;
+              if (isNaN(savedKey)) {
+                rows.forEach((row) => {
+                  let nameCell = row.querySelector(".med-name");
+                  if (nameCell) {
+                    let cleanName = nameCell.childNodes[0].textContent
+                      .replace(/✏️/g, "")
+                      .replace(/🗑️/g, "")
+                      .replace(/\*/g, "")
+                      .trim();
+                    if (cleanName === savedKey) {
+                      targetRow = row;
+                    }
+                  }
+                });
+              } else {
+                targetRow = rows[savedKey];
+              }
+              if (targetRow) {
+                const inputField = targetRow.querySelector(".qty-input");
+                if (inputField) {
+                  inputField.value = qty;
+                  targetRow.classList.add("row-active");
+                  const rate = parseFloat(targetRow.cells[3].innerText);
+                  const costField = targetRow.querySelector(".row-cost");
+                  costField.innerText = (qty * rate).toFixed(2);
+                }
+              }
+            }
+          });
+          if (typeof calculateAll === "function") calculateAll();
+        }
+      };
+      function resetForm() {
+        if (
+          confirm(
+            "നിങ്ങൾ ഉറപ്പായും ഈ ഇൻഡന്‍റ് പൂർണ്ണമായും ഒഴിവാക്കാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?",
+          )
+        ) {
+          localStorage.removeItem("rubun_draft");
+          localStorage.removeItem("rubun_info");
+          document.getElementById("inst-details").value = "";
+          document.getElementById("total-budget").value = "";
+          const input = document.getElementById("indent-type");
+          const select = document.getElementById("indent-select");
+          input.value = "";
+          if (select) {
+            select.selectedIndex = 0;
+            input.value = select.value;
+          }
+          input.style.display = "none";
+          if (document.getElementById("newIndentName"))
+            document.getElementById("newIndentName").value = "";
+          if (document.getElementById("savedIndentsList"))
+            document.getElementById("savedIndentsList").value = "";
+          document
+            .querySelectorAll(".qty-input")
+            .forEach((input) => (input.value = ""));
+          document
+            .querySelectorAll(".row-cost")
+            .forEach((td) => (td.innerText = "0.00"));
+          document
+            .querySelectorAll("tr")
+            .forEach((tr) => tr.classList.remove("row-active"));
+          if (typeof calculateAll === "function") {
+            calculateAll();
+          }
+          alert("വിവരങ്ങൾ ക്ലിയർ ചെയ്തിരിക്കുന്നു.");
+          location.reload();
+        }
+      }
+      function filterByRate() {
+        const rangeInput = document.getElementById("rateRange").value.trim();
+        const rows = document
+          .getElementById("product-body")
+          .getElementsByClassName("med-row");
+        if (!rangeInput) {
+          for (let row of rows) {
+            const slNo = parseInt(row.cells[0].textContent);
+            row.style.display =
+              slNo >= currentMin && slNo <= currentMax ? "" : "none";
+          }
+          return;
+        }
+        const [minRate, maxRate] = rangeInput.split("-").map(Number);
+        if (isNaN(minRate) || isNaN(maxRate)) {
+          alert("Please enter a valid range (Example: 40-50)");
+          return;
+        }
+        for (let i = 0; i < rows.length; i++) {
+          const slNo = parseInt(rows[i].cells[0].textContent);
+          const rate = parseFloat(rows[i].cells[3].textContent);
+          if (
+            slNo >= currentMin &&
+            slNo <= currentMax &&
+            rate >= minRate &&
+            rate <= maxRate
+          ) {
+            rows[i].style.display = "";
+            rows[i].style.backgroundColor = "#fff9c4";
+          } else {
+            rows[i].style.display = "none";
+          }
+        }
+        setTimeout(() => {
+          for (let row of rows) {
+            if (!row.classList.contains("row-active"))
+              row.style.backgroundColor = "";
+          }
+        }, 4000);
+      }
+      function updateIndentDropdown() {
+        const dropdown = document.getElementById("savedIndentsList");
+        dropdown.innerHTML =
+          '<option value="">-- Select a saved indent --</option>';
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith("IND_")) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = key.replace("IND_", "");
+            dropdown.add(option);
+          }
+        }
+      }
+      function saveNewIndent() {
+        const nameInput = document.getElementById("newIndentName");
+        const name = nameInput.value.trim();
+        if (!name) {
+          Swal.fire("Attention!", "ദയവായി ഒരു പേര് നൽകുക!", "warning");
+          return;
+        }
+        const now = new Date();
+        const ts =
+          now.getFullYear().toString().slice(-2) +
+          ("0" + (now.getMonth() + 1)).slice(-2) +
+          ("0" + now.getDate()).slice(-2) +
+          "_" +
+          ("0" + now.getHours()).slice(-2) +
+          ("0" + now.getMinutes()).slice(-2);
+        const finalFileName = name + "_" + ts;
+        const key = "IND_" + finalFileName;
+        const data = {};
+        document.querySelectorAll(".qty-input").forEach((input) => {
+          if (parseFloat(input.value) > 0) {
+            const row = input.closest("tr");
+            const nameCell = row.querySelector(".med-name");
+            let cleanName = nameCell.childNodes[0].textContent
+              .replace(/✏️/g, "")
+              .replace(/🗑️/g, "")
+              .replace(/\*/g, "")
+              .trim();
+            data[cleanName] = input.value;
+          }
+        });
+        const savedCustomMed =
+          JSON.parse(localStorage.getItem("customMedicines")) || [];
+        const fullData = {
+          fileName: finalFileName,
+          inst: document.getElementById("inst-details").value,
+          budget: document.getElementById("total-budget").value,
+          type: document.getElementById("indent-type").value,
+          quantities: data,
+          customData: savedCustomMed,
+        };
+        localStorage.setItem(key, JSON.stringify(fullData));
+        const blob = new Blob([JSON.stringify(fullData, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = finalFileName + ".json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        if (typeof updateIndentDropdown === "function") updateIndentDropdown();
+        nameInput.value = "";
+        Swal.fire(
+          "Saved!",
+          "'" +
+            finalFileName +
+            "' സേവ് ചെയ്യുകയും ഡൗൺലോഡ് ചെയ്യുകയും ചെയ്തിരിക്കുന്നു.",
+          "success",
+        );
+      }
+      function loadSelectedIndent() {
+        const key = document.getElementById("savedIndentsList").value;
+        if (!key) {
+          return Swal.fire({ title: "Select a file!", icon: "warning" });
+        }
+        if (typeof loadMedicines === "function") loadMedicines();
+        const savedData = JSON.parse(localStorage.getItem(key));
+        document.getElementById("inst-details").value = savedData.inst || "";
+        document.getElementById("total-budget").value = savedData.budget || "";
+        const input = document.getElementById("indent-type");
+        const select = document.getElementById("indent-select");
+        const val = savedData.type || "";
+        input.value = val;
+        let exists = !1;
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === val) {
+            select.value = val;
+            exists = !0;
+            break;
+          }
+        }
+        if (!exists && val !== "") {
+          select.value = "user-input";
+          input.style.display = "block";
+        } else {
+          input.style.display = "none";
+        }
+        const rows = document.querySelectorAll("#product-body tr");
+        let counter = 1;
+        rows.forEach((row) => {
+          const inputField = row.querySelector(".qty-input");
+          if (inputField) inputField.value = "";
+          row.classList.remove("row-active");
+          if (row.cells[4]) row.cells[4].innerText = "0.00";
+          row.style.display = "none";
+        });
+        for (let savedKey in savedData.quantities) {
+          let qty = savedData.quantities[savedKey];
+          let targetRow = null;
+          if (isNaN(savedKey)) {
+            rows.forEach((row) => {
+              let nameCell = row.querySelector(".med-name");
+              if (nameCell) {
+                let cleanName = nameCell.childNodes[0].textContent
+                  .replace(/✏️/g, "")
+                  .replace(/🗑️/g, "")
+                  .replace(/\*/g, "")
+                  .trim();
+                if (cleanName === savedKey) {
+                  targetRow = row;
+                }
+              }
+            });
+          } else {
+            targetRow = rows[savedKey];
+          }
+          if (targetRow) {
+            const inputField = targetRow.querySelector(".qty-input");
+            if (inputField) {
+              inputField.value = qty;
+              targetRow.classList.add("row-active");
+              targetRow.style.display = "";
+              targetRow.cells[0].innerText = counter++;
+              const rate = parseFloat(targetRow.cells[3].innerText);
+              targetRow.cells[4].innerText = (
+                parseFloat(inputField.value) * rate
+              ).toFixed(2);
+            }
+          }
+        }
+        if (typeof calculateAll === "function") calculateAll();
+        const viewBtn = document.getElementById("view-btn");
+        if (viewBtn) {
+          viewBtn.innerText = "SHOW ALL";
+          viewBtn.style.backgroundColor = "#2ecc71";
+        }
+        saveDraft();
+        Swal.fire({
+          title: "Loaded!",
+          text: "ഇൻഡന്‍റ് ലോഡ് ചെയ്തിരിക്കുന്നു.",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: !1,
+        });
+      }
+      function deleteSelectedIndent() {
+        const key = document.getElementById("savedIndentsList").value;
+        if (!key) return;
+        if (confirm("ഈ ഇൻഡന്‍റ് സ്ഥിരമായി ഡിലീറ്റ് ചെയ്യണോ?")) {
+          localStorage.removeItem(key);
+          updateIndentDropdown();
+          alert("ഡിലീറ്റ് ചെയ്തു.");
+        }
+      }
+      function importJsonData(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const data = JSON.parse(e.target.result);
+            const fileName =
+              data.fileName || "Imported_Indent_" + new Date().getTime();
+            const key = "IND_" + fileName;
+            if (data.customData && data.customData.length > 0) {
+              let existingCustomMeds =
+                JSON.parse(localStorage.getItem("customMedicines")) || [];
+              let isUpdated = !1;
+              data.customData.forEach((importedMed) => {
+                let exists = existingCustomMeds.find(
+                  (med) => med.name === importedMed.name,
+                );
+                if (!exists) {
+                  importedMed.type = "NEW ADDED";
+                  existingCustomMeds.push(importedMed);
+                  isUpdated = !0;
+                }
+              });
+              if (isUpdated) {
+                localStorage.setItem(
+                  "customMedicines",
+                  JSON.stringify(existingCustomMeds),
+                );
+                if (typeof loadMedicines === "function") loadMedicines();
+              }
+            }
+            localStorage.setItem(key, JSON.stringify(data));
+            if (typeof updateIndentDropdown === "function")
+              updateIndentDropdown();
+            document.getElementById("savedIndentsList").value = key;
+            Swal.fire({
+              title: "Import Success!",
+              text: "ഫയൽ വിജയകരമായി ചേർത്തു. ഇനി LOAD ബട്ടൺ അമർത്താം.",
+              icon: "success",
+            });
+            input.value = "";
+          } catch (error) {
+            Swal.fire(
+              "Error!",
+              "ഈ ഫയൽ ഇൻഡന്‍റ് മേക്കറിന് അനുയോജ്യമല്ല.",
+              "error",
+            );
+          }
+        };
+        reader.readAsText(file);
+      }
+      let currentMin = 0;
+      let currentMax = 9999;
+      function filterByCategory(start, end, typeName) {
+        const rows = document.querySelectorAll(".med-row");
+        let newSlNo = 1;
+        const searchInp = document.getElementById("medicineSearch");
+        if (searchInp) searchInp.value = "";
+        rows.forEach((row) => {
+          const medType = row.getAttribute("data-type");
+          if (typeName === "ALL" || medType === typeName) {
+            row.style.display = "";
+            row.cells[0].innerText = newSlNo++;
+            row.setAttribute("data-visible-type", "true");
+          } else {
+            row.style.display = "none";
+            row.setAttribute("data-visible-type", "false");
+          }
+        });
+        const menu = document.getElementById("categoryMenu");
+        if (menu) {
+          menu.style.display = "none";
+          menu.classList.remove("show-grid");
+        }
+        const mainBtn = document.getElementById("typeBtn");
+        if (mainBtn) {
+          mainBtn.innerText = typeName === "ALL" ? "TYPE ▾" : typeName + " ▾";
+        }
+        const addBtn = document.getElementById("addCustomBtn");
+        if (addBtn) {
+          if (typeName === "ALL") {
+            addBtn.style.display = "none";
+          } else {
+            addBtn.style.display = "block";
+          }
+        }
+      }
+      function toggleCategoryMenu() {
+        const menu = document.getElementById("categoryMenu");
+        if (
+          menu.style.display === "grid" ||
+          menu.classList.contains("show-grid")
+        ) {
+          menu.style.display = "none";
+          menu.classList.remove("show-grid");
+        } else {
+          menu.style.display = "grid";
+          menu.classList.add("show-grid");
+        }
+      }
+      const inputField = document.getElementById("inst-details");
+      const formID = "1FAIpQLSd5X69WBI4gCtzYrfM6Cl9mz_AZ7pceQa1N7PVFtdD24stQMw";
+      const entryLocation = "entry.819565876";
+      const entryEvent = "entry.281654567";
+      const entryInstitution = "entry.1879993025";
+      async function trackUser(currentName) {
+        const today = new Date().toISOString().slice(0, 10);
+        const lastDate = localStorage.getItem("last_track_date");
+        const lastType = localStorage.getItem("last_track_type");
+        const isNewDay = lastDate !== today;
+        const isUpgrade =
+          lastType === "unknown" && currentName !== "Not Provided";
+        if (isNewDay || isUpgrade) {
+          console.log("Tracking started for: " + currentName);
+          let userLocation = "Unknown";
+          try {
+            const geoResponse = await fetch("https://ipapi.co/json/");
+            const geoData = await geoResponse.json();
+            if (geoData.city && geoData.region) {
+              userLocation = `${geoData.city}, ${geoData.region}`;
+            }
+          } catch (error) {
+            console.log("Location fetch failed, using default.");
+          }
+          const trackerUrl = `https://docs.google.com/forms/d/e/${formID}/formResponse?usp=pp_url&${entryEvent}=AutoTracked&${entryLocation}=${encodeURIComponent(userLocation)}&${entryInstitution}=${encodeURIComponent(currentName)}&submit=Submit`;
+          fetch(trackerUrl, { method: "POST", mode: "no-cors" })
+            .then(() => {
+              localStorage.setItem("last_track_date", today);
+              if (currentName !== "Not Provided") {
+                localStorage.setItem("last_track_type", "named");
+              } else {
+                localStorage.setItem("last_track_type", "unknown");
+              }
+              console.log("Successfully tracked: " + currentName);
+            })
+            .catch((e) => console.log("Tracking error: ", e));
+        } else {
+          console.log("Skipped: Already tracked properly for today.");
+        }
+      }
+      window.addEventListener("load", () => {
+        const val = inputField.value.trim();
+        trackUser(val ? val : "Not Provided");
+      });
+      inputField.addEventListener("blur", () => {
+        const instName = inputField.value.trim();
+        if (instName) {
+          trackUser(instName);
+        }
+      });
+      async function autoAdjustBudget() {
+        const budgetInput = document.getElementById("total-budget");
+        const targetPaise = Math.round(parseFloat(budgetInput.value) * 100);
+        if (!targetPaise || targetPaise <= 0)
+          return Swal.fire({ title: "ബജറ്റ് നൽകുക!", icon: "warning" });
+        Swal.fire({
+          title: "ബജറ്റ് ക്രമീകരിക്കുന്നു, ദയവായി കാത്തിരിക്കുക...",
+          allowOutsideClick: !1,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        await new Promise((r) => setTimeout(r, 600));
+        const rows = Array.from(document.querySelectorAll(".med-row"));
+        let selected = [];
+        let unselected = [];
+        let currentTotalPaise = 0;
+        let originalTotalPaise = 0;
+        rows.forEach((row) => {
+          const qtyInp = row.querySelector(".qty-input");
+          const ratePaise = Math.round(
+            parseFloat(row.cells[3].innerText) * 100,
+          );
+          const qty = parseInt(qtyInp.value) || 0;
+          const item = {
+            row,
+            oldQty: qty,
+            qty,
+            ratePaise,
+            input: qtyInp,
+            name: row.cells[1].innerText,
+          };
+          if (qty > 0) {
+            selected.push(item);
+            currentTotalPaise += qty * ratePaise;
+            originalTotalPaise += qty * ratePaise;
+          } else {
+            unselected.push(item);
+          }
+        });
+        if (selected.length < 1) {
+          Swal.close();
+          return Swal.fire({
+            title: "മരുന്നുകൾ തിരഞ്ഞെടുക്കുക!",
+            icon: "info",
+          });
+        }
+        let ratio = targetPaise / currentTotalPaise;
+        currentTotalPaise = 0;
+        selected.forEach((item) => {
+          item.qty = Math.floor(item.qty * ratio);
+          currentTotalPaise += item.qty * item.ratePaise;
+        });
+        let limit = 0;
+        while (limit < 500) {
+          let diff = targetPaise - currentTotalPaise;
+          if (diff === 0) break;
+          let actionTaken = !1;
+          if (diff > 0) {
+            let bestToAdd = selected
+              .filter((i) => i.ratePaise <= diff)
+              .sort((a, b) => b.ratePaise - a.ratePaise)[0];
+            if (bestToAdd) {
+              bestToAdd.qty++;
+              currentTotalPaise += bestToAdd.ratePaise;
+              actionTaken = !0;
+            } else {
+              for (let a of selected) {
+                if (a.qty > 0) {
+                  for (let b of selected) {
+                    let swapGain = b.ratePaise - a.ratePaise;
+                    if (swapGain > 0 && swapGain <= diff) {
+                      a.qty--;
+                      b.qty++;
+                      currentTotalPaise += swapGain;
+                      actionTaken = !0;
+                      break;
+                    }
+                  }
+                }
+                if (actionTaken) break;
+              }
+            }
+          } else {
+            let absDiff = Math.abs(diff);
+            let bestToRemove = selected
+              .filter((i) => i.qty > 0 && i.ratePaise <= absDiff)
+              .sort((a, b) => b.ratePaise - a.ratePaise)[0];
+            if (bestToRemove) {
+              bestToRemove.qty--;
+              currentTotalPaise -= bestToRemove.ratePaise;
+              actionTaken = !0;
+            }
+          }
+          if (!actionTaken) break;
+          limit++;
+        }
+        let finalDiff = targetPaise - currentTotalPaise;
+        if (finalDiff > 500) {
+          Swal.close();
+          let matchingMedicines = unselected
+            .filter((i) => i.ratePaise <= finalDiff)
+            .sort((a, b) => b.ratePaise - a.ratePaise);
+          if (matchingMedicines.length > 0) {
+            let topSuggestions = matchingMedicines.slice(0, 10);
+            let optionsObj = {};
+            topSuggestions.forEach((item, index) => {
+              let cleanName = item.name
+                .replace(/✏️/g, "")
+                .replace(/🗑️/g, "")
+                .replace(/\*/g, "")
+                .trim();
+              optionsObj[index] =
+                `${cleanName} - ₹ ${(item.ratePaise / 100).toFixed(2)}`;
+            });
+            const result = await Swal.fire({
+              title: "ബജറ്റ് ഗ്യാപ്പ്!",
+              html: `₹ <b>${(finalDiff / 100).toFixed(2)}</b> ബാക്കിയുണ്ട്.<br><br>ചേർക്കേണ്ട മരുന്ന് തിരഞ്ഞെടുക്കുക:`,
+              icon: "question",
+              input: "select",
+              inputOptions: optionsObj,
+              inputPlaceholder: "ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക...",
+              showCancelButton: !0,
+              confirmButtonText: "ചേർക്കൂ",
+              cancelButtonText: "വേണ്ട",
+              inputValidator: (value) => {
+                if (!value) return "ദയവായി ഒരു മരുന്ന് തിരഞ്ഞെടുക്കുക!";
+              },
+            });
+            Swal.fire({
+              title: "ബജറ്റ് ക്രമീകരിക്കുന്നു...",
+              allowOutsideClick: !1,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+            });
+            if (result.isConfirmed && result.value) {
+              let suggestion = topSuggestions[result.value];
+              suggestion.oldQty = 0;
+              let addQty = Math.floor(finalDiff / suggestion.ratePaise);
+              suggestion.qty = addQty;
+              currentTotalPaise += addQty * suggestion.ratePaise;
+              selected.push(suggestion);
+            }
+            await new Promise((r) => setTimeout(r, 400));
+          }
+        }
+        let summaryRows = "";
+        let sl = 1;
+        let finalSelected = selected.filter((i) => i.qty > 0 || i.oldQty > 0);
+        finalSelected.forEach((item) => {
+          let isChanged = item.qty !== item.oldQty;
+          let changeIndicator = "";
+          if (item.qty > item.oldQty) {
+            changeIndicator = ` <span style="color: #27ae60; font-size: 14px; font-weight: bold;">(↑)</span>`;
+          } else if (item.qty < item.oldQty) {
+            changeIndicator = ` <span style="color: #e74c3c; font-size: 14px; font-weight: bold;">(↓)</span>`;
+          }
+          let rowBg = isChanged ? "background-color: #fffae6;" : "";
+          let cleanName = item.name
+            .replace(/✏️/g, "")
+            .replace(/🗑️/g, "")
+            .replace(/\*/g, "")
+            .trim();
+          summaryRows += `
         <tr style="border-bottom: 1px solid #ddd; ${rowBg}">
             <td style="padding: 6px 4px;">${sl++}</td>
             <td style="padding: 6px 4px; word-break: break-word; line-height: 1.2;">${cleanName}</td>
             <td style="padding: 6px 4px; text-align:center;">${item.oldQty}</td>
             <td style="padding: 6px 4px; text-align:center; font-weight:bold;">${item.qty}${changeIndicator}</td>
-        </tr>`});const finalTotalDisp=(currentTotalPaise/100).toFixed(2);const oldTotalDisp=(originalTotalPaise/100).toFixed(2);const targetDisp=(targetPaise/100).toFixed(2);const balanceDisp=((targetPaise-currentTotalPaise)/100).toFixed(2,);let summaryHtml=`
+        </tr>`;
+        });
+        const finalTotalDisp = (currentTotalPaise / 100).toFixed(2);
+        const oldTotalDisp = (originalTotalPaise / 100).toFixed(2);
+        const targetDisp = (targetPaise / 100).toFixed(2);
+        const balanceDisp = ((targetPaise - currentTotalPaise) / 100).toFixed(
+          2,
+        );
+        let summaryHtml = `
     <div style="max-height: 55vh; overflow-y: auto; border: 1px solid #ccc; margin-bottom: 10px; border-radius: 4px;">
         <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
             <thead style="position: sticky; top: 0; background: #1e3c72; color: white; z-index: 2;">
@@ -1196,34 +3949,356 @@ let rowBg=isChanged?"background-color: #fffae6;":"";let cleanName=item.name.repl
             <span style="color: ${balanceDisp < 0 ? "#e74c3c" : "#27ae60"}; text-align: right;">ബാക്കി തുക:<br>₹ ${balanceDisp}</span>
         </div>
     </div>
-    `;Swal.close();const confirmResult=await Swal.fire({title:"ബജറ്റ് അഡ്ജസ്റ്റ്മെൻ്റ് സമ്മറി",html:summaryHtml,width:"min(95%, 600px)",showCancelButton:!0,confirmButtonColor:"#27ae60",cancelButtonColor:"#7f8c8d",confirmButtonText:"മാറ്റങ്ങൾ സേവ് ചെയ്യുക",cancelButtonText:"തിരികെ പോവുക (Cancel)",allowOutsideClick:!1,});if(confirmResult.isConfirmed){renderFinal(selected.filter((i)=>i.qty>0),rows,currentTotalPaise,targetPaise,)}else{Swal.fire({title:"റദ്ദാക്കി",text:"പഴയ മരുന്നുകൾ അതേപടി നിലനിർത്തിയിട്ടുണ്ട്.",icon:"info",timer:2000,showConfirmButton:!1,})}}
-function renderFinal(selected,rows,currentTotalPaise,targetPaise){let slNo=1;rows.forEach((row)=>{const qtyInp=row.querySelector(".qty-input");if(qtyInp&&!selected.find((s)=>s.row===row)){qtyInp.value=""}
-row.style.display="none";row.style.backgroundColor=""});selected.forEach((item)=>{item.input.value=item.qty;item.row.cells[4].innerText=((item.qty*item.ratePaise)/100).toFixed(2);item.row.style.display="";item.row.cells[0].innerText=slNo++;item.row.style.backgroundColor="#e8f5e9"});const finalTotal=(currentTotalPaise/100).toFixed(2);const finalBal=((targetPaise-currentTotalPaise)/100).toFixed(2);document.getElementById("display-total").innerText=parseFloat(finalTotal,).toLocaleString("en-IN",{minimumFractionDigits:2});const balDisp=document.getElementById("display-balance");if(balDisp){balDisp.innerText=parseFloat(finalBal).toLocaleString("en-IN",{minimumFractionDigits:2,});const infoCard=balDisp.closest(".info-card");if(infoCard){infoCard.style.backgroundColor=finalBal<0?"#e74c3c":"#2980b9"}}
-const viewBtn=document.getElementById("view-btn");if(viewBtn){viewBtn.innerText="SHOW ALL";viewBtn.style.backgroundColor="#e67e22"}
-if(typeof saveDraft==="function"){saveDraft()}
-Swal.fire({title:finalBal=="0.00"?"Perfect Alignment!":"ക്രമീകരണം കഴിഞ്ഞു",html:`ടോട്ടൽ: <b>Rs. ${finalTotal}</b><br>ബാക്കി: <b>Rs. ${finalBal}</b>`,icon:finalBal=="0.00"?"success":"info",})}
-function enterApp(){const screen=document.getElementById("welcome-screen");screen.style.transition="opacity 0.5s ease";screen.style.opacity="0";setTimeout(()=>{screen.style.display="none"},500)}
-function toggleHelp(){const modal=document.getElementById("help-modal");if(modal.style.display==="flex"){modal.style.display="none"}else{modal.style.display="flex"}}
-window.onclick=function(event){const modal=document.getElementById("help-modal");if(event.target==modal){modal.style.display="none"}};function updateIndentInput(val){const input=document.getElementById("indent-type");if(val==="user-input"){input.style.display="block";input.value="";input.focus()}else{input.style.display="none";input.value=val}
-saveDraft()}
-function setupIndentTypeLogic(){const indentSelect=document.getElementById("indent-select");const indentInput=document.getElementById("indent-type");const now=new Date();const month=now.getMonth();const year=now.getFullYear();const shortNextYear=(year+1).toString().substring(2);const yearString=`${year}-${shortNextYear}`;const t1=`Term - I / ${yearString}`;const t2=`Term - II / ${yearString}`;const t3=`Term - III / ${yearString}`;const staticOptions=["LSGD","Custom Input...","NAM"];const termOptions=[t1,t2,t3];let finalOptions=[];let priorityTerm="";if(month===0||month===1){priorityTerm=t1}else if(month===4||month===5){priorityTerm=t2}else if(month===8||month===9){priorityTerm=t3}
-if(priorityTerm){finalOptions.push(priorityTerm);finalOptions=finalOptions.concat(staticOptions);termOptions.forEach((term)=>{if(term!==priorityTerm){finalOptions.push(term)}})}else{finalOptions=finalOptions.concat(staticOptions);finalOptions=finalOptions.concat(termOptions)}
-indentSelect.innerHTML="";finalOptions.forEach((opt)=>{let option=document.createElement("option");option.value=opt==="Custom Input..."?"user-input":opt;option.text=opt;indentSelect.appendChild(option)});if(!indentInput.value){indentInput.value=indentSelect.value}}
-document.addEventListener("DOMContentLoaded",()=>{filterByCategory(0,0,"ALL")});function silentFilter(typeName){const rows=document.querySelectorAll(".med-row");let newSlNo=1;rows.forEach((row)=>{const medType=row.getAttribute("data-type");if(typeName==="ALL"||medType===typeName){row.style.display="";row.cells[0].innerText=newSlNo++;row.setAttribute("data-visible-type","true")}else{row.style.display="none";row.setAttribute("data-visible-type","false")}})}
-function checkRateInput(){const input=document.getElementById("rateRange");const clearBtn=document.getElementById("clearRate");if(clearBtn){clearBtn.style.display=input.value.length>0?"block":"none"}}
-function clearRateInput(){const input=document.getElementById("rateRange");input.value="";checkRateInput();input.focus()}
-function openNewMedicineModal(){editIndex=-1;document.getElementById("customMedName").value="";document.getElementById("customMedRate").value="";document.getElementById("customMedGST").value="0";openAddModal()}
-function openAddModal(){document.getElementById("customMedicineModal").style.display="flex"}
-function closeAddModal(){document.getElementById("customMedicineModal").style.display="none"}
-function editCustomMedicine(index){let customMedicines=JSON.parse(localStorage.getItem("customMedicines"))||[];let med=customMedicines[index];let cleanName=med.name.replace(" *","");document.getElementById("customMedName").value=cleanName;document.getElementById("customMedRate").value=med.rate;document.getElementById("customMedGST").value=med.gst;editIndex=index;openAddModal()}
-function deleteCustomMedicine(index){if(!confirm("ഈ മരുന്ന് ലിസ്റ്റിൽ നിന്നും ഡിലീറ്റ് ചെയ്യണോ?"))return;if(typeof saveDraft==="function")saveDraft();let customMedicines=JSON.parse(localStorage.getItem("customMedicines"))||[];customMedicines.splice(index,1);localStorage.setItem("customMedicines",JSON.stringify(customMedicines),);if(typeof loadMedicines==="function")loadMedicines();const savedDraft=localStorage.getItem("rubun_draft");if(savedDraft){const draftData=JSON.parse(savedDraft);const rows=document.querySelectorAll("#product-body tr");Object.keys(draftData).forEach((savedKey)=>{let qty=parseFloat(draftData[savedKey])||0;if(qty>0){let targetRow=null;if(isNaN(savedKey)){rows.forEach((row)=>{let nameCell=row.querySelector(".med-name");if(nameCell){let cleanName=nameCell.childNodes[0].textContent.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();if(cleanName===savedKey){targetRow=row}}})}else{targetRow=rows[savedKey]}
-if(targetRow){const inputField=targetRow.querySelector(".qty-input");if(inputField){inputField.value=qty;targetRow.classList.add("row-active");const rowRate=parseFloat(targetRow.cells[3].innerText);const costField=targetRow.querySelector(".row-cost");if(costField)
-costField.innerText=(qty*rowRate).toFixed(2);}}}});if(typeof calculateAll==="function")calculateAll();}
-if(typeof filterByCategory==="function")
-filterByCategory(0,0,"NEW ADDED");let typeBtn=document.getElementById("typeBtn");if(typeBtn){typeBtn.innerText="NEW ADDED ▾"}}
-function saveCustomMedicine(){if(typeof saveDraft==="function")saveDraft();let name=document.getElementById("customMedName").value;let type="NEW ADDED";let rate=document.getElementById("customMedRate").value;let gst=document.getElementById("customMedGST").value;if(name===""||rate===""){alert("Please enter Medicine Name and Rate!");return}
-let newMedicine={name:name+" *",type:type,rate:parseFloat(rate),gst:parseFloat(gst),isCustom:!0,};let customMedicines=JSON.parse(localStorage.getItem("customMedicines"))||[];if(typeof editIndex!=="undefined"&&editIndex>-1){customMedicines[editIndex]=newMedicine;editIndex=-1}else{customMedicines.push(newMedicine)}
-localStorage.setItem("customMedicines",JSON.stringify(customMedicines),);closeAddModal();loadMedicines();const savedDraft=localStorage.getItem("rubun_draft");if(savedDraft){const draftData=JSON.parse(savedDraft);const rows=document.querySelectorAll("#product-body tr");Object.keys(draftData).forEach((savedKey)=>{let qty=parseFloat(draftData[savedKey])||0;if(qty>0){let targetRow=null;if(isNaN(savedKey)){rows.forEach((row)=>{let nameCell=row.querySelector(".med-name");if(nameCell){let cleanName=nameCell.childNodes[0].textContent.replace(/✏️/g,"").replace(/🗑️/g,"").replace(/\*/g,"").trim();if(cleanName===savedKey){targetRow=row}}})}else{targetRow=rows[savedKey]}
-if(targetRow){const inputField=targetRow.querySelector(".qty-input");if(inputField){inputField.value=qty;targetRow.classList.add("row-active");const rowRate=parseFloat(targetRow.cells[3].innerText);const costField=targetRow.querySelector(".row-cost");if(costField)
-costField.innerText=(qty*rowRate).toFixed(2);}}}});if(typeof calculateAll==="function")calculateAll();}
-filterByCategory(0,0,"NEW ADDED");let typeBtn=document.getElementById("typeBtn");if(typeBtn){typeBtn.innerText="NEW ADDED ▾"}}</script></body></html>
+    `;
+        Swal.close();
+        const confirmResult = await Swal.fire({
+          title: "ബജറ്റ് അഡ്ജസ്റ്റ്മെൻ്റ് സമ്മറി",
+          html: summaryHtml,
+          width: "min(95%, 600px)",
+          showCancelButton: !0,
+          confirmButtonColor: "#27ae60",
+          cancelButtonColor: "#7f8c8d",
+          confirmButtonText: "മാറ്റങ്ങൾ സേവ് ചെയ്യുക",
+          cancelButtonText: "തിരികെ പോവുക (Cancel)",
+          allowOutsideClick: !1,
+        });
+        if (confirmResult.isConfirmed) {
+          renderFinal(
+            selected.filter((i) => i.qty > 0),
+            rows,
+            currentTotalPaise,
+            targetPaise,
+          );
+        } else {
+          Swal.fire({
+            title: "റദ്ദാക്കി",
+            text: "പഴയ മരുന്നുകൾ അതേപടി നിലനിർത്തിയിട്ടുണ്ട്.",
+            icon: "info",
+            timer: 2000,
+            showConfirmButton: !1,
+          });
+        }
+      }
+      function renderFinal(selected, rows, currentTotalPaise, targetPaise) {
+        let slNo = 1;
+        rows.forEach((row) => {
+          const qtyInp = row.querySelector(".qty-input");
+          if (qtyInp && !selected.find((s) => s.row === row)) {
+            qtyInp.value = "";
+          }
+          row.style.display = "none";
+          row.style.backgroundColor = "";
+        });
+        selected.forEach((item) => {
+          item.input.value = item.qty;
+          item.row.cells[4].innerText = (
+            (item.qty * item.ratePaise) /
+            100
+          ).toFixed(2);
+          item.row.style.display = "";
+          item.row.cells[0].innerText = slNo++;
+          item.row.style.backgroundColor = "#e8f5e9";
+        });
+        const finalTotal = (currentTotalPaise / 100).toFixed(2);
+        const finalBal = ((targetPaise - currentTotalPaise) / 100).toFixed(2);
+        document.getElementById("display-total").innerText = parseFloat(
+          finalTotal,
+        ).toLocaleString("en-IN", { minimumFractionDigits: 2 });
+        const balDisp = document.getElementById("display-balance");
+        if (balDisp) {
+          balDisp.innerText = parseFloat(finalBal).toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+          });
+          const infoCard = balDisp.closest(".info-card");
+          if (infoCard) {
+            infoCard.style.backgroundColor =
+              finalBal < 0 ? "#e74c3c" : "#2980b9";
+          }
+        }
+        const viewBtn = document.getElementById("view-btn");
+        if (viewBtn) {
+          viewBtn.innerText = "SHOW ALL";
+          viewBtn.style.backgroundColor = "#e67e22";
+        }
+        if (typeof saveDraft === "function") {
+          saveDraft();
+        }
+        Swal.fire({
+          title:
+            finalBal == "0.00" ? "Perfect Alignment!" : "ക്രമീകരണം കഴിഞ്ഞു",
+          html: `ടോട്ടൽ: <b>Rs. ${finalTotal}</b><br>ബാക്കി: <b>Rs. ${finalBal}</b>`,
+          icon: finalBal == "0.00" ? "success" : "info",
+        });
+      }
+      function enterApp() {
+        const screen = document.getElementById("welcome-screen");
+        screen.style.transition = "opacity 0.5s ease";
+        screen.style.opacity = "0";
+        setTimeout(() => {
+          screen.style.display = "none";
+        }, 500);
+      }
+      function toggleHelp() {
+        const modal = document.getElementById("help-modal");
+        if (modal.style.display === "flex") {
+          modal.style.display = "none";
+        } else {
+          modal.style.display = "flex";
+        }
+      }
+      window.onclick = function (event) {
+        const modal = document.getElementById("help-modal");
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+      function updateIndentInput(val) {
+        const input = document.getElementById("indent-type");
+        if (val === "user-input") {
+          input.style.display = "block";
+          input.value = "";
+          input.focus();
+        } else {
+          input.style.display = "none";
+          input.value = val;
+        }
+        saveDraft();
+      }
+      function setupIndentTypeLogic() {
+        const indentSelect = document.getElementById("indent-select");
+        const indentInput = document.getElementById("indent-type");
+        const now = new Date();
+        const month = now.getMonth();
+        const year = now.getFullYear();
+        const shortNextYear = (year + 1).toString().substring(2);
+        const yearString = `${year}-${shortNextYear}`;
+        const t1 = `Term - I / ${yearString}`;
+        const t2 = `Term - II / ${yearString}`;
+        const t3 = `Term - III / ${yearString}`;
+        const staticOptions = ["LSGD", "Custom Input...", "NAM"];
+        const termOptions = [t1, t2, t3];
+        let finalOptions = [];
+        let priorityTerm = "";
+        if (month === 0 || month === 1) {
+          priorityTerm = t1;
+        } else if (month === 4 || month === 5) {
+          priorityTerm = t2;
+        } else if (month === 8 || month === 9) {
+          priorityTerm = t3;
+        }
+        if (priorityTerm) {
+          finalOptions.push(priorityTerm);
+          finalOptions = finalOptions.concat(staticOptions);
+          termOptions.forEach((term) => {
+            if (term !== priorityTerm) {
+              finalOptions.push(term);
+            }
+          });
+        } else {
+          finalOptions = finalOptions.concat(staticOptions);
+          finalOptions = finalOptions.concat(termOptions);
+        }
+        indentSelect.innerHTML = "";
+        finalOptions.forEach((opt) => {
+          let option = document.createElement("option");
+          option.value = opt === "Custom Input..." ? "user-input" : opt;
+          option.text = opt;
+          indentSelect.appendChild(option);
+        });
+        if (!indentInput.value) {
+          indentInput.value = indentSelect.value;
+        }
+      }
+      document.addEventListener("DOMContentLoaded", () => {
+        filterByCategory(0, 0, "ALL");
+      });
+      function silentFilter(typeName) {
+        const rows = document.querySelectorAll(".med-row");
+        let newSlNo = 1;
+        rows.forEach((row) => {
+          const medType = row.getAttribute("data-type");
+          if (typeName === "ALL" || medType === typeName) {
+            row.style.display = "";
+            row.cells[0].innerText = newSlNo++;
+            row.setAttribute("data-visible-type", "true");
+          } else {
+            row.style.display = "none";
+            row.setAttribute("data-visible-type", "false");
+          }
+        });
+      }
+      function checkRateInput() {
+        const input = document.getElementById("rateRange");
+        const clearBtn = document.getElementById("clearRate");
+        if (clearBtn) {
+          clearBtn.style.display = input.value.length > 0 ? "block" : "none";
+        }
+      }
+      function clearRateInput() {
+        const input = document.getElementById("rateRange");
+        input.value = "";
+        checkRateInput();
+        input.focus();
+      }
+      function openNewMedicineModal() {
+        editIndex = -1;
+        document.getElementById("customMedName").value = "";
+        document.getElementById("customMedRate").value = "";
+        document.getElementById("customMedGST").value = "0";
+        openAddModal();
+      }
+      function openAddModal() {
+        document.getElementById("customMedicineModal").style.display = "flex";
+      }
+      function closeAddModal() {
+        document.getElementById("customMedicineModal").style.display = "none";
+      }
+      function editCustomMedicine(index) {
+        let customMedicines =
+          JSON.parse(localStorage.getItem("customMedicines")) || [];
+        let med = customMedicines[index];
+        let cleanName = med.name.replace(" *", "");
+        document.getElementById("customMedName").value = cleanName;
+        document.getElementById("customMedRate").value = med.rate;
+        document.getElementById("customMedGST").value = med.gst;
+        editIndex = index;
+        openAddModal();
+      }
+      function deleteCustomMedicine(index) {
+        if (!confirm("ഈ മരുന്ന് ലിസ്റ്റിൽ നിന്നും ഡിലീറ്റ് ചെയ്യണോ?")) return;
+        if (typeof saveDraft === "function") saveDraft();
+        let customMedicines =
+          JSON.parse(localStorage.getItem("customMedicines")) || [];
+        customMedicines.splice(index, 1);
+        localStorage.setItem(
+          "customMedicines",
+          JSON.stringify(customMedicines),
+        );
+        if (typeof loadMedicines === "function") loadMedicines();
+        const savedDraft = localStorage.getItem("rubun_draft");
+        if (savedDraft) {
+          const draftData = JSON.parse(savedDraft);
+          const rows = document.querySelectorAll("#product-body tr");
+          Object.keys(draftData).forEach((savedKey) => {
+            let qty = parseFloat(draftData[savedKey]) || 0;
+            if (qty > 0) {
+              let targetRow = null;
+              if (isNaN(savedKey)) {
+                rows.forEach((row) => {
+                  let nameCell = row.querySelector(".med-name");
+                  if (nameCell) {
+                    let cleanName = nameCell.childNodes[0].textContent
+                      .replace(/✏️/g, "")
+                      .replace(/🗑️/g, "")
+                      .replace(/\*/g, "")
+                      .trim();
+                    if (cleanName === savedKey) {
+                      targetRow = row;
+                    }
+                  }
+                });
+              } else {
+                targetRow = rows[savedKey];
+              }
+              if (targetRow) {
+                const inputField = targetRow.querySelector(".qty-input");
+                if (inputField) {
+                  inputField.value = qty;
+                  targetRow.classList.add("row-active");
+                  const rowRate = parseFloat(targetRow.cells[3].innerText);
+                  const costField = targetRow.querySelector(".row-cost");
+                  if (costField)
+                    costField.innerText = (qty * rowRate).toFixed(2);
+                }
+              }
+            }
+          });
+          if (typeof calculateAll === "function") calculateAll();
+        }
+        if (typeof filterByCategory === "function")
+          filterByCategory(0, 0, "NEW ADDED");
+        let typeBtn = document.getElementById("typeBtn");
+        if (typeBtn) {
+          typeBtn.innerText = "NEW ADDED ▾";
+        }
+      }
+      function saveCustomMedicine() {
+        if (typeof saveDraft === "function") saveDraft();
+        let name = document.getElementById("customMedName").value;
+        let type = "NEW ADDED";
+        let rate = document.getElementById("customMedRate").value;
+        let gst = document.getElementById("customMedGST").value;
+        if (name === "" || rate === "") {
+          alert("Please enter Medicine Name and Rate!");
+          return;
+        }
+        let newMedicine = {
+          name: name + " *",
+          type: type,
+          rate: parseFloat(rate),
+          gst: parseFloat(gst),
+          isCustom: !0,
+        };
+        let customMedicines =
+          JSON.parse(localStorage.getItem("customMedicines")) || [];
+        if (typeof editIndex !== "undefined" && editIndex > -1) {
+          customMedicines[editIndex] = newMedicine;
+          editIndex = -1;
+        } else {
+          customMedicines.push(newMedicine);
+        }
+        localStorage.setItem(
+          "customMedicines",
+          JSON.stringify(customMedicines),
+        );
+        closeAddModal();
+        loadMedicines();
+        const savedDraft = localStorage.getItem("rubun_draft");
+        if (savedDraft) {
+          const draftData = JSON.parse(savedDraft);
+          const rows = document.querySelectorAll("#product-body tr");
+          Object.keys(draftData).forEach((savedKey) => {
+            let qty = parseFloat(draftData[savedKey]) || 0;
+            if (qty > 0) {
+              let targetRow = null;
+              if (isNaN(savedKey)) {
+                rows.forEach((row) => {
+                  let nameCell = row.querySelector(".med-name");
+                  if (nameCell) {
+                    let cleanName = nameCell.childNodes[0].textContent
+                      .replace(/✏️/g, "")
+                      .replace(/🗑️/g, "")
+                      .replace(/\*/g, "")
+                      .trim();
+                    if (cleanName === savedKey) {
+                      targetRow = row;
+                    }
+                  }
+                });
+              } else {
+                targetRow = rows[savedKey];
+              }
+              if (targetRow) {
+                const inputField = targetRow.querySelector(".qty-input");
+                if (inputField) {
+                  inputField.value = qty;
+                  targetRow.classList.add("row-active");
+                  const rowRate = parseFloat(targetRow.cells[3].innerText);
+                  const costField = targetRow.querySelector(".row-cost");
+                  if (costField)
+                    costField.innerText = (qty * rowRate).toFixed(2);
+                }
+              }
+            }
+          });
+          if (typeof calculateAll === "function") calculateAll();
+        }
+        filterByCategory(0, 0, "NEW ADDED");
+        let typeBtn = document.getElementById("typeBtn");
+        if (typeBtn) {
+          typeBtn.innerText = "NEW ADDED ▾";
+        }
+      }
+    </script>
+  </body>
+</html>
