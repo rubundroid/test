@@ -1,14 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ml">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url=https://indentmaker.rubundroid.com">
-    <script type="text/javascript">
-        window.location.href = "https://indentmaker.rubundroid.com";
-    </script>
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLI Auto PDF Filler</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        :root { --primary-color: #007bff; --bg-color: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); }
+        
+        #wizard-container { max-width: 600px; margin: 30px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
+        .header-bar { background: var(--primary-color); color: #fff; padding: 15px; text-align: center; }
+        .header-bar h3 { margin: 0; font-size: 20px; }
+        
+        .step { padding: 30px 20px; }
+        h2 { margin-top: 0; color: #333; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px;}
+        
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; font-size: 14px; margin-top: 15px;}
+        input[type="text"], input[type="date"] {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;
+            font-size: 15px; margin-bottom: 5px; box-sizing: border-box; text-transform: uppercase;
+        }
+        
+        .btn-print { background: #28a745; color: #fff; width: 100%; padding: 15px; font-size: 18px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: 0.3s;}
+        .btn-print:hover { background: #218838; }
+        
+        .status-msg { text-align: center; margin-top: 15px; font-weight: bold; color: #007bff; display: none; }
+        
+        /* For Coordinate Testing/Adjustment */
+        .dev-tools { background: #fff3cd; padding: 15px; margin-top: 20px; border-radius: 5px; font-size: 12px; }
+        .dev-tools input { width: 60px; padding: 5px; margin-right: 10px; }
+    </style>
 </head>
 <body>
-    <p>If you are not redirected automatically, <a href="https://indentmaker.rubundroid.com">click here</a>.</p>
+
+    <div id="wizard-container">
+        <div class="header-bar">
+            <h3>SLI Proposal Auto-Filler</h3>
+        </div>
+
+        <div class="step">
+            <h2>വ്യക്തിഗത വിവരങ്ങൾ (Personal Details)</h2>
+            
+            <label>1. Employee Code (PEN/KSID ID)</label>
+            <input type="text" id="inp-pen" maxlength="10" placeholder="E.g., 123456">
+            
+            <label>2. Name (in Capital Letters)</label>
+            <input type="text" id="inp-name" maxlength="30" placeholder="E.g., ARUN K">
+            
+            <label>4. Date of Birth / ജനന തീയ്യതി</label>
+            <input type="date" id="inp-dob">
+
+            <div class="dev-tools">
+                <b>Alignment Adjustments (X, Y, Spacing):</b><br><br>
+                PEN: X <input type="number" id="pen-x" value="265"> Y <input type="number" id="pen-y" value="690"> Spacing <input type="number" id="pen-space" value="14.5" step="0.1"><br><br>
+                Name: X <input type="number" id="name-x" value="265"> Y <input type="number" id="name-y" value="665"> Spacing <input type="number" id="name-space" value="14.5" step="0.1">
+            </div>
+
+            <button class="btn-print" onclick="generateFilledPDF()" id="printBtn">📄 പൂരിപ്പിച്ച PDF ഡൗൺലോഡ് ചെയ്യുക</button>
+            <div class="status-msg" id="statusMsg">PDF തയ്യാറാകുന്നു... ദയവായി കാത്തിരിക്കുക.</div>
+        </div>
+    </div>
+
+    <script>
+        async function generateFilledPDF() {
+            const btn = document.getElementById('printBtn');
+            const status = document.getElementById('statusMsg');
+            btn.style.display = 'none';
+            status.style.display = 'block';
+
+            try {
+                // 1. ഫയൽ സിസ്റ്റത്തിൽ നിന്നും sli_blank.pdf എടുക്കുന്നു
+                // GitHub-ലോ വെബ് സെർവറിലോ ഇത് കൃത്യമായി വർക്ക് ചെയ്യും.
+                const url = 'sli_blank.pdf'; 
+                const existingPdfBytes = await fetch(url).then(res => {
+                    if (!res.ok) throw new Error("sli_blank.pdf ഫയൽ കണ്ടെത്താനായില്ല!");
+                    return res.arrayBuffer();
+                });
+
+                // 2. PDF ലോഡ് ചെയ്യുന്നു
+                const { PDFDocument, rgb } = PDFLib;
+                const pdfDoc = await PDFDocument.load(existingPdfBytes);
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0]; // ആദ്യത്തെ പേജ്
+
+                // ഡാറ്റ എടുക്കുന്നു
+                const pen = document.getElementById('inp-pen').value.toUpperCase();
+                const name = document.getElementById('inp-name').value.toUpperCase();
+
+                // കോർഡിനേറ്റുകൾ (ഇവ കൃത്യമായി സെറ്റ് ചെയ്തു കഴിഞ്ഞാൽ dev-tools ഒഴിവാക്കാം)
+                const penX = parseFloat(document.getElementById('pen-x').value);
+                const penY = parseFloat(document.getElementById('pen-y').value);
+                const penSpace = parseFloat(document.getElementById('pen-space').value);
+
+                const nameX = parseFloat(document.getElementById('name-x').value);
+                const nameY = parseFloat(document.getElementById('name-y').value);
+                const nameSpace = parseFloat(document.getElementById('name-space').value);
+
+                // 3. PEN നമ്പർ കള്ളികളിൽ പതിപ്പിക്കുന്നു (നീല നിറത്തിൽ)
+                for (let i = 0; i < pen.length; i++) {
+                    firstPage.drawText(pen[i], {
+                        x: penX + (i * penSpace),
+                        y: penY,
+                        size: 11,
+                        color: rgb(0, 0, 0.8), // Blue
+                    });
+                }
+
+                // 4. പേര് കള്ളികളിൽ പതിപ്പിക്കുന്നു
+                for (let i = 0; i < name.length; i++) {
+                    if(name[i] !== ' ') {
+                        firstPage.drawText(name[i], {
+                            x: nameX + (i * nameSpace),
+                            y: nameY,
+                            size: 11,
+                            color: rgb(0, 0, 0.8),
+                        });
+                    }
+                }
+
+                // 5. PDF സേവ് ചെയ്ത് ഡൗൺലോഡ് നൽകുന്നു
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `SLI_Proposal_${pen}.pdf`;
+                link.click();
+
+            } catch (error) {
+                console.error(error);
+                alert("ഒരു പിശക് സംഭവിച്ചു: " + error.message + "\n(ശ്രദ്ധിക്കുക: ഇത് നിങ്ങളുടെ കമ്പ്യൂട്ടറിൽ ഡയറക്ട് ആയി ഓപ്പൺ ചെയ്യുമ്പോൾ ബ്രൗസർ സെക്യൂരിറ്റി കാരണം sli_blank.pdf എടുക്കാൻ സാധിച്ചില്ലെന്ന് വരാം. GitHub-ൽ ഹോസ്റ്റ് ചെയ്യുമ്പോൾ ഇത് കൃത്യമായി പ്രവർത്തിക്കും.)");
+            } finally {
+                btn.style.display = 'block';
+                status.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
