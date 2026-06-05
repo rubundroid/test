@@ -1218,7 +1218,7 @@
 
       // Never intercept passthrough keys
       if (INSCRIPT_PASSTHROUGH.has(e.key)) return false;
-
+      if (e.code && e.code.startsWith('Numpad')) return false;
       // Look up the character in the map using the actual key value
       const mlChar = INSCRIPT_MAP[e.key];
       if (!mlChar) return false;  // unmapped key — let it through normally
