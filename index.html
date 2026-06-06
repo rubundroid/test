@@ -793,6 +793,10 @@
     </button>
     <button class="btn" id="btn-inscript-toggle"
       title="InScript Malayalam Keyboard (Kerala ISM/InScript layout)">InScript: OFF</button>
+    <select id="inscript-layout-select" class="ribbon-select" title="InScript keyboard layout">
+      <option value="typeit" selected>TypeIn / ISM</option>
+      <option value="windows">Windows InScript</option>
+    </select>
     <div class="ribbon-sep"></div>
 
     <!-- Save to LocalStorage -->
@@ -1158,40 +1162,43 @@
     // ── Full ISM/InScript key map ─────────────────────────────────────────
     // Based on the standard Kerala Government InScript (ISM) layout.
     // ── Typeit! InScript Key Map (Corrected) ────────────────────
-    const INSCRIPT_MAP = {
-      // --- Unshifted (lowercase) keys ---
-      '`': 'ൊ', '1': '1', '2': '2', '3': '3', '4': '4',
-      '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
-      '0': '0', '-': '-', '=': 'ൃ', // 🌟 മാറ്റം വരുത്തി 
-      
-      'q': 'ൗ', 'w': 'ൈ', 'e': 'ാ', 'r': 'ീ', 't': 'ൂ',
-      'y': 'ബ', 'u': 'ഹ', 'i': 'ഗ', 'o': 'ദ', 'p': 'ജ',
-      '[': 'ഡ', ']': 'ഞ', '\\': '\u200C', // \u200C is ZWNJ
-      
-      'a': 'ോ', 's': 'േ', 'd': '്', 'f': 'ി', 'g': 'ു',
-      'h': 'പ', 'j': 'ര', 'k': 'ക', 'l': 'ത', ';': 'ച',
-      "'": 'ട',
-      
-      'z': 'െ', 'x': 'ം', 'c': 'മ', 'v': 'ന', 'b': 'വ',
-      'n': 'ല', 'm': 'സ', ',': ',', '.': '.', '/': 'യ',
-
-      // --- Shifted (uppercase / Shift+key) keys ---
-      '~': 'ഒ', '!': '!', '@': '@',
-      '#': 'സ്റ്റ', '$': '₹', '%': 'ജ്ഞ', // 🌟 മാറ്റം വരുത്തി 
-      '^': 'ന്റ', '&': 'ക്ഷ', '*': 'ൾ',   // 🌟 മാറ്റം വരുത്തി 
-      '(': '(', ')': ')', '_': 'ഃ', '+': 'ഋ', // 🌟 മാറ്റം വരുത്തി 
-      
-      'Q': 'ഔ', 'W': 'ഐ', 'E': 'ആ', 'R': 'ഈ', 'T': 'ഊ',
-      'Y': 'ഭ', 'U': 'ങ', 'I': 'ഘ', 'O': 'ധ', 'P': 'ഝ',
-      '{': 'ഢ', '}': 'ഞ്ഞ', '|': 'ർ',     // 🌟 ZWJ മാറ്റി 'ർ' ആക്കി
-      
-      'A': 'ഓ', 'S': 'ഏ', 'D': 'അ', 'F': 'ഇ', 'G': 'ഉ',
-      'H': 'ഫ', 'J': 'റ', 'K': 'ഖ', 'L': 'ഥ', ':': 'ഛ',
-      '"': 'ഠ',
-      
-      'Z': 'എ', 'X': 'ൺ', 'C': 'ണ', 'V': 'ൻ', 'B': 'ഴ',
-      'N': 'ള', 'M': 'ശ', '<': 'ഷ', '>': 'ൽ', '?': '?'  // 🌟 മാറ്റം വരുത്തി 
+    const INSCRIPT_LAYOUTS = {
+      typeit: {
+        '`': 'ൊ', '1': '1', '2': '2', '3': '3', '4': '4',
+        '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
+        '0': '0', '-': '-', '=': 'ൃ',
+        'q': 'ൗ', 'w': 'ൈ', 'e': 'ാ', 'r': 'ീ', 't': 'ൂ',
+        'y': 'ബ', 'u': 'ഹ', 'i': 'ഗ', 'o': 'ദ', 'p': 'ജ',
+        '[': 'ഡ', ']': 'ഞ', '\\': '\u200C',
+        'a': 'ോ', 's': 'േ', 'd': '്', 'f': 'ി', 'g': 'ു',
+        'h': 'പ', 'j': 'ര', 'k': 'ക', 'l': 'ത', ';': 'ച', "'": 'ട',
+        'z': 'െ', 'x': 'ം', 'c': 'മ', 'v': 'ന', 'b': 'വ',
+        'n': 'ല', 'm': 'സ', ',': ',', '.': '.', '/': 'യ',
+        '~': 'ഒ', '!': '!', '@': '@',
+        '#': 'സ്റ്റ', '$': '₹', '%': 'ജ്ഞ',
+        '^': 'ന്റ', '&': 'ക്ഷ', '*': 'ൾ',
+        '(': '(', ')': ')', '_': 'ഃ', '+': 'ഋ',
+        'Q': 'ഔ', 'W': 'ഐ', 'E': 'ആ', 'R': 'ഈ', 'T': 'ഊ',
+        'Y': 'ഭ', 'U': 'ങ', 'I': 'ഘ', 'O': 'ധ', 'P': 'ഝ',
+        '{': 'ഢ', '}': 'ഞ്ഞ', '|': 'ർ',
+        'A': 'ഓ', 'S': 'ഏ', 'D': 'അ', 'F': 'ഇ', 'G': 'ഉ',
+        'H': 'ഫ', 'J': 'റ', 'K': 'ഖ', 'L': 'ഥ', ':': 'ഛ', '"': 'ഠ',
+        'Z': 'എ', 'X': 'ൺ', 'C': 'ണ', 'V': 'ൻ', 'B': 'ഴ',
+        'N': 'ള', 'M': 'ശ', '<': 'ഷ', '>': 'ൽ', '?': '?'
+      },
+      windows: {
+        '`': 'ൊ', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '0': '0', '-': '-', '=': 'ൃ',
+        'q': 'ൗ', 'w': 'ൈ', 'e': 'ാ', 'r': 'ീ', 't': 'ൂ', 'y': 'ബ', 'u': 'ഹ', 'i': 'ഗ', 'o': 'ദ', 'p': 'ജ', '[': 'ഡ', ']': 'ർ', '\\': '\u200C',
+        'a': 'ോ', 's': 'േ', 'd': '്', 'f': 'ി', 'g': 'ു', 'h': 'പ', 'j': 'ര', 'k': 'ക', 'l': 'ത', ';': 'ച', "'": 'ട',
+        'z': 'െ', 'x': 'ം', 'c': 'മ', 'v': 'ന', 'b': 'വ', 'n': 'ല', 'm': 'സ', ',': ',', '.': '.', '/': 'യ',
+        '~': 'ഒ', '!': '!', '@': '@', '#': '#', '$': '$', '%': '%', '^': 'ക്', '&': 'ക്ഷ', '*': 'ശ്ര', '(': '(', ')': ')', '_': 'ഃ', '+': 'ഋ',
+        'Q': 'ഔ', 'W': 'ഐ', 'E': 'ആ', 'R': 'ഈ', 'T': 'ഊ', 'Y': 'ഭ', 'U': 'ങ', 'I': 'ഘ', 'O': 'ധ', 'P': 'ഝ', '{': 'ഢ', '}': 'ഞ', '|': '\u200D',
+        'A': 'ഓ', 'S': 'ഏ', 'D': 'അ', 'F': 'ഇ', 'G': 'ഉ', 'H': 'ഫ', 'J': 'റ', 'K': 'ഖ', 'L': 'ഥ', ':': 'ഛ', '"': 'ഠ',
+        'Z': 'എ', 'X': 'ൺ', 'C': 'ണ', 'V': 'ൻ', 'B': 'ഴ', 'N': 'ള', 'M': 'ശ', '<': 'ഷ', '>': 'ൽ', '?': 'ൾ'
+      }
     };
+    // Tracks the active layout key; must match the <select>'s default selected value
+    let currentInscriptLayout = 'typeit';
 
 
     // Keys that must always pass through unchanged (never intercepted)
@@ -1220,7 +1227,7 @@
       if (INSCRIPT_PASSTHROUGH.has(e.key)) return false;
       if (e.code && e.code.startsWith('Numpad')) return false;
       // Look up the character in the map using the actual key value
-      const mlChar = INSCRIPT_MAP[e.key];
+      const mlChar = INSCRIPT_LAYOUTS[currentInscriptLayout][e.key];
       if (!mlChar) return false;  // unmapped key — let it through normally
 
       e.preventDefault();
@@ -1263,6 +1270,11 @@
       showToast(isInScriptEnabled
         ? '⌨️ InScript ON — ISM/InScript Malayalam keyboard active'
         : '❌ InScript OFF');
+    });
+    // ── InScript layout switcher ─────────────────────────────────────────
+    document.getElementById('inscript-layout-select').addEventListener('change', function () {
+      currentInscriptLayout = this.value;
+      showToast('⌨️ Layout: ' + this.options[this.selectedIndex].text);
     });
     async function fetchMalayalam(word) {
       try {
@@ -1786,7 +1798,7 @@
 
     body {
       font-family: 'Mandaram', 'Times New Roman', 'Manjari', serif;
-      font-size: 13pt;
+      font-size: 14pt;
       line-height: 1.8;
       color: #000;
       width: 210mm;
