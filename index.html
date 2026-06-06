@@ -1125,6 +1125,7 @@
       </div>
     </div>
   </div>
+
   <!-- ══════════════════════════════════════
      INSTALL POPUP HTML
 ══════════════════════════════════════ -->
@@ -1139,6 +1140,54 @@
     <div class="install-actions">
       <button id="btn-close-install" class="btn">Not Now</button>
       <button id="btn-install-app" class="btn btn-primary">Install App</button>
+    </div>
+  </div>
+  <!-- ══════════════════════════════════════
+     AI DRAFT MODAL
+══════════════════════════════════════ -->
+  <div class="modal-overlay" id="ai-draft-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span>🤖 AI Reply Generator (Gemini 1.5 Flash)</span>
+        <button class="modal-close" id="ai-draft-modal-close" title="Close">✕</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
+            📄 Incoming Letter (Scanned PDF)
+          </label>
+          <input type="file" id="ai-draft-pdf-input" accept=".pdf"
+            style="width:100%; border:1px solid #bbb; border-radius:4px; padding:5px 8px; font-size:0.82rem; cursor:pointer;" />
+          <div style="font-size:0.72rem; color:#888; margin-top:3px;">
+            Gemini reads the scanned PDF natively via Base64 — no pdf.js required.
+          </div>
+        </div>
+        <div>
+          <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
+            ✏️ Hints / Points to Include in Reply
+          </label>
+          <textarea id="ai-draft-hints" rows="5"
+            style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; resize:vertical; outline:none; transition:border-color 0.15s;"
+            placeholder="e.g.&#10;- Reply is approved&#10;- Forward to District Office by 15th&#10;- Attach originals&#10;(Leave blank to let AI decide)"></textarea>
+        </div>
+        <div>
+          <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
+            🔑 Gemini API Key
+          </label>
+          <input type="password" id="ai-draft-apikey"
+            style="width:100%; border:1px solid #bbb; border-radius:4px; padding:6px 10px; font-size:0.85rem; outline:none; transition:border-color 0.15s;"
+            placeholder="AIza…" autocomplete="off" />
+          <div style="font-size:0.72rem; color:#888; margin-top:3px;">
+            Saved locally in your browser. Never sent anywhere except Google's API.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gold" id="ai-draft-generate-btn" style="min-width:140px; justify-content:center;">
+          ✨ Generate Reply
+        </button>
+        <button class="btn" id="ai-draft-cancel-btn">Cancel</button>
+      </div>
     </div>
   </div>
   <!-- ══════════════════════════════════════
@@ -2947,6 +2996,178 @@
         sel.addRange(range);
         _vRange = range.cloneRange();   // save for next spoken word
       }
+
+    })();
+    /* ══════════════════════════════════════
+       AI DRAFT – GEMINI 1.5 FLASH INTEGRATION
+    ══════════════════════════════════════ */
+    (function () {
+      const GEMINI_LS_KEY = 'edraft_gemini_api_key';
+      const modal = document.getElementById('ai-draft-modal');
+
+      // ── Open modal ─────────────────────────────────────────────
+      document.getElementById('btn-ai-draft').addEventListener('click', () => {
+        document.getElementById('ai-draft-apikey').value =
+          localStorage.getItem(GEMINI_LS_KEY) || '';
+        document.getElementById('ai-draft-pdf-input').value = '';
+        // Don't clear hints — user may want to re-use them
+        modal.classList.add('open');
+      });
+
+      // ── Close modal ────────────────────────────────────────────
+      function closeAiModal() { modal.classList.remove('open'); }
+      document.getElementById('ai-draft-modal-close').addEventListener('click', closeAiModal);
+      document.getElementById('ai-draft-cancel-btn').addEventListener('click', closeAiModal);
+      modal.addEventListener('click', e => { if (e.target === modal) closeAiModal(); });
+
+      // ── Convert Gemini's markdown text to styled HTML ──────────
+      function geminiTextToHtml(text) {
+        const pStyle =
+          "font-family:'Mandaram','Keralam','Noto Sans Malayalam','Manjari',serif;" +
+          "font-size:14pt;line-height:1.8;margin:0 0 8pt 0;";
+        const hStyle =
+          "font-family:'Mandaram','Keralam','Noto Sans Malayalam','Manjari',serif;" +
+          "font-size:14pt;font-weight:bold;line-height:1.6;margin:12pt 0 4pt 0;";
+
+        const blocks = text.trim().split(/\n{2,}/);
+        return blocks.map(block => {
+          block = block.trim();
+          if (!block) return '';
+
+          // Heading: # or ## or ###
+          const hMatch = block.match(/^(#{1,3})\s+([\s\S]*)/);
+          if (hMatch) {
+            const lvl = hMatch[1].length;
+            return `<h${lvl} style="${hStyle}">${hMatch[2]}</h${lvl}>`;
+          }
+
+          // Inline markdown: **bold** and *italic*
+          let html = block
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+          // Single newlines within a paragraph → <br>
+          html = html.replace(/\n/g, '<br>');
+
+          return `<p style="${pStyle}">${html}</p>`;
+        }).join('\n');
+      }
+
+      // ── Generate button ────────────────────────────────────────
+      document.getElementById('ai-draft-generate-btn').addEventListener('click', async () => {
+        const apiKey = document.getElementById('ai-draft-apikey').value.trim();
+        const hints = document.getElementById('ai-draft-hints').value.trim();
+        const fileInp = document.getElementById('ai-draft-pdf-input');
+        const pdfFile = fileInp.files[0];
+
+        // ── Validation ──────────────────────────────────────────
+        if (!apiKey) {
+          showToast('⚠️ Please enter your Gemini API Key.'); return;
+        }
+        if (!pdfFile) {
+          showToast('⚠️ Please select the incoming letter PDF.'); return;
+        }
+
+        // ── Persist API key ─────────────────────────────────────
+        localStorage.setItem(GEMINI_LS_KEY, apiKey);
+
+        // ── Loading toast (long duration) ───────────────────────
+        showToast('⏳ AI is reading the scanned letter and drafting…', 60000);
+
+        // ── Read PDF → Base64 ───────────────────────────────────
+        let base64Data;
+        try {
+          base64Data = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              // DataURL = "data:application/pdf;base64,<DATA>"
+              // We only need the part after the comma
+              const comma = reader.result.indexOf(',');
+              resolve(reader.result.slice(comma + 1));
+            };
+            reader.onerror = () => reject(new Error('FileReader failed'));
+            reader.readAsDataURL(pdfFile);
+          });
+        } catch (err) {
+          showToast('❌ Could not read the PDF file.');
+          console.error(err);
+          return;
+        }
+
+        // ── Build prompt ────────────────────────────────────────
+        const promptText =
+          'You are an expert Kerala Government office clerk who specialises in formal Malayalam official correspondence.\n' +
+          'Carefully read the attached incoming letter (it may be a scanned PDF image — use OCR vision to read it).\n' +
+          'Draft a complete formal official reply in Malayalam using the standard Kerala Government letter format:\n' +
+          '  • Opening: നമ്പർ, തീയതി, സ്വീകർത്താവ്\n' +
+          '  • സർ/മഹോദയ,\n' +
+          '  • വിഷയം / സൂചന\n' +
+          '  • Body paragraphs with proper text-indent\n' +
+          '  • Closing: വിശ്വാസപൂർവ്വം, signature block\n' +
+          'Use formal ഔദ്യോഗിക മലയാളം only. Do NOT add any English or markdown code fences.\n\n' +
+          'Points / Hints to include in the reply:\n' +
+          (hints || '(No specific hints — draft a suitable reply based on the letter content)');
+
+        // ── Gemini API payload ──────────────────────────────────
+        const payload = {
+          contents: [{
+            parts: [
+              { text: promptText },
+              {
+                inlineData: {
+                  mimeType: 'application/pdf',
+                  data: base64Data
+                }
+              }
+            ]
+          }],
+          generationConfig: {
+            temperature: 0.35,
+            maxOutputTokens: 2048
+          }
+        };
+
+        // ── Fetch Gemini ────────────────────────────────────────
+        let responseText;
+        try {
+          const apiUrl =
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' +
+            encodeURIComponent(apiKey);
+
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData?.error?.message || 'HTTP ' + res.status);
+          }
+
+          const data = await res.json();
+          responseText =
+            data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+          if (!responseText) throw new Error('Gemini returned an empty response.');
+
+        } catch (err) {
+          showToast('❌ Gemini Error: ' + err.message, 6000);
+          console.error('Gemini API error:', err);
+          return;
+        }
+
+        // ── Insert into TinyMCE ─────────────────────────────────
+        const htmlContent = geminiTextToHtml(responseText);
+        const ed = getEditor();
+        if (ed) {
+          ed.setContent(htmlContent);
+          updateWordCount();
+        }
+
+        closeAiModal();
+        showToast('✅ AI reply drafted! Review and edit before sending.', 4500);
+      });
 
     })();
   </script>
