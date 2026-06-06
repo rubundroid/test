@@ -269,6 +269,27 @@
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
     }
 
+    /* Voice Typing Active Button Style */
+    #btn-voice-typing.active {
+      background: #c00000;
+      color: #fff;
+      border-color: #8b0000;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+      animation: voicePulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes voicePulse {
+
+      0%,
+      100% {
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(192, 0, 0, 0.45);
+      }
+
+      50% {
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 0 6px rgba(192, 0, 0, 0);
+      }
+    }
+
     .ribbon-select {
       appearance: none;
       background: var(--btn-bg);
@@ -797,6 +818,7 @@
       <option value="typeit" selected>TypeIn / ISM</option>
       <option value="windows">Windows InScript</option>
     </select>
+    <button class="btn" id="btn-voice-typing" title="Voice Typing (Malayalam)">🎤 Voice: OFF</button>
     <div class="ribbon-sep"></div>
 
     <!-- Save to LocalStorage -->
@@ -2746,6 +2768,187 @@
     btnCloseInstall.addEventListener('click', () => {
       installPopup.classList.remove('show');
     });
+    /* ══════════════════════════════════════
+       VOICE TYPING  (Speech-to-Text, ml-IN)
+    ══════════════════════════════════════ */
+    (function () {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let voiceActive = false;
+      let recognition = null;
+
+      // ── Track last-focused surface (TinyMCE body vs Float-box) ─────────
+      let _vTarget = 'tinymce';   // 'tinymce' | 'floatbox'
+      let _vFloat = null;        // the focused float-box element
+      let _vRange = null;        // last saved cursor Range inside float-box
+
+      // Wait for TinyMCE to initialise, then attach iframe focus hooks
+      (function waitAndHook() {
+        const ed = tinymce.get('the-editor');
+        if (ed && ed.initialized) {
+          attachFocusHooks(ed);
+        } else {
+          const iv = setInterval(() => {
+            const e = tinymce.get('the-editor');
+            if (e && e.initialized) { clearInterval(iv); attachFocusHooks(e); }
+          }, 150);
+        }
+      })();
+
+      function attachFocusHooks(ed) {
+        const iDoc = ed.getDoc();
+
+        // Detect whether a float-box or the main editor body gained focus
+        iDoc.addEventListener('focusin', (e) => {
+          const el = e.target;
+          if (el && el.getAttribute && el.getAttribute('data-float-box') === 'true') {
+            _vTarget = 'floatbox';
+            _vFloat = el;
+            _vRange = null;          // fresh; selectionchange will populate
+          } else {
+            _vTarget = 'tinymce';
+            _vFloat = null;
+            _vRange = null;
+          }
+        });
+
+        // Continuously snapshot the cursor inside a float-box so we can
+        // restore it even after the ribbon button steals main-frame focus
+        iDoc.addEventListener('selectionchange', () => {
+          if (_vTarget !== 'floatbox' || !_vFloat) return;
+          const sel = iDoc.defaultView.getSelection();
+          if (sel && sel.rangeCount) {
+            _vRange = sel.getRangeAt(0).cloneRange();
+          }
+        });
+      }
+
+      // ── Button wiring ─────────────────────────────────────────────────
+      const btn = document.getElementById('btn-voice-typing');
+
+      btn.addEventListener('click', () => {
+        // Browser support check
+        if (!SpeechRecognition) {
+          showToast('⚠️ Voice typing is only supported in Google Chrome or Edge.');
+          return;
+        }
+        voiceActive = !voiceActive;
+        if (voiceActive) {
+          startVoice();
+          btn.classList.add('active');
+          btn.textContent = '🎤 Listening...';
+          showToast('🎤 Voice typing ON — Malayalam (ml-IN)');
+        } else {
+          stopVoice();
+          btn.classList.remove('active');
+          btn.textContent = '🎤 Voice: OFF';
+          showToast('🔇 Voice typing OFF');
+        }
+      });
+
+      // ── Recognition lifecycle ─────────────────────────────────────────
+      function startVoice() {
+        if (recognition) { try { recognition.abort(); } catch (_) { } }
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ml-IN';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = (ev) => {
+          // Use resultIndex so multi-result batches are handled correctly
+          for (let i = ev.resultIndex; i < ev.results.length; i++) {
+            if (ev.results[i].isFinal) {
+              insertVoiceText(ev.results[i][0].transcript + ' ');
+            }
+          }
+        };
+
+        recognition.onerror = (ev) => {
+          console.warn('SpeechRecognition error:', ev.error);
+          if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') {
+            // Hard stop — mic permission denied
+            voiceActive = false;
+            btn.classList.remove('active');
+            btn.textContent = '🎤 Voice: OFF';
+            recognition = null;
+            showToast('⚠️ Microphone access denied. Please allow mic in browser settings.');
+          }
+          // Transient errors (network, no-speech, audio-capture) — onend
+          // will auto-restart if voiceActive is still true
+        };
+
+        // Auto-restart on natural pause / service timeout
+        recognition.onend = () => {
+          if (voiceActive) {
+            try { recognition.start(); } catch (_) { }
+          }
+        };
+
+        try { recognition.start(); } catch (_) { }
+      }
+
+      function stopVoice() {
+        voiceActive = false;
+        if (recognition) {
+          try { recognition.abort(); } catch (_) { }
+          recognition = null;
+        }
+      }
+
+      // ── Insertion (dual surface support) ──────────────────────────────
+      function insertVoiceText(text) {
+        if (_vTarget === 'floatbox' && _vFloat && _vFloat.isConnected) {
+          insertInFloatBox(text);
+        } else {
+          insertInTinyMCE(text);
+        }
+      }
+
+      function insertInTinyMCE(text) {
+        const ed = getEditor();
+        if (!ed) return;
+        ed.focus();
+        ed.insertContent(text);
+      }
+
+      function insertInFloatBox(text) {
+        const box = _vFloat;
+        const ed = getEditor();
+        const iDoc = ed ? ed.getDoc() : null;
+        if (!iDoc) { insertInTinyMCE(text); return; }
+
+        // Re-focus the box (it lost focus when user clicked the ribbon btn)
+        box.focus();
+        const win = iDoc.defaultView;
+        const sel = win.getSelection();
+
+        // Restore the last saved cursor position if available
+        let range;
+        if (_vRange) {
+          range = _vRange.cloneRange();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else if (sel && sel.rangeCount) {
+          range = sel.getRangeAt(0);
+        } else {
+          // Fallback: append at end of float-box
+          range = iDoc.createRange();
+          range.selectNodeContents(box);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+
+        range.deleteContents();
+        const node = iDoc.createTextNode(text);
+        range.insertNode(node);
+        range.setStartAfter(node);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        _vRange = range.cloneRange();   // save for next spoken word
+      }
+
+    })();
   </script>
   <script>
     // Service Worker Registration
