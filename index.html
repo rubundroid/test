@@ -1150,7 +1150,7 @@
   <div class="modal-overlay" id="ai-draft-modal">
     <div class="modal">
       <div class="modal-header">
-        <span>🤖 AI Reply Generator (Gemini 1.5 Flash)</span>
+        <span>🤖 AI Reply Generator </span>
         <button class="modal-close" id="ai-draft-modal-close" title="Close">✕</button>
       </div>
       <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
@@ -1172,17 +1172,7 @@
             style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; resize:vertical; outline:none; transition:border-color 0.15s;"
             placeholder="e.g.&#10;- Reply is approved&#10;- Forward to District Office by 15th&#10;- Attach originals&#10;(Leave blank to let AI decide)"></textarea>
         </div>
-        <div>
-          <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
-            🔑 Gemini API Key
-          </label>
-          <input type="password" id="ai-draft-apikey"
-            style="width:100%; border:1px solid #bbb; border-radius:4px; padding:6px 10px; font-size:0.85rem; outline:none; transition:border-color 0.15s;"
-            placeholder="AIza…" autocomplete="off" />
-          <div style="font-size:0.72rem; color:#888; margin-top:3px;">
-            Saved locally in your browser. Never sent anywhere except Google's API.
-          </div>
-        </div>
+
       </div>
       <div class="modal-footer">
         <button class="btn btn-gold" id="ai-draft-generate-btn" style="min-width:140px; justify-content:center;">
@@ -3004,13 +2994,10 @@
        AI DRAFT – GEMINI 1.5 FLASH INTEGRATION
     ══════════════════════════════════════ */
     (function () {
-      const GEMINI_LS_KEY = 'edraft_gemini_api_key';
       const modal = document.getElementById('ai-draft-modal');
 
       // ── Open modal ─────────────────────────────────────────────
       document.getElementById('btn-ai-draft').addEventListener('click', () => {
-        document.getElementById('ai-draft-apikey').value =
-          localStorage.getItem(GEMINI_LS_KEY) || '';
         document.getElementById('ai-draft-pdf-input').value = '';
         // Don't clear hints — user may want to re-use them
         modal.classList.add('open');
@@ -3245,21 +3232,14 @@
 
       // ── Generate button ────────────────────────────────────────
       document.getElementById('ai-draft-generate-btn').addEventListener('click', async () => {
-        const apiKey = document.getElementById('ai-draft-apikey').value.trim();
         const hints = document.getElementById('ai-draft-hints').value.trim();
         const fileInp = document.getElementById('ai-draft-pdf-input');
         const pdfFile = fileInp.files[0];
 
         // ── Validation ──────────────────────────────────────────
-        if (!apiKey) {
-          showToast('⚠️ Please enter your Gemini API Key.'); return;
-        }
         if (!pdfFile) {
           showToast('⚠️ Please select the incoming letter PDF.'); return;
         }
-
-        // ── Persist API key ─────────────────────────────────────
-        localStorage.setItem(GEMINI_LS_KEY, apiKey);
 
         // ── Loading toast (long duration) ───────────────────────
         showToast('⏳ AI is reading the scanned letter and drafting…', 60000);
@@ -3298,71 +3278,33 @@
           'Points / Hints to include in the reply:\n' +
           (hints || '(No specific hints — draft a suitable reply based on the letter content)');
 
-        // ── Gemini API payload ──────────────────────────────────
-        // ── Gemini API payload ──────────────────────────────────
-        const payload = {
-          contents: [{
-            parts: [
-              { text: promptText + "\n\nCRITICAL INSTRUCTION: You MUST generate the ENTIRE letter from start to end. Do not stop halfway." },
-              {
-                inlineData: {
-                  mimeType: 'application/pdf',
-                  data: base64Data
-                }
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.35,
-            maxOutputTokens: 8192 // 🌟 ടോക്കൺ ലിമിറ്റ് പരമാവധി കൂട്ടി 🌟
-          },
-          safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-          ]
-        };
-
-        // ── Fetch Gemini ────────────────────────────────────────
+        // ── Backend API call ────────────────────────────────────
         let responseText = '';
         try {
-          const apiUrl =
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=' +
-            encodeURIComponent(apiKey);
-
-          const res = await fetch(apiUrl, {
+          const res = await fetch('https://edraft-backend.onrender.com/api/generate-draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ promptText, pdfBase64: base64Data })
           });
 
           if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
-            throw new Error(errData?.error?.message || 'HTTP ' + res.status);
+            throw new Error(errData?.error || 'HTTP ' + res.status);
           }
 
           const data = await res.json();
-          const candidate = data?.candidates?.[0];
+          responseText = data.text || '';
 
-          if (!candidate) throw new Error('Gemini returned an empty response.');
-
-          // 🌟 മറുപടിയുടെ എല്ലാ ഭാഗങ്ങളും (Chunks) ഒരുമിച്ച് ചേർക്കുന്നു 🌟
-          if (candidate.content && candidate.content.parts) {
-            responseText = candidate.content.parts.map(p => p.text || '').join('');
-          }
-
-          // 🌟 എന്തുകൊണ്ടാണ് നിന്നത് എന്ന് സ്ക്രീനിൽ കാണിക്കാൻ 🌟
-          if (candidate.finishReason && candidate.finishReason !== 'STOP') {
-            console.warn("Stopped due to:", candidate.finishReason);
-            showToast('⚠️ AI പാതിവഴിയിൽ നിർത്തി! കാരണം: ' + candidate.finishReason, 6000);
+          if (data.finishReason && data.finishReason !== 'STOP' && data.finishReason !== 'UNKNOWN') {
+            console.warn('Stopped due to:', data.finishReason);
+            showToast('⚠️ AI പാതിവഴിയിൽ നിർത്തി! കാരണം: ' + data.finishReason, 6000);
           }
 
           if (!responseText) throw new Error('No text generated.');
 
         } catch (err) {
-          showToast('❌ Gemini Error: ' + err.message, 6000);
-          console.error('Gemini API error:', err);
+          showToast('❌ AI Error: ' + err.message, 6000);
+          console.error('Backend API error:', err);
           return;
         }
 
