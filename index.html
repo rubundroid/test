@@ -3111,10 +3111,11 @@
           (hints || '(No specific hints — draft a suitable reply based on the letter content)');
 
         // ── Gemini API payload ──────────────────────────────────
+        // ── Gemini API payload ──────────────────────────────────
         const payload = {
           contents: [{
             parts: [
-              { text: promptText },
+              { text: promptText + "\n\nCRITICAL INSTRUCTION: You MUST generate the ENTIRE letter from start to end. Do not stop halfway." },
               {
                 inlineData: {
                   mimeType: 'application/pdf',
@@ -3125,12 +3126,18 @@
           }],
           generationConfig: {
             temperature: 0.35,
-            maxOutputTokens: 2048
-          }
+            maxOutputTokens: 8192 // 🌟 ടോക്കൺ ലിമിറ്റ് പരമാവധി കൂട്ടി 🌟
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+          ]
         };
 
         // ── Fetch Gemini ────────────────────────────────────────
-        let responseText;
+        let responseText = '';
         try {
           const apiUrl =
             'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=' +
@@ -3148,10 +3155,22 @@
           }
 
           const data = await res.json();
-          responseText =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          const candidate = data?.candidates?.[0];
 
-          if (!responseText) throw new Error('Gemini returned an empty response.');
+          if (!candidate) throw new Error('Gemini returned an empty response.');
+
+          // 🌟 മറുപടിയുടെ എല്ലാ ഭാഗങ്ങളും (Chunks) ഒരുമിച്ച് ചേർക്കുന്നു 🌟
+          if (candidate.content && candidate.content.parts) {
+            responseText = candidate.content.parts.map(p => p.text || '').join('');
+          }
+
+          // 🌟 എന്തുകൊണ്ടാണ് നിന്നത് എന്ന് സ്ക്രീനിൽ കാണിക്കാൻ 🌟
+          if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+            console.warn("Stopped due to:", candidate.finishReason);
+            showToast('⚠️ AI പാതിവഴിയിൽ നിർത്തി! കാരണം: ' + candidate.finishReason, 6000);
+          }
+
+          if (!responseText) throw new Error('No text generated.');
 
         } catch (err) {
           showToast('❌ Gemini Error: ' + err.message, 6000);
