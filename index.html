@@ -3021,7 +3021,195 @@
       document.getElementById('ai-draft-modal-close').addEventListener('click', closeAiModal);
       document.getElementById('ai-draft-cancel-btn').addEventListener('click', closeAiModal);
       modal.addEventListener('click', e => { if (e.target === modal) closeAiModal(); });
+      // ══════════════════════════════════════
+      // TEXTAREA MANGLISH TRANSLITERATION
+      // Target: #ai-draft-hints
+      // Reuses globals: isMalayalamEnabled, fetchMalayalam,
+      //   fetchMalayalamSuggestions, hideMLDropdown,
+      //   mlSuggestions, mlCurrentWord, mlDropdownVisible,
+      //   mlHighlightedIndex, mlDebounceTimer
+      // NOTE: Does NOT use Selection/Range API.
+      //       Uses textarea.selectionStart / selectionEnd instead.
+      // ══════════════════════════════════════
+      (function () {
+        const ta = document.getElementById('ai-draft-hints');
 
+        // Tracks whether the live #ml-dropdown was spawned by this
+        // textarea — prevents interference with TinyMCE's dropdown.
+        let taOwnsDropdown = false;
+
+        /* ── { word, start, end } of the English token immediately
+              before the caret, or null if none ──────────────────── */
+        function taGetWordBeforeCursor() {
+          const pos = ta.selectionStart;
+          const m = ta.value.slice(0, pos).match(/([a-zA-Z]+)$/);
+          if (!m) return null;
+          return { word: m[1], start: pos - m[1].length, end: pos };
+        }
+
+        /* ── Substitute the English token with mlWord and park the
+              caret immediately after it ──────────────────────────── */
+        function taReplaceWord(mlWord, addSpace = false) {
+          const match = taGetWordBeforeCursor();
+          if (!match || !mlWord) { hideMLDropdown(); taOwnsDropdown = false; return; }
+          const insert = addSpace ? mlWord + ' ' : mlWord;
+          ta.value = ta.value.slice(0, match.start) + insert + ta.value.slice(match.end);
+          ta.selectionStart = ta.selectionEnd = match.start + insert.length;
+          ta.focus();
+          hideMLDropdown();
+          taOwnsDropdown = false;
+        }
+
+        /* ── Rebuild the #ml-dropdown list, wiring clicks to
+              taReplaceWord instead of the Range-based
+              selectMLSuggestion used by TinyMCE / float-boxes ───── */
+        function taRenderDropdown() {
+          const dd = document.getElementById('ml-dropdown');
+          dd.innerHTML = mlSuggestions.map((s, i) =>
+            `<div class="ml-item${i === mlHighlightedIndex ? ' ml-active' : ''}"
+                  data-idx="${i}">${s}</div>`
+          ).join('');
+          dd.querySelectorAll('.ml-item').forEach(el =>
+            el.addEventListener('mousedown', ev => {
+              ev.preventDefault();   // keep textarea focused
+              taReplaceWord(mlSuggestions[parseInt(el.dataset.idx)]);
+            })
+          );
+        }
+
+        /* ── Show the dropdown anchored to the bottom-left of the
+              textarea (simple, reliable, no caret-pixel math) ────── */
+        function taShowDropdown(suggestions) {
+          if (!suggestions.length) { hideMLDropdown(); return; }
+          mlSuggestions = suggestions;
+          mlHighlightedIndex = 0;
+          mlDropdownVisible = true;
+          taOwnsDropdown = true;
+          taRenderDropdown();
+
+          const dd = document.getElementById('ml-dropdown');
+          const rect = ta.getBoundingClientRect();
+          let top = rect.bottom + 5;
+          let left = rect.left;
+          // Flip above if the dropdown would overflow the viewport bottom
+          if (top + 220 > window.innerHeight) top = rect.top - 225;
+          if (left + 220 > window.innerWidth - 8) left = window.innerWidth - 228;
+          dd.style.top = Math.max(0, top) + 'px';
+          dd.style.left = Math.max(0, left) + 'px';
+          dd.classList.add('ml-visible');
+        }
+
+        /* ════════════════════════════════════════
+           KEYDOWN — navigation must preventDefault
+           so the browser never inserts the key
+        ════════════════════════════════════════ */
+        ta.addEventListener('keydown', e => {
+          if (!isMalayalamEnabled || !mlDropdownVisible || !taOwnsDropdown) return;
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            mlHighlightedIndex = Math.min(mlHighlightedIndex + 1, mlSuggestions.length - 1);
+            taRenderDropdown();
+
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            mlHighlightedIndex = Math.max(mlHighlightedIndex - 1, 0);
+            taRenderDropdown();
+
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            taReplaceWord(mlSuggestions[mlHighlightedIndex]);
+
+          } else if (e.key === ' ') {
+            // Confirm selection and append a real space character
+            e.preventDefault();
+            taReplaceWord(mlSuggestions[mlHighlightedIndex], true);
+
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            hideMLDropdown(); taOwnsDropdown = false;
+          }
+        });
+
+        /* ════════════════════════════════════════
+           KEYUP — spacebar transliteration + live
+           suggestion debounce
+        ════════════════════════════════════════ */
+        ta.addEventListener('keyup', async e => {
+          if (!isMalayalamEnabled) {
+            if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+            return;
+          }
+          // Navigation was already fully handled in keydown
+          if (['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(e.key)) return;
+
+          /* ── Space: transliterate the English word before cursor ── */
+          if (e.key === ' ') {
+            // When the dropdown handled Space in keydown, e.preventDefault()
+            // was called → the browser inserted nothing → ta.value already
+            // contains the Malayalam word (not English) → the regex below
+            // won't match → safely falls through with no double-replacement.
+            const pos = ta.selectionStart;
+            const m = ta.value.slice(0, pos).match(/([a-zA-Z]+)(\s+)$/);
+            if (!m) return;                          // nothing English to replace
+
+            const engWord = m[1];
+            const spaces = m[2];
+            const wordStart = pos - engWord.length - spaces.length;
+
+            const mlWord = await fetchMalayalam(engWord);
+            if (mlWord) {
+              const before = ta.value.slice(0, wordStart);
+              const after = ta.value.slice(wordStart + engWord.length);
+              ta.value = before + mlWord + after;
+              ta.selectionStart = ta.selectionEnd =
+                Math.min(wordStart + mlWord.length + spaces.length, ta.value.length);
+              ta.focus();
+            }
+            return;
+          }
+
+          if (e.key === 'Backspace' || e.key === 'Delete') {
+            if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+            return;
+          }
+
+          /* ── Letter: debounced live-suggestion fetch ──────────── */
+          if (/^[a-zA-Z]$/.test(e.key)) {
+            const match = taGetWordBeforeCursor();
+            if (!match) { if (taOwnsDropdown) hideMLDropdown(); return; }
+
+            const word = match.word;
+            mlCurrentWord = word;
+            if (taOwnsDropdown) hideMLDropdown();    // clear stale dropdown
+            taOwnsDropdown = false;
+
+            clearTimeout(mlDebounceTimer);
+            mlDebounceTimer = setTimeout(async () => {
+              if (mlCurrentWord !== word) return;    // user typed more; result is stale
+              const suggestions = await fetchMalayalamSuggestions(word);
+              if (mlCurrentWord === word && suggestions.length) {
+                taShowDropdown(suggestions);
+              } else if (taOwnsDropdown) {
+                hideMLDropdown(); taOwnsDropdown = false;
+              }
+            }, 280);
+            return;
+          }
+
+          // Any other key (punctuation, Tab, etc.): close dropdown
+          if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+        });
+
+        /* ── BLUR: dismiss dropdown, but delay 150 ms so a mousedown
+              on a dropdown item fires and completes first ────────── */
+        ta.addEventListener('blur', () => {
+          setTimeout(() => {
+            if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+          }, 150);
+        });
+
+      })(); // end: textarea transliteration IIFE
       // ── Convert Gemini's markdown text to styled HTML ──────────
       function geminiTextToHtml(text) {
         const pStyle =
