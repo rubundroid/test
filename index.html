@@ -3425,18 +3425,88 @@
         }
 
         // ── Build prompt ────────────────────────────────────────
+        const todayDate = new Date()
+          .toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+          .replace(/\//g, '-');                    // → "DD-MM-YYYY"
+
         const promptText =
-          'You are an expert Kerala Government office clerk who specialises in formal Malayalam official correspondence.\n' +
-          'Carefully read the attached incoming letter (it may be a scanned PDF image — use OCR vision to read it).\n' +
-          'Draft a complete formal official reply in Malayalam using the standard Kerala Government letter format:\n' +
-          '  • Opening: നമ്പർ, തീയതി, സ്വീകർത്താവ്\n' +
-          '  • സർ/മഹോദയ,\n' +
-          '  • വിഷയം / സൂചന\n' +
-          '  • Body paragraphs with proper text-indent\n' +
-          '  • Closing: വിശ്വാസപൂർവ്വം, signature block\n' +
-          'Use formal ഔദ്യോഗിക മലയാളം only. Do NOT add any English or markdown code fences.\n\n' +
-          'Points / Hints to include in the reply:\n' +
-          (hints || '(No specific hints — draft a suitable reply based on the letter content)');
+          // ─── ROLE + TASK ──────────────────────────────────────
+          'You are an expert Kerala Government office assistant. Your ONLY task is to output a ' +
+          'complete formal reply letter in ഔദ്യോഗിക മലയാളം. ' +
+          'Output the letter body ONLY — no preamble, no commentary, no explanations.\n\n' +
+
+          // ─── STEP 1: READ THE INCOMING LETTER ─────────────────
+          'STEP 1 — READ THE MAIN LETTER:\n' +
+          'Carefully read the main (⭐) PDF. If it is a scanned image, use OCR/vision to read it. Extract:\n' +
+          '  (a) SENDER of the incoming letter — name, designation, institution, full address.\n' +
+          '  (b) RECIPIENT of the incoming letter — name, designation, institution, full address.\n' +
+          '  (c) Reference letter number and its date.\n' +
+          '  (d) Subject/purpose of the letter.\n\n' +
+
+          // ─── STEP 2: DRAFT THE REPLY ──────────────────────────
+          'STEP 2 — DRAFT THE REPLY:\n' +
+          'In a reply letter, the original RECIPIENT becomes the new SENDER (പ്രേഷകൻ), ' +
+          'and the original SENDER becomes the new RECIPIENT (സ്വീകർത്താവ്).\n\n' +
+          'Produce the output in EXACTLY the structure below.\n' +
+          'Put exactly ONE blank line (empty line) between every block.\n' +
+          'Within an address block, use single newlines — NO blank lines between address lines.\n\n' +
+
+          // ─── EXACT LETTER STRUCTURE ───────────────────────────
+          '**ഭരണഭാഷ – മാതൃഭാഷ**\n\n' +
+
+          'നമ്പർ: [Construct a logical reply letter number from the reference series]\n' +
+          'തീയതി: ' + todayDate + '\n\n' +
+
+          'പ്രേഷകൻ\n' +
+          '[Name of the Reply Sender — originally the Recipient of the incoming letter]\n' +
+          '[Designation]\n' +
+          '[Institution]\n' +
+          '[Place/Town]\n\n' +
+
+          'സ്വീകർത്താവ്\n' +
+          '[Name of the Reply Recipient — originally the Sender of the incoming letter]\n' +
+          '[Designation]\n' +
+          '[Institution]\n' +
+          '[Full office address with PIN code]\n\n' +
+
+          'സർ,\n\n' +
+
+          '**വിഷയം:** [One concise formal Malayalam sentence clearly stating the subject of this reply]\n\n' +
+
+          '**സൂചന:** [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 dated 01-06-2026"]\n\n' +
+
+          '[Body Paragraph 1: Open formally, e.g. "സൂചന കത്തിലെ നിർദ്ദേശപ്രകാരം..." — ' +
+          'link the subject and the reference letter in one or two sentences.]\n\n' +
+
+          '[Body Paragraph 2 onwards: Incorporate the hints provided below. ' +
+          'Each paragraph separated by a blank line. Maintain formal ഔദ്യോഗിക മലയാളം throughout.]\n\n' +
+
+          'മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.\n\n' +
+
+          'വിശ്വാസപൂർവ്വം,\n\n' +
+
+          '(ഒപ്പ്)\n' +
+          '[Full Name of the Reply Sender]\n' +
+          '[Designation]\n' +
+          '[Institution]\n' +
+          '[Place]\n\n' +
+
+          'ഉള്ളടക്കം: [List enclosures if relevant; omit this entire line if there are none]\n\n' +
+
+          // ─── STRICT OUTPUT RULES ──────────────────────────────
+          'STRICT RULES — follow all of these without exception:\n' +
+          '1. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
+          '2. Do NOT wrap output in code fences (``` or ~~~).\n' +
+          '3. Use **double asterisks** ONLY for the top header line AND the labels "വിഷയം:" and "സൂചന:". Nowhere else.\n' +
+          '4. Do NOT use # headings anywhere.\n' +
+          '5. Exactly ONE blank line between each block/section of the letter.\n' +
+          '6. Within any address block — single newlines only, no blank lines between address lines.\n' +
+          '7. The closing line ("മേൽവിവരം...") MUST appear immediately before "വിശ്വാസപൂർവ്വം,".\n' +
+          '8. Output the letter ONLY — no preamble like "Here is the letter:" or any explanation.\n\n' +
+
+          // ─── USER HINTS ───────────────────────────────────────
+          'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
+          (hints || '(No specific hints provided — draft a contextually appropriate and complete body based on the letter content.)');
 
         // ── Backend API call ────────────────────────────────────
         let responseText = '';
