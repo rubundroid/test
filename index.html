@@ -253,6 +253,98 @@
       background: #8b6508;
     }
 
+    /* ══════════════════════════════════════
+       GEMINI GLOW AI BUTTON (Compact Size)
+    ══════════════════════════════════════ */
+    .btn-ai-glow {
+      position: relative;
+      background: transparent !important;
+      border: 1px solid #dfe1e5;
+      padding: 5px 18px;
+      /* ഹൈറ്റ് കുറയ്ക്കാൻ padding കുറച്ചു */
+      width: max-content;
+      /* ടെക്സ്റ്റിനൊപ്പം മാത്രം നീളം നിൽക്കാൻ */
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 1;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ⚪ വെള്ള നിറമുള്ള ഉൾഭാഗം */
+    .btn-ai-glow::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      border-radius: 20px;
+      z-index: -1;
+    }
+
+    /* 🌈 ആനിമേറ്റഡ് ഗ്ലോ ഷാഡോ (പുറത്ത് മാത്രം) */
+    .btn-ai-glow::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(90deg, #4285F4, #34A853, #FBBC05, #EA4335, #4285F4);
+      background-size: 200% 200%;
+      border-radius: 22px;
+      filter: blur(5px);
+      z-index: -2;
+      animation: geminiBgAnimate 3s linear infinite;
+      opacity: 0.7;
+      transition: opacity 0.2s, filter 0.2s;
+    }
+
+    .btn-ai-glow:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-ai-glow:hover::after {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-ai-glow:hover::before {
+      filter: blur(8px);
+      opacity: 1;
+    }
+
+    /* ✨ ടെക്സ്റ്റിനുള്ള ഗൂഗിൾ കളർ ആനിമേഷൻ */
+    .gemini-text {
+      background: linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853, #4285F4);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      /* ടെക്സ്റ്റിൽ മാത്രം കളർ വരാൻ */
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      font-size: 0.95rem;
+      font-family: inherit;
+      animation: geminiTextAnimate 3s linear infinite;
+    }
+
+    @keyframes geminiBgAnimate {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      100% {
+        background-position: 200% 50%;
+      }
+    }
+
+    @keyframes geminiTextAnimate {
+      0% {
+        background-position: 0% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
     /* Malayalam Active Button Style */
     #btn-ml-toggle.active {
       background: var(--success);
@@ -801,27 +893,15 @@
 ══════════════════════════════════════ -->
   <div id="ribbon">
 
-    <!-- Templates -->
-    <select class="ribbon-select" id="template-select" title="Load a template">
-      <option value="">📄 Templates…</option>
-      <option value="keralaGovtOfficialLetter">Kerala Govt. Official Letter (Malayalam)</option>
-      <option value="geriatric-camp">covering letter</option>
-    </select>
-
-    <!-- 🌟 പുതിയ മലയാളം ടൈപ്പിംഗ് ബട്ടൺ 🌟 -->
-    <button class="btn" id="btn-ml-toggle" title="Manglish to Malayalam Typing (Press Space)">
-      മലയാളം: OFF
+    <!-- ── Group 1: File Operations ────────────────────────────── -->
+    <button class="btn" id="btn-open-file" title="Open .edraft / .txt / .html file">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+      </svg>
+      Open File
     </button>
-    <button class="btn" id="btn-inscript-toggle"
-      title="InScript Malayalam Keyboard (Kerala ISM/InScript layout)">InScript: OFF</button>
-    <select id="inscript-layout-select" class="ribbon-select" title="InScript keyboard layout">
-      <option value="typeit" selected>TypeIn / ISM</option>
-      <option value="windows">Windows InScript</option>
-    </select>
-    <button class="btn" id="btn-voice-typing" title="Voice Typing (Malayalam)">🎤 Voice: OFF</button>
-    <div class="ribbon-sep"></div>
+    <input type="file" id="file-open-input" accept=".edraft,.txt,.html,.json" style="display:none" />
 
-    <!-- Save to LocalStorage -->
     <button class="btn btn-success" id="btn-save-local" title="Save to browser (LocalStorage)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -831,7 +911,6 @@
       Save Draft
     </button>
 
-    <!-- Download file -->
     <button class="btn" id="btn-download" title="Download as .edraft file">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -841,40 +920,6 @@
       Download
     </button>
 
-    <!-- Open file -->
-    <button class="btn" id="btn-open-file" title="Open .edraft / .txt / .html file">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-      </svg>
-      Open File
-    </button>
-    <input type="file" id="file-open-input" accept=".edraft,.txt,.html,.json" style="display:none" />
-
-    <div class="ribbon-sep"></div>
-
-    <!-- Image -->
-    <button class="btn" id="btn-insert-image" title="Insert image (embedded as Base64)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="8.5" cy="8.5" r="1.5" />
-        <polyline points="21 15 16 10 5 21" />
-      </svg>
-      Image
-    </button>
-    <input type="file" id="file-image-input" accept="image/*" style="display:none" />
-
-    <!-- Copy plain text -->
-    <button class="btn" id="btn-copy-text" title="Copy plain text to clipboard">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <rect x="9" y="9" width="13" height="13" rx="2" />
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-      </svg>
-      Copy Text
-    </button>
-
-    <div class="ribbon-sep"></div>
-
-    <!-- Clear -->
     <button class="btn btn-danger" id="btn-clear" title="Clear all content">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <polyline points="3 6 5 6 21 6" />
@@ -888,7 +933,48 @@
 
     <div class="ribbon-sep"></div>
 
-    <!-- Floating Text Box Tool -->
+    <!-- ── Group 2: Templates ─────────────────────────────────── -->
+    <select class="ribbon-select" id="template-select" title="Load a template">
+      <option value="">📄 Templates…</option>
+      <option value="keralaGovtOfficialLetter">Kerala Govt. Official Letter (Malayalam)</option>
+      <option value="geriatric-camp">covering letter</option>
+    </select>
+
+    <div class="ribbon-sep"></div>
+
+    <!-- ── Group 3: Typing & Language ────────────────────────── -->
+    <button class="btn" id="btn-ml-toggle" title="Manglish to Malayalam Typing (Press Space)">
+      മലയാളം: OFF
+    </button>
+    <button class="btn" id="btn-inscript-toggle"
+      title="InScript Malayalam Keyboard (Kerala ISM/InScript layout)">InScript: OFF</button>
+    <select id="inscript-layout-select" class="ribbon-select" title="InScript keyboard layout">
+      <option value="typeit" selected>TypeIn / ISM</option>
+      <option value="windows">Windows InScript</option>
+    </select>
+    <button class="btn" id="btn-voice-typing" title="Voice Typing (Malayalam)">🎤 Voice: OFF</button>
+
+    <div class="ribbon-sep"></div>
+
+    <!-- ── Group 4: Insert & Tools ───────────────────────────── -->
+    <button class="btn" id="btn-insert-image" title="Insert image (embedded as Base64)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <polyline points="21 15 16 10 5 21" />
+      </svg>
+      Image
+    </button>
+    <input type="file" id="file-image-input" accept="image/*" style="display:none" />
+
+    <button class="btn" id="btn-copy-text" title="Copy plain text to clipboard">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <rect x="9" y="9" width="13" height="13" rx="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+      Copy Text
+    </button>
+
     <button class="btn" id="btn-add-floatbox"
       title="Click to activate, then click anywhere on the page to place a floating text box">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -899,7 +985,6 @@
       Add Floating Text
     </button>
 
-    <!-- Delete-mode toggle (🌟 Unhidden for easy access 🌟) -->
     <button class="btn" id="btn-delete-floatbox"
       title="Click to activate delete mode, then click a floating text box to remove it">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -912,9 +997,26 @@
       Delete Float Box
     </button>
 
-    <div class="ribbon-sep" id="hidden-sep" style="display: none;"></div>
+    <div class="ribbon-sep"></div>
 
-    <!-- 🌟 Margins Button (Hidden initially, moved to MenuBar by JS) -->
+    <!-- ── Group 5: AI Magic  ·  Group 6: Stats (pushed right) ── -->
+    <div
+      style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative; margin-top: 5px; margin-bottom: 2px;">
+
+      <button class="btn-ai-glow" id="btn-ai-draft">
+        <span class="gemini-text">✨ Ask to AI eDraft ✨</span>
+      </button>
+
+      <div
+        style="position: absolute; right: 0; display: flex; align-items: center; gap: 6px; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; color: #0369a1;"
+        title="Total Visitors">
+        👁️ Visitors: <span id="count-value" style="color: #0c4a6e; font-size: 0.85rem; font-weight: 700;">...</span>
+      </div>
+
+    </div>
+
+    <!-- Hidden utility buttons (JS-managed via getElementById – do not remove) -->
+    <div class="ribbon-sep" id="hidden-sep" style="display: none;"></div>
     <button class="btn" id="btn-margins" title="Set Page Margins" style="display:none;">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <rect x="3" y="3" width="18" height="18" rx="1" />
@@ -925,8 +1027,6 @@
       </svg>
       Margins ▾
     </button>
-
-    <!-- 🌟 Orientation Button (Hidden initially, moved to MenuBar by JS) -->
     <button class="btn" id="btn-orientation" title="Page Orientation" style="display:none;">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <rect x="4" y="2" width="10" height="14" rx="1" />
@@ -934,13 +1034,7 @@
       </svg>
       Orientation ▾
     </button>
-    <div class="ribbon-sep"></div>
-    <button class="btn btn-gold" id="btn-ai-draft">🤖 AI Draft</button>
-    <div
-      style="margin-left: auto; display: flex; align-items: center; gap: 6px; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; color: #0369a1;"
-      title="Total Visitors">
-      👁️ Visitors: <span id="count-value" style="color: #0c4a6e; font-size: 0.85rem; font-weight: 700;">...</span>
-    </div>
+
   </div>
 
 
