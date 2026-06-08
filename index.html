@@ -1156,13 +1156,16 @@
       <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
         <div>
           <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
-            📄 Incoming Letter (Scanned PDF)
+            📄 Incoming Letter + Reference PDFs
           </label>
-          <input type="file" id="ai-draft-pdf-input" accept=".pdf"
+          <input type="file" id="ai-draft-pdf-input" accept=".pdf" multiple
             style="width:100%; border:1px solid #bbb; border-radius:4px; padding:5px 8px; font-size:0.82rem; cursor:pointer;" />
           <div style="font-size:0.72rem; color:#888; margin-top:3px;">
-            Gemini reads the scanned PDF natively via Base64 — no pdf.js required.
+            Select one or more PDFs. Use the ⭐ radio to mark the <strong>Main Letter</strong>; others become Reference
+            Files.
           </div>
+          <ul id="ai-draft-file-list"
+            style="list-style:none; margin-top:8px; padding:0; display:flex; flex-direction:column; gap:5px;"></ul>
         </div>
         <div>
           <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
@@ -2999,6 +3002,7 @@
       // ── Open modal ─────────────────────────────────────────────
       document.getElementById('btn-ai-draft').addEventListener('click', () => {
         document.getElementById('ai-draft-pdf-input').value = '';
+        document.getElementById('ai-draft-file-list').innerHTML = '';
         // Don't clear hints — user may want to re-use them
         modal.classList.add('open');
       });
@@ -3230,36 +3234,98 @@
         }).join('\n');
       }
 
+      // ── File input → build role-selection list ─────────────────
+      document.getElementById('ai-draft-pdf-input').addEventListener('change', function () {
+        const list = document.getElementById('ai-draft-file-list');
+        list.innerHTML = '';
+        const files = Array.from(this.files);
+        if (!files.length) return;
+
+        files.forEach((file, idx) => {
+          const li = document.createElement('li');
+          li.style.cssText =
+            'display:flex;align-items:center;gap:8px;padding:6px 10px;' +
+            'background:#f5f8ff;border:1px solid #d0daf0;border-radius:4px;font-size:0.8rem;';
+
+          // One shared radio group — the checked item becomes "main"
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'ai-main-file';
+          radio.value = String(idx);
+          radio.checked = (idx === 0);
+          radio.title = 'Mark as Main Letter';
+          radio.style.cursor = 'pointer';
+
+          const nameSpan = document.createElement('span');
+          nameSpan.style.cssText =
+            'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#333;';
+          nameSpan.textContent = '📄 ' + file.name;
+
+          const badge = document.createElement('span');
+          badge.id = 'ai-file-badge-' + idx;
+          badge.style.cssText =
+            'font-size:0.7rem;padding:2px 7px;border-radius:10px;white-space:nowrap;' +
+            (idx === 0 ? 'background:#dce6f1;color:#1e4480;'
+              : 'background:#f0f0f0;color:#888;');
+          badge.textContent = idx === 0 ? '⭐ Main Letter' : '📎 Reference';
+
+          // Update all badges whenever selection changes
+          radio.addEventListener('change', () => {
+            Array.from(list.children).forEach((item, i) => {
+              const b = document.getElementById('ai-file-badge-' + i);
+              const r = list.querySelector(`input[name="ai-main-file"][value="${i}"]`);
+              if (!b || !r) return;
+              const isMain = r.checked;
+              b.textContent = isMain ? '⭐ Main Letter' : '📎 Reference';
+              b.style.background = isMain ? '#dce6f1' : '#f0f0f0';
+              b.style.color = isMain ? '#1e4480' : '#888';
+            });
+          });
+
+          li.appendChild(radio);
+          li.appendChild(nameSpan);
+          li.appendChild(badge);
+          list.appendChild(li);
+        });
+      });
+
       // ── Generate button ────────────────────────────────────────
       document.getElementById('ai-draft-generate-btn').addEventListener('click', async () => {
         const hints = document.getElementById('ai-draft-hints').value.trim();
         const fileInp = document.getElementById('ai-draft-pdf-input');
-        const pdfFile = fileInp.files[0];
+        const files = Array.from(fileInp.files);
 
         // ── Validation ──────────────────────────────────────────
-        if (!pdfFile) {
-          showToast('⚠️ Please select the incoming letter PDF.'); return;
+        if (!files.length) {
+          showToast('⚠️ Please select at least one PDF.'); return;
         }
 
-        // ── Loading toast (long duration) ───────────────────────
-        showToast('⏳ AI is reading the scanned letter and drafting…', 60000);
+        // Determine which file index is the Main Letter
+        const mainRadio = document.querySelector('input[name="ai-main-file"]:checked');
+        const mainIdx = mainRadio ? parseInt(mainRadio.value, 10) : 0;
 
-        // ── Read PDF → Base64 ───────────────────────────────────
-        let base64Data;
+        // ── Loading toast (long duration) ───────────────────────
+        showToast('⏳ AI is reading the letter(s) and drafting…', 60000);
+
+        // ── Read all PDFs → Base64 (parallel) ───────────────────
+        const toBase64 = file => new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result.slice(r.result.indexOf(',') + 1));
+          r.onerror = () => reject(new Error('FileReader failed for ' + file.name));
+          r.readAsDataURL(file);
+        });
+
+        let filesArray;
         try {
-          base64Data = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              // DataURL = "data:application/pdf;base64,<DATA>"
-              // We only need the part after the comma
-              const comma = reader.result.indexOf(',');
-              resolve(reader.result.slice(comma + 1));
-            };
-            reader.onerror = () => reject(new Error('FileReader failed'));
-            reader.readAsDataURL(pdfFile);
-          });
+          filesArray = await Promise.all(
+            files.map(async (file, idx) => ({
+              name: file.name,
+              data: await toBase64(file),
+              role: idx === mainIdx ? 'main' : 'ref'
+            }))
+          );
         } catch (err) {
-          showToast('❌ Could not read the PDF file.');
+          showToast('❌ Could not read a PDF file.');
           console.error(err);
           return;
         }
@@ -3284,7 +3350,7 @@
           const res = await fetch('https://edraft-backend.onrender.com/api/generate-draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ promptText, pdfBase64: base64Data })
+            body: JSON.stringify({ promptText, files: filesArray })
           });
 
           if (!res.ok) {
