@@ -3737,7 +3737,11 @@
           if (!responseText) throw new Error('No text generated.');
 
         } catch (err) {
-          showToast('❌ AI Error: ' + err.message, 6000);
+          if (err.message.includes('429') || err.message.includes('failed') || err.message.includes('503')) {
+            showToast('⚠️ സിസ്റ്റത്തിൽ ആളുകൾ കൂടുതലാണ് (Heavy Traffic). ദയവായി ഒരു മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.', 6000);
+          } else {
+            showToast('❌ AI Error: ' + err.message, 6000);
+          }
           console.error('Backend API error:', err);
           return;
         }
