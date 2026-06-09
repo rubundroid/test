@@ -1269,6 +1269,25 @@
             style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; resize:vertical; outline:none; transition:border-color 0.15s;"
             placeholder="e.g.&#10;- Reply is approved&#10;- Forward to District Office by 15th&#10;- Attach originals&#10;(Leave blank to let AI decide)"></textarea>
         </div>
+        <div style="margin-top:4px; padding:8px 12px; background:#f7f8fc; border:1px solid #dde3f0; border-radius:6px;">
+          <p
+            style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#888;">
+            ⚙️ Output Mode
+          </p>
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:#333;">
+            <input type="radio" name="draftMode" id="draftModePlain" value="plain" checked
+              style="accent-color:#c9a227; cursor:pointer;" />
+            ⚡ Plain Text Mode
+            <span style="color:#999; font-size:0.72rem;">(Faster, fewer API limits)</span>
+          </label>
+          <label
+            style="display:flex; align-items:center; gap:8px; margin-bottom:5px; cursor:pointer; font-size:0.82rem; color:#333;">
+            <input type="radio" name="draftMode" id="draftModeRich" value="rich"
+              style="accent-color:#c9a227; cursor:pointer;" />
+            🏛️ Rich Official Format
+            <span style="color:#999; font-size:0.72rem;">(Strict HTML layout, more tokens)</span>
+          </label>
+        </div>
 
       </div>
       <div class="modal-footer">
@@ -3327,7 +3346,17 @@
           return `<p style="${pStyle}">${html}</p>`;
         }).join('\n');
       }
-
+      function plainTextToEditorHtml(text) {
+        // Converts Gemini plain-text response → editor-safe HTML.
+        // Double newlines → <p> breaks; single \n → <br> within a paragraph.
+        return text
+          .trim()
+          .split(/\n{2,}/)
+          .map(para => para.trim())
+          .filter(para => para.length > 0)
+          .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
+          .join('\n');
+      }
       // ── File input → build role-selection list ─────────────────
       document.getElementById('ai-draft-pdf-input').addEventListener('change', function () {
         const list = document.getElementById('ai-draft-file-list');
@@ -3386,6 +3415,7 @@
       // ── Generate button ────────────────────────────────────────
       document.getElementById('ai-draft-generate-btn').addEventListener('click', async () => {
         const hints = document.getElementById('ai-draft-hints').value.trim();
+        const isPlainMode = document.getElementById('draftModePlain')?.checked === true;
         const fileInp = document.getElementById('ai-draft-pdf-input');
         const files = Array.from(fileInp.files);
 
@@ -3433,221 +3463,254 @@
         const isTransformation = hints &&
           /മാറ്റ|കൺവർട്ട്|അപ്ഡേറ്റ്|ആക്കി\s*മാറ്|change|convert|update|transform/i.test(hints);
 
-        const promptText = isTransformation
+        let promptText;
 
+        if (isPlainMode) {
           // ════════════════════════════════════════════════════════
-          // SCENARIO B — LETTER TRANSFORMATION / MONTH UPDATE
+          // PLAIN TEXT MODE — short token-efficient prompts
           // ════════════════════════════════════════════════════════
-          ? (
-            'You are an expert Kerala Government office assistant. Your ONLY task is to output a ' +
-            'TRANSFORMED version of the attached letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
-            'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
-            'no explanations, no code fences, no prose outside the HTML.\n\n' +
-
-            // ─── STEP 1: READ THE ORIGINAL LETTER ────────────────
-            'STEP 1 — READ THE ORIGINAL LETTER:\n' +
-            'Carefully read the main (⭐) PDF. If it is a scanned image, use OCR/vision to read it. ' +
-            'Extract the COMPLETE content including:\n' +
-            '  (a) Document/reference number (e.g. ഡി.എം.ഒ.പി.എം./684/2026-G1)\n' +
-            '  (b) Date of the letter\n' +
-            '  (c) ALL month names mentioned anywhere — in the header, subject, body, enclosures\n' +
-            '  (d) Sender (പ്രേഷകൻ) — full name, designation, institution, address\n' +
-            '  (e) Recipient (സ്വീകർത്താവ്) — full name, designation, institution, address\n' +
-            '  (f) Subject (വിഷയം) and Reference (സൂചന) lines\n' +
-            '  (g) Every body paragraph — word for word\n' +
-            '  (h) Closing, signature block, enclosures if any\n\n' +
-
-            // ─── STEP 2: IDENTIFY TARGET ──────────────────────────
-            'STEP 2 — IDENTIFY THE TRANSFORMATION TARGET from the user hints:\n' +
-            'Determine the new target month and/or year the user wants to switch to.\n' +
-            'Example: if hints say "ജൂൺ മാസത്തെ കത്താക്കി മാറ്റുക", target month = ജൂൺ.\n\n' +
-
-            // ─── STEP 3: TRANSFORM ────────────────────────────────
-            'STEP 3 — PRODUCE THE TRANSFORMED LETTER:\n' +
-            'Clone the original letter EXACTLY, then make ONLY these targeted substitutions:\n' +
-            '  • Replace every occurrence of the OLD month name with the NEW target month throughout.\n' +
-            '  • Update the letter DATE (തീയതി) to today: ' + todayDate + '\n' +
-            '  • If the reference/document number contains a month abbreviation, serial period, or ' +
-            '    financial-year segment that corresponds to the old month, update it logically.\n' +
-            '  • If body text references attendance, reports, lists, or statistics for the old month, ' +
-            '    update those month references to the new target month.\n' +
-            '  • Keep ALL other content IDENTICAL — same sender, same recipient, same subject structure, ' +
-            '    same body sentences (only month names substituted), same closing, same enclosures.\n\n' +
-
-            'Produce the output in EXACTLY the HTML structure shown in the TEMPLATE below.\n' +
-            'Each section MUST be its own <div> with the correct style="text-align:..." attribute.\n' +
-            'Within address blocks, use <br> for line breaks — no nested tags inside.\n\n' +
-
-            // ─── TEMPLATE ─────────────────────────────────────────
-            'OUTPUT TEMPLATE — fill with transformed content and output THIS HTML ONLY:\n\n' +
-
-            '<div style="text-align:center;"><strong>ഭരണഭാഷ – മാതൃഭാഷ</strong></div>\n' +
-
-            '<div style="text-align:left;">നമ്പർ: [Original reference number, with month/serial updated for new month if applicable]<br>' +
-            'തീയതി: ' + todayDate + '</div>\n' +
-
-            '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-            '[Sender — EXACTLY as in the original letter]<br>' +
-            '[Designation]<br>' +
-            '[Institution]<br>' +
-            '[Place/Town]</div>\n' +
-
-            '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-            '[Recipient — EXACTLY as in the original letter]<br>' +
-            '[Designation]<br>' +
-            '[Institution]<br>' +
-            '[Full address with PIN code]</div>\n' +
-
-            '<div style="text-align:left;">സർ,</div>\n' +
-
-            '<div style="text-align:justify;"><strong>വിഷയം:</strong> [Subject — EXACTLY as original, old month swapped to new target month if present]</div>\n' +
-
-            '<div style="text-align:justify;"><strong>സൂചന:</strong> [Reference — EXACTLY as original if present; OMIT this div entirely if absent in original]</div>\n' +
-
-            '[Each body paragraph in its OWN <div style="text-align:justify;">...</div> — ' +
-            'text EXACTLY as in original, with every old month name replaced by the new target month.]\n' +
-
-            '<div style="text-align:justify;">മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.</div>\n' +
-
-            '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
-
-            '<div style="text-align:right;">(ഒപ്പ്)<br>' +
-            '[Sender full name — EXACTLY as original]<br>' +
-            '[Designation]<br>' +
-            '[Institution]<br>' +
-            '[Place]</div>\n' +
-
-            '[IF enclosures exist in original: ' +
-            '<div style="text-align:left;">ഉള്ളടക്കം: [same enclosures as original, month updated if applicable]</div> ' +
-            '— OMIT entirely if there are no enclosures.]\n\n' +
-
-            // ─── STRICT OUTPUT RULES ──────────────────────────────
-            'STRICT RULES — follow every rule without exception:\n' +
-            '1. Output RAW HTML ONLY. The very first character must be "<" and the last must be ">". ' +
-            'Zero prose, zero commentary, zero blank lines before or after the HTML.\n' +
-            '2. Do NOT wrap output in code fences (``` or ~~~) under any circumstances.\n' +
-            '3. Do NOT use any markdown formatting whatsoever — ' +
-            'NO **double asterisks**, NO *single asterisks*, NO # headings. ' +
-            'Use <strong>...</strong> tags for bold text only.\n' +
-            '4. Every section must be in its own <div> with the exact style="text-align:..." ' +
-            'shown in the template. Do NOT change, omit, or consolidate these attributes.\n' +
-            '5. Do NOT add any font-family, font-size, color, or other CSS properties — use text-align only.\n' +
-            '6. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
-            '7. Within address blocks — use <br> for line breaks only. No nested tags inside address divs.\n' +
-            '8. Each body paragraph must be in its OWN separate <div style="text-align:justify;"> tag. ' +
-            'Do NOT merge multiple paragraphs into one div.\n' +
-            '9. The closing sentence ("മേൽവിവരം...") must be in its own <div style="text-align:justify;"> ' +
-            'placed immediately before <div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>.\n' +
-            '10. Omit the enclosures div entirely if there are no enclosures.\n' +
-            '11. CRITICAL: Do NOT invent, hallucinate, or alter any names, designations, or institutions. ' +
-            'Copy them exactly as they appear in the original letter. If a name is unclear, leave it blank.\n' +
-            '12. TRANSFORMATION ONLY: Do NOT add new sentences or content. Do NOT rewrite. ' +
-            'ONLY substitute the old month name with the new target month throughout.\n\n' +
-
-            // ─── USER HINTS ───────────────────────────────────────
-            'USER TRANSFORMATION REQUEST:\n' + hints
-          )
-
+          if (isTransformation) {
+            // Scenario B — Transformation (plain output)
+            promptText =
+              'You are a Kerala Government office assistant.\n' +
+              'Read the attached PDF letter carefully. Transform it according to the user request below.\n' +
+              'Output the transformed letter in ഔദ്യോഗിക Malayalam as PLAIN TEXT ONLY.\n\n' +
+              'RULES:\n' +
+              '- Plain Malayalam text only. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
+              '- Separate each section (number/date, sender, recipient, subject, body, closing) with ONE blank line.\n' +
+              '- Use ഭരണഭാഷ official Malayalam throughout.\n' +
+              '- Today\'s date: ' + todayDate + '\n\n' +
+              'USER REQUEST:\n' + hints;
+          } else {
+            // Scenario A — Reply (plain output)
+            promptText =
+              'You are a Kerala Government office assistant.\n' +
+              'Read the attached main (⭐) PDF letter carefully. Draft a formal reply in ഔദ്യോഗിക Malayalam as PLAIN TEXT ONLY.\n\n' +
+              'LETTER STRUCTURE (separate each section with ONE blank line):\n' +
+              '1. നമ്പർ: [reply number]  തീയതി: ' + todayDate + '\n' +
+              '2. പ്രേഷകൻ: [original Recipient becomes the Sender of this reply]\n' +
+              '3. സ്വീകർത്താവ്: [original Sender becomes the Recipient of this reply]\n' +
+              '4. സർ,\n' +
+              '5. വിഷയം: [subject line]\n' +
+              '6. സൂചന: [cite the incoming letter number and date]\n' +
+              '7. [Body paragraphs — one paragraph per blank-line-separated block]\n' +
+              '8. മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.\n' +
+              '9. വിശ്വാസപൂർവ്വം, / [Sender name, designation, institution]\n\n' +
+              'RULES:\n' +
+              '- Plain Malayalam text only. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
+              '- Use ഭരണഭാഷ official Malayalam throughout.\n' +
+              '- Do NOT invent names — leave blank if unclear.\n\n' +
+              'HINTS / POINTS TO INCLUDE:\n' +
+              (hints || '(No hints provided — draft a complete contextually appropriate reply.)');
+          }
+        } else {
           // ════════════════════════════════════════════════════════
-          // SCENARIO A — DEFAULT REPLY (original logic, unchanged)
+          // RICH FORMAT MODE — original massive HTML prompt (unchanged)
           // ════════════════════════════════════════════════════════
-          : (
-            // ─── ROLE + TASK ────────────────────────────────────
-            'You are an expert Kerala Government office assistant. Your ONLY task is to output a ' +
-            'complete formal reply letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
-            'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
-            'no explanations, no code fences, no prose outside the HTML.\n\n' +
+          promptText = isTransformation
 
-            // ─── STEP 1: READ THE INCOMING LETTER ───────────────
-            'STEP 1 — READ THE MAIN LETTER:\n' +
-            'Carefully read the main (⭐) PDF. If it is a scanned image, use OCR/vision to read it. Extract:\n' +
-            '  (a) SENDER of the incoming letter — name, designation, institution, full address.\n' +
-            '  (b) RECIPIENT of the incoming letter — name, designation, institution, full address.\n' +
-            '  (c) Reference letter number and its date.\n' +
-            '  (d) Subject/purpose of the letter.\n\n' +
+            // ════════════════════════════════════════════════════════
+            // SCENARIO B — LETTER TRANSFORMATION / MONTH UPDATE
+            // ════════════════════════════════════════════════════════
+            ? (
+              'You are an expert Kerala Government office assistant. Your ONLY task is to output a ' +
+              'TRANSFORMED version of the attached letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
+              'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
+              'no explanations, no code fences, no prose outside the HTML.\n\n' +
 
-            // ─── STEP 2: DRAFT THE REPLY ────────────────────────
-            'STEP 2 — DRAFT THE REPLY:\n' +
-            'In a reply letter, the original RECIPIENT becomes the new SENDER (പ്രേഷകൻ), ' +
-            'and the original SENDER becomes the new RECIPIENT (സ്വീകർത്താവ്).\n\n' +
-            'Produce the output in EXACTLY the HTML structure shown in the TEMPLATE below.\n' +
-            'Replace every [...] placeholder with the actual extracted or drafted content.\n' +
-            'Each section MUST be its own <div> element with the correct style="text-align:..." ' +
-            'attribute — do NOT merge multiple sections into one <div>.\n' +
-            'Within address blocks, separate lines with <br> — do NOT use nested <div> or <p> tags inside.\n\n' +
+              'STEP 1 — READ THE ORIGINAL LETTER:\n' +
+              'Carefully read the main (⭐) PDF. If it is a scanned image, use OCR/vision to read it. ' +
+              'Extract the COMPLETE content including:\n' +
+              '  (a) Document/reference number (e.g. ഡി.എം.ഒ.പി.എം./684/2026-G1)\n' +
+              '  (b) Date of the letter\n' +
+              '  (c) ALL month names mentioned anywhere — in the header, subject, body, enclosures\n' +
+              '  (d) Sender (പ്രേഷകൻ) — full name, designation, institution, address\n' +
+              '  (e) Recipient (സ്വീകർത്താവ്) — full name, designation, institution, address\n' +
+              '  (f) Subject (വിഷയം) and Reference (സൂചന) lines\n' +
+              '  (g) Every body paragraph — word for word\n' +
+              '  (h) Closing, signature block, enclosures if any\n\n' +
 
-            // ─── EXACT HTML LETTER TEMPLATE ─────────────────────
-            'OUTPUT TEMPLATE — fill every placeholder and output THIS HTML ONLY:\n\n' +
+              'STEP 2 — IDENTIFY THE TRANSFORMATION TARGET from the user hints:\n' +
+              'Determine the new target month and/or year the user wants to switch to.\n' +
+              'Example: if hints say "ജൂൺ മാസത്തെ കത്താക്കി മാറ്റുക", target month = ജൂൺ.\n\n' +
 
-            '<div style="text-align:center;"><strong>ഭരണഭാഷ – മാതൃഭാഷ</strong></div>\n' +
+              'STEP 3 — PRODUCE THE TRANSFORMED LETTER:\n' +
+              'Clone the original letter EXACTLY, then make ONLY these targeted substitutions:\n' +
+              '  • Replace every occurrence of the OLD month name with the NEW target month throughout.\n' +
+              '  • Update the letter DATE (തീയതി) to today: ' + todayDate + '\n' +
+              '  • If the reference/document number contains a month abbreviation, serial period, or ' +
+              '    financial-year segment that corresponds to the old month, update it logically.\n' +
+              '  • If body text references attendance, reports, lists, or statistics for the old month, ' +
+              '    update those month references to the new target month.\n' +
+              '  • Keep ALL other content IDENTICAL — same sender, same recipient, same subject structure, ' +
+              '    same body sentences (only month names substituted), same closing, same enclosures.\n\n' +
 
-            '<div style="text-align:left;">നമ്പർ: [Construct a logical reply letter number from the reference series]<br>' +
-            'തീയതി: ' + todayDate + '</div>\n' +
+              'Produce the output in EXACTLY the HTML structure shown in the TEMPLATE below.\n' +
+              'Each section MUST be its own <div> with the correct style="text-align:..." attribute.\n' +
+              'Within address blocks, use <br> for line breaks — no nested tags inside.\n\n' +
 
-            '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-            '[Name of Reply Sender — originally the Recipient of the incoming letter]<br>' +
-            '[Designation]<br>' +
-            '[Institution]<br>' +
-            '[Place/Town]</div>\n' +
+              'OUTPUT TEMPLATE — fill with transformed content and output THIS HTML ONLY:\n\n' +
 
-            '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-            '[Name of Reply Recipient — originally the Sender of the incoming letter]<br>' +
-            '[Designation]<br>' +
-            '[Institution]<br>' +
-            '[Full office address with PIN code]</div>\n' +
+              '<div style="text-align:center;"><strong>ഭരണഭാഷ – മാതൃഭാഷ</strong></div>\n' +
 
-            '<div style="text-align:left;">സർ,</div>\n' +
+              '<div style="text-align:left;">നമ്പർ: [Original reference number, with month/serial updated for new month if applicable]<br>' +
+              'തീയതി: ' + todayDate + '</div>\n' +
 
-            '<div style="text-align:justify;"><strong>വിഷയം:</strong> [One concise formal Malayalam sentence clearly stating the subject of this reply]</div>\n' +
+              '<div style="text-align:left;">പ്രേഷകൻ<br>' +
+              '[Sender — EXACTLY as in the original letter]<br>' +
+              '[Designation]<br>' +
+              '[Institution]<br>' +
+              '[Place/Town]</div>\n' +
 
-            '<div style="text-align:justify;"><strong>സൂചന:</strong> [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 dated 01-06-2026"]</div>\n' +
+              '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
+              '[Recipient — EXACTLY as in the original letter]<br>' +
+              '[Designation]<br>' +
+              '[Institution]<br>' +
+              '[Full address with PIN code]</div>\n' +
 
-            '<div style="text-align:justify;">[Body Paragraph 1: Open formally, e.g. "സൂചന കത്തിലെ നിർദ്ദേശപ്രകാരം..." — ' +
-            'link the subject and the reference letter in one or two sentences.]</div>\n' +
+              '<div style="text-align:left;">സർ,</div>\n' +
 
-            '[Each additional body paragraph in its OWN separate <div style="text-align:justify;">...</div> tag. ' +
-            'Use as many paragraphs as needed based on the hints below. ' +
-            'Maintain formal ഔദ്യോഗിക മലയാളം throughout.]\n' +
+              '<div style="text-align:justify;"><strong>വിഷയം:</strong> [Subject — EXACTLY as original, old month swapped to new target month if present]</div>\n' +
 
-            '<div style="text-align:justify;">മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.</div>\n' +
+              '<div style="text-align:justify;"><strong>സൂചന:</strong> [Reference — EXACTLY as original if present; OMIT this div entirely if absent in original]</div>\n' +
 
-            '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
+              '[Each body paragraph in its OWN <div style="text-align:justify;">...</div> — ' +
+              'text EXACTLY as in original, with every old month name replaced by the new target month.]\n' +
 
-            '<div style="text-align:right;">(ഒപ്പ്)<br>' +
-            '[Full Name of the Reply Sender]<br>' +
-            '[Designation]<br>' +
-            '[Institution]<br>' +
-            '[Place]</div>\n' +
+              '<div style="text-align:justify;">മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.</div>\n' +
 
-            '[IF enclosures exist, output exactly this div: ' +
-            '<div style="text-align:left;">ഉള്ളടക്കം: [comma-separated list of enclosures]</div> ' +
-            '— OMIT this div entirely if there are no enclosures.]\n\n' +
+              '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
 
-            // ─── STRICT OUTPUT RULES ────────────────────────────
-            'STRICT RULES — follow every rule without exception:\n' +
-            '1. Output RAW HTML ONLY. The very first character must be "<" and the last must be ">". ' +
-            'Zero prose, zero commentary, zero blank lines before or after the HTML.\n' +
-            '2. Do NOT wrap output in code fences (``` or ~~~) under any circumstances.\n' +
-            '3. Do NOT use any markdown formatting whatsoever — ' +
-            'NO **double asterisks**, NO *single asterisks*, NO # headings. ' +
-            'Use <strong>...</strong> tags for bold text only.\n' +
-            '4. Every section must be in its own <div> with the exact style="text-align:..." ' +
-            'shown in the template. Do NOT change, omit, or consolidate these attributes.\n' +
-            '5. Do NOT add any font-family, font-size, color, or other CSS properties to any element — ' +
-            'use text-align only.\n' +
-            '6. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
-            '7. Within address blocks — use <br> for line breaks only. No nested tags inside address divs.\n' +
-            '8. Each body paragraph must be in its OWN separate <div style="text-align:justify;"> tag. ' +
-            'Do NOT merge multiple paragraphs into one div.\n' +
-            '9. The closing sentence ("മേൽവിവരം...") must be in its own <div style="text-align:justify;"> ' +
-            'placed immediately before <div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>.\n' +
-            '10. Omit the enclosures div entirely if there are no enclosures to list.\n' +
-            '11. CRITICAL: If the exact full name of the sender or recipient is not explicitly found in the PDF, do NOT invent or hallucinate any names (like Prakash, Suresh, etc.). Instead, leave it blank so the user can type it manually.\n\n' +
+              '<div style="text-align:right;">(ഒപ്പ്)<br>' +
+              '[Sender full name — EXACTLY as original]<br>' +
+              '[Designation]<br>' +
+              '[Institution]<br>' +
+              '[Place]</div>\n' +
 
-            // ─── USER HINTS ─────────────────────────────────────
-            'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
-            (hints || '(No specific hints provided — draft a contextually appropriate and complete body based on the letter content.)')
-          );
+              '[IF enclosures exist in original: ' +
+              '<div style="text-align:left;">ഉള്ളടക്കം: [same enclosures as original, month updated if applicable]</div> ' +
+              '— OMIT entirely if there are no enclosures.]\n\n' +
+
+              'STRICT RULES — follow every rule without exception:\n' +
+              '1. Output RAW HTML ONLY. The very first character must be "<" and the last must be ">". ' +
+              'Zero prose, zero commentary, zero blank lines before or after the HTML.\n' +
+              '2. Do NOT wrap output in code fences (``` or ~~~) under any circumstances.\n' +
+              '3. Do NOT use any markdown formatting whatsoever — ' +
+              'NO **double asterisks**, NO *single asterisks*, NO # headings. ' +
+              'Use <strong>...</strong> tags for bold text only.\n' +
+              '4. Every section must be in its own <div> with the exact style="text-align:..." ' +
+              'shown in the template. Do NOT change, omit, or consolidate these attributes.\n' +
+              '5. Do NOT add any font-family, font-size, color, or other CSS properties — use text-align only.\n' +
+              '6. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
+              '7. Within address blocks — use <br> for line breaks only. No nested tags inside address divs.\n' +
+              '8. Each body paragraph must be in its OWN separate <div style="text-align:justify;"> tag. ' +
+              'Do NOT merge multiple paragraphs into one div.\n' +
+              '9. The closing sentence ("മേൽവിവരം...") must be in its own <div style="text-align:justify;"> ' +
+              'placed immediately before <div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>.\n' +
+              '10. Omit the enclosures div entirely if there are no enclosures.\n' +
+              '11. CRITICAL: Do NOT invent, hallucinate, or alter any names, designations, or institutions. ' +
+              'Copy them exactly as they appear in the original letter. If a name is unclear, leave it blank.\n' +
+              '12. TRANSFORMATION ONLY: Do NOT add new sentences or content. Do NOT rewrite. ' +
+              'ONLY substitute the old month name with the new target month throughout.\n\n' +
+
+              'USER TRANSFORMATION REQUEST:\n' + hints
+            )
+
+            // ════════════════════════════════════════════════════════
+            // SCENARIO A — DEFAULT REPLY (original logic, unchanged)
+            // ════════════════════════════════════════════════════════
+            : (
+              'You are an expert Kerala Government office assistant. Your ONLY task is to output a ' +
+              'complete formal reply letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
+              'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
+              'no explanations, no code fences, no prose outside the HTML.\n\n' +
+
+              'STEP 1 — READ THE MAIN LETTER:\n' +
+              'Carefully read the main (⭐) PDF. If it is a scanned image, use OCR/vision to read it. Extract:\n' +
+              '  (a) SENDER of the incoming letter — name, designation, institution, full address.\n' +
+              '  (b) RECIPIENT of the incoming letter — name, designation, institution, full address.\n' +
+              '  (c) Reference letter number and its date.\n' +
+              '  (d) Subject/purpose of the letter.\n\n' +
+
+              'STEP 2 — DRAFT THE REPLY:\n' +
+              'In a reply letter, the original RECIPIENT becomes the new SENDER (പ്രേഷകൻ), ' +
+              'and the original SENDER becomes the new RECIPIENT (സ്വീകർത്താവ്).\n\n' +
+              'Produce the output in EXACTLY the HTML structure shown in the TEMPLATE below.\n' +
+              'Replace every [...] placeholder with the actual extracted or drafted content.\n' +
+              'Each section MUST be its own <div> element with the correct style="text-align:..." ' +
+              'attribute — do NOT merge multiple sections into one <div>.\n' +
+              'Within address blocks, separate lines with <br> — do NOT use nested <div> or <p> tags inside.\n\n' +
+
+              'OUTPUT TEMPLATE — fill every placeholder and output THIS HTML ONLY:\n\n' +
+
+              '<div style="text-align:center;"><strong>ഭരണഭാഷ – മാതൃഭാഷ</strong></div>\n' +
+
+              '<div style="text-align:left;">നമ്പർ: [Construct a logical reply letter number from the reference series]<br>' +
+              'തീയതി: ' + todayDate + '</div>\n' +
+
+              '<div style="text-align:left;">പ്രേഷകൻ<br>' +
+              '[Name of Reply Sender — originally the Recipient of the incoming letter]<br>' +
+              '[Designation]<br>' +
+              '[Institution]<br>' +
+              '[Place/Town]</div>\n' +
+
+              '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
+              '[Name of Reply Recipient — originally the Sender of the incoming letter]<br>' +
+              '[Designation]<br>' +
+              '[Institution]<br>' +
+              '[Full office address with PIN code]</div>\n' +
+
+              '<div style="text-align:left;">സർ,</div>\n' +
+
+              '<div style="text-align:justify;"><strong>വിഷയം:</strong> [One concise formal Malayalam sentence clearly stating the subject of this reply]</div>\n' +
+
+              '<div style="text-align:justify;"><strong>സൂചന:</strong> [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 dated 01-06-2026"]</div>\n' +
+
+              '<div style="text-align:justify;">[Body Paragraph 1: Open formally, e.g. "സൂചന കത്തിലെ നിർദ്ദേശപ്രകാരം..." — ' +
+              'link the subject and the reference letter in one or two sentences.]</div>\n' +
+
+              '[Each additional body paragraph in its OWN separate <div style="text-align:justify;">...</div> tag. ' +
+              'Use as many paragraphs as needed based on the hints below. ' +
+              'Maintain formal ഔദ്യോഗിക മലയാളം throughout.]\n' +
+
+              '<div style="text-align:justify;">മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.</div>\n' +
+
+              '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
+
+              '<div style="text-align:right;">(ഒപ്പ്)<br>' +
+              '[Full Name of the Reply Sender]<br>' +
+              '[Designation]<br>' +
+              '[Institution]<br>' +
+              '[Place]</div>\n' +
+
+              '[IF enclosures exist, output exactly this div: ' +
+              '<div style="text-align:left;">ഉള്ളടക്കം: [comma-separated list of enclosures]</div> ' +
+              '— OMIT this div entirely if there are no enclosures to list.]\n\n' +
+
+              'STRICT RULES — follow every rule without exception:\n' +
+              '1. Output RAW HTML ONLY. The very first character must be "<" and the last must be ">". ' +
+              'Zero prose, zero commentary, zero blank lines before or after the HTML.\n' +
+              '2. Do NOT wrap output in code fences (``` or ~~~) under any circumstances.\n' +
+              '3. Do NOT use any markdown formatting whatsoever — ' +
+              'NO **double asterisks**, NO *single asterisks*, NO # headings. ' +
+              'Use <strong>...</strong> tags for bold text only.\n' +
+              '4. Every section must be in its own <div> with the exact style="text-align:..." ' +
+              'shown in the template. Do NOT change, omit, or consolidate these attributes.\n' +
+              '5. Do NOT add any font-family, font-size, color, or other CSS properties to any element — ' +
+              'use text-align only.\n' +
+              '6. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
+              '7. Within address blocks — use <br> for line breaks only. No nested tags inside address divs.\n' +
+              '8. Each body paragraph must be in its OWN separate <div style="text-align:justify;"> tag. ' +
+              'Do NOT merge multiple paragraphs into one div.\n' +
+              '9. The closing sentence ("മേൽവിവരം...") must be in its own <div style="text-align:justify;"> ' +
+              'placed immediately before <div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>.\n' +
+              '10. Omit the enclosures div entirely if there are no enclosures to list.\n' +
+              '11. CRITICAL: If the exact full name of the sender or recipient is not explicitly found in the PDF, do NOT invent or hallucinate any names (like Prakash, Suresh, etc.). Instead, leave it blank so the user can type it manually.\n\n' +
+
+              'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
+              (hints || '(No specific hints provided — draft a contextually appropriate and complete body based on the letter content.)')
+            );
+        }
 
         // ── Backend API call ────────────────────────────────────
         let responseText = '';
@@ -3680,8 +3743,9 @@
         }
 
         // ── Insert into TinyMCE ─────────────────────────────────
-        // AFTER — replace with this
-        const htmlContent = responseText.trim();
+        const htmlContent = isPlainMode
+          ? plainTextToEditorHtml(responseText)   // plain \n → <p>/<br>
+          : responseText.trim();                  // rich: raw HTML as-is
         const ed = getEditor();
         if (ed) {
           ed.setContent(htmlContent);
