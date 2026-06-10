@@ -1280,12 +1280,18 @@
             ⚡ Plain Text Mode
             <span style="color:#999; font-size:0.72rem;">(Faster, fewer API limits)</span>
           </label>
-          <label
-            style="display:flex; align-items:center; gap:8px; margin-bottom:5px; cursor:pointer; font-size:0.82rem; color:#333;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:#333;">
             <input type="radio" name="draftMode" id="draftModeRich" value="rich"
               style="accent-color:#c9a227; cursor:pointer;" />
             🏛️ Rich Official Format
             <span style="color:#999; font-size:0.72rem;">(Strict HTML layout, more tokens)</span>
+          </label>
+          <label
+            style="display:flex; align-items:center; gap:8px; margin-bottom:5px; cursor:pointer; font-size:0.82rem; color:#333;">
+            <input type="radio" name="draftMode" id="draftModeUltraLite" value="ultralite"
+              style="accent-color:#107c10; cursor:pointer;" />
+            🚀 Ultra Lite (for e-Office)
+            <span style="color:#999; font-size:0.72rem;">(Only Subject, Ref &amp; Body. No addresses/signatures)</span>
           </label>
         </div>
 
@@ -3415,7 +3421,7 @@
       // ── Generate button ────────────────────────────────────────
       document.getElementById('ai-draft-generate-btn').addEventListener('click', async () => {
         const hints = document.getElementById('ai-draft-hints').value.trim();
-        const isPlainMode = document.getElementById('draftModePlain')?.checked === true;
+        const draftMode = document.querySelector('input[name="draftMode"]:checked')?.value ?? 'plain';
         const fileInp = document.getElementById('ai-draft-pdf-input');
         const files = Array.from(fileInp.files);
 
@@ -3465,15 +3471,60 @@
 
         let promptText;
 
-        if (isPlainMode) {
+        if (draftMode === 'ultralite') {
+          // ════════════════════════════════════════════════════════
+          // ULTRA LITE MODE — e-Office: Subject + Reference + Body only
+          // ════════════════════════════════════════════════════════
+          if (isTransformation) {
+            // Scenario B — Transformation (ultra lite output)
+            promptText =
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
+              'Read the attached PDF letter carefully. Also read any reference (📎) PDFs for context. Transform it according to the user request below.\n\n' +
+              'IMPORTANT CONTEXT: This output will be pasted into e-Office software, which automatically\n' +
+              'generates the Sender block, Recipient block, Date, Document Number, Salutation (സർ,),\n' +
+              'and Signature block. DO NOT include any of those elements.\n\n' +
+              'Output ONLY these THREE elements as PLAIN TEXT, separated by ONE blank line each:\n\n' +
+              '1. വിഷയം: [Subject line — update the month reference if applicable, otherwise keep EXACTLY as in original]\n\n' +
+              '2. സൂചന: [Reference line — EXACTLY as in original, updating month if applicable. OMIT this line entirely if not present in original.]\n\n' +
+              '3. [Body paragraphs — EXACTLY as in the original letter, with ONLY the requested month/date substitutions made.\n' +
+              '   Do NOT add or remove any sentences. Separate paragraphs with ONE blank line.]\n\n' +
+              'STRICT RULES:\n' +
+              '- PLAIN TEXT ONLY. Absolutely NO HTML tags, NO markdown, NO asterisks, NO bold symbols.\n' +
+              '- DO NOT output: any sender/recipient address, date line, letter number, "സർ,", "വിശ്വാസപൂർവ്വം,", or any signature/designation block.\n' +
+              '- TRANSFORMATION ONLY: Do NOT add new sentences. ONLY substitute month names/dates as requested.\n' +
+              '- Use ഭരണഭാഷ official Malayalam throughout.\n\n' +
+              'USER TRANSFORMATION REQUEST:\n' + hints;
+          } else {
+            // Scenario A — Reply (ultra lite output)
+            promptText =
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
+              'Read the attached main (⭐) PDF letter carefully. Also read any reference (📎) PDFs for context.\n\n' +
+              'IMPORTANT CONTEXT: This output will be pasted into e-Office software, which automatically\n' +
+              'generates the Sender block, Recipient block, Date, Document Number, Salutation (സർ,),\n' +
+              'and Signature block. DO NOT include any of those elements.\n\n' +
+              'Output ONLY these THREE elements as PLAIN TEXT, separated by ONE blank line each:\n\n' +
+              '1. വിഷയം: [One concise formal Malayalam sentence clearly stating the subject of this reply]\n\n' +
+              '2. സൂചന: [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 തീയതി 01-06-2026"]\n\n' +
+              '3. [Body paragraphs — write as many as needed based on the hints below.\n' +
+              '   Begin the first paragraph formally, e.g. "സൂചന കത്തിലെ നിർദ്ദേശപ്രകാരം..."\n' +
+              '   Separate each paragraph with ONE blank line.]\n\n' +
+              'STRICT RULES:\n' +
+              '- PLAIN TEXT ONLY. Absolutely NO HTML tags, NO markdown, NO asterisks, NO bold symbols.\n' +
+              '- DO NOT output: any sender/recipient address, date line, letter number, "സർ,", "വിശ്വാസപൂർവ്വം,", or any signature/designation block.\n' +
+              '- Use ഭരണഭാഷ official Malayalam throughout.\n' +
+              '- Do NOT invent names — leave blank if unclear.\n\n' +
+              'HINTS / POINTS TO INCLUDE IN THE BODY:\n' +
+              (hints || '(No hints provided — draft a complete contextually appropriate reply.)');
+          }
+        } else if (draftMode === 'plain') {
           // ════════════════════════════════════════════════════════
           // PLAIN TEXT MODE — short token-efficient prompts
           // ════════════════════════════════════════════════════════
           if (isTransformation) {
             // Scenario B — Transformation (plain output)
             promptText =
-              'You are a Kerala Government office assistant.\n' +
-              'Read the attached PDF letter carefully. Transform it according to the user request below.\n' +
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
+              'Read the attached PDF letter carefully. Also read any reference (📎) PDFs for context. Transform it according to the user request below.\n' +
               'Output the transformed letter in ഔദ്യോഗിക Malayalam as PLAIN TEXT ONLY.\n\n' +
               'RULES:\n' +
               '- Plain Malayalam text only. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
@@ -3484,8 +3535,8 @@
           } else {
             // Scenario A — Reply (plain output)
             promptText =
-              'You are a Kerala Government office assistant.\n' +
-              'Read the attached main (⭐) PDF letter carefully. Draft a formal reply in ഔദ്യോഗിക Malayalam as PLAIN TEXT ONLY.\n\n' +
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
+              'Read the attached main (⭐) PDF letter carefully. Also read any reference (📎) PDFs for context. Draft a formal reply in ഔദ്യോഗിക Malayalam as PLAIN TEXT ONLY.\n\n' +
               'LETTER STRUCTURE (separate each section with ONE blank line):\n' +
               '1. നമ്പർ: [reply number]  തീയതി: ' + todayDate + '\n' +
               '2. പ്രേഷകൻ: [original Recipient becomes the Sender of this reply]\n' +
@@ -3494,8 +3545,7 @@
               '5. വിഷയം: [subject line]\n' +
               '6. സൂചന: [cite the incoming letter number and date]\n' +
               '7. [Body paragraphs — one paragraph per blank-line-separated block]\n' +
-              '8. മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.\n' +
-              '9. വിശ്വാസപൂർവ്വം, / [Sender name, designation, institution]\n\n' +
+              '8. വിശ്വാസപൂർവ്വം, / [Sender name, designation, institution]\n\n' +
               'RULES:\n' +
               '- Plain Malayalam text only. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
               '- Use ഭരണഭാഷ official Malayalam throughout.\n' +
@@ -3513,13 +3563,13 @@
             // SCENARIO B — LETTER TRANSFORMATION / MONTH UPDATE
             // ════════════════════════════════════════════════════════
             ? (
-              'You are an expert Kerala Government office assistant. Your ONLY task is to output a ' +
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government. Your ONLY task is to output a ' +
               'TRANSFORMED version of the attached letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
               'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
               'no explanations, no code fences, no prose outside the HTML.\n\n' +
 
               'STEP 1 — READ THE ORIGINAL LETTER:\n' +
-              'Carefully read the main (⭐) PDF. If it is a scanned image, use OCR/vision to read it. ' +
+              'Carefully read the main (⭐) PDF. Also read any reference (📎) PDFs for context. If it is a scanned image, use OCR/vision to read it. ' +
               'Extract the COMPLETE content including:\n' +
               '  (a) Document/reference number (e.g. ഡി.എം.ഒ.പി.എം./684/2026-G1)\n' +
               '  (b) Date of the letter\n' +
@@ -3577,7 +3627,6 @@
               '[Each body paragraph in its OWN <div style="text-align:justify;">...</div> — ' +
               'text EXACTLY as in original, with every old month name replaced by the new target month.]\n' +
 
-              '<div style="text-align:justify;">മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.</div>\n' +
 
               '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
 
@@ -3620,13 +3669,13 @@
             // SCENARIO A — DEFAULT REPLY (original logic, unchanged)
             // ════════════════════════════════════════════════════════
             : (
-              'You are an expert Kerala Government office assistant. Your ONLY task is to output a ' +
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government. Your ONLY task is to output a ' +
               'complete formal reply letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
               'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
               'no explanations, no code fences, no prose outside the HTML.\n\n' +
 
               'STEP 1 — READ THE MAIN LETTER:\n' +
-              'Carefully read the main (⭐) PDF. If it is a scanned image, use OCR/vision to read it. Extract:\n' +
+              'Carefully read the main (⭐) PDF. Also read any reference (📎) PDFs for context. If it is a scanned image, use OCR/vision to read it. Extract:\n' +
               '  (a) SENDER of the incoming letter — name, designation, institution, full address.\n' +
               '  (b) RECIPIENT of the incoming letter — name, designation, institution, full address.\n' +
               '  (c) Reference letter number and its date.\n' +
@@ -3673,7 +3722,6 @@
               'Use as many paragraphs as needed based on the hints below. ' +
               'Maintain formal ഔദ്യോഗിക മലയാളം throughout.]\n' +
 
-              '<div style="text-align:justify;">മേൽവിവരം തുടർനടപടികൾക്കായി ദയവായി സ്വീകരിക്കണമെന്ന് അഭ്യർത്ഥിക്കുന്നു.</div>\n' +
 
               '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
 
@@ -3747,8 +3795,8 @@
         }
 
         // ── Insert into TinyMCE ─────────────────────────────────
-        const htmlContent = isPlainMode
-          ? plainTextToEditorHtml(responseText)   // plain \n → <p>/<br>
+        const htmlContent = (draftMode === 'plain' || draftMode === 'ultralite')
+          ? plainTextToEditorHtml(responseText)   // plain/ultralite \n → <p>/<br>
           : responseText.trim();                  // rich: raw HTML as-is
         const ed = getEditor();
         if (ed) {
