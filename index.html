@@ -1295,6 +1295,22 @@
           </label>
         </div>
 
+        <!-- ══ BYOK: Bring Your Own Gemini API Key ══ -->
+        <div style="margin-top:6px; padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
+          <p style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
+            🔑 Want faster drafts during heavy traffic? <span style="font-weight:400; color:#999;">(Optional)</span>
+          </p>
+          <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
+            style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
+          <p style="margin:6px 0 0; font-size:0.72rem; color:#777; line-height:1.5;">
+            This is a one-time setup. The key will be saved securely in your own browser's LocalStorage.<br>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank"
+              style="color:#8b6508; font-weight:600; text-decoration:underline;">
+              Click here to get a FREE Gemini API Key from Google AI Studio
+            </a>
+          </p>
+        </div>
+
       </div>
       <div class="modal-footer">
         <button class="btn btn-gold" id="ai-draft-generate-btn" style="min-width:140px; justify-content:center;">
@@ -3123,6 +3139,9 @@
         document.getElementById('ai-draft-pdf-input').value = '';
         document.getElementById('ai-draft-file-list').innerHTML = '';
         // Don't clear hints — user may want to re-use them
+        // ── BYOK: Restore saved Gemini API key from LocalStorage ──
+        const savedKey = localStorage.getItem('edraft_user_gemini_key');
+        if (savedKey) document.getElementById('ai-user-api-key').value = savedKey;
         modal.classList.add('open');
       });
 
@@ -3424,6 +3443,14 @@
         const draftMode = document.querySelector('input[name="draftMode"]:checked')?.value ?? 'plain';
         const fileInp = document.getElementById('ai-draft-pdf-input');
         const files = Array.from(fileInp.files);
+
+        // ── BYOK: Read key → persist or remove from LocalStorage ──
+        const userApiKeyVal = document.getElementById('ai-user-api-key').value.trim();
+        if (userApiKeyVal) {
+          localStorage.setItem('edraft_user_gemini_key', userApiKeyVal);
+        } else {
+          localStorage.removeItem('edraft_user_gemini_key');
+        }
 
         // ── Validation ──────────────────────────────────────────
         if (!files.length) {
@@ -3766,7 +3793,7 @@
           const res = await fetch('https://edraft-backend.onrender.com/api/generate-draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ promptText, files: filesArray })
+            body: JSON.stringify({ promptText, files: filesArray, userApiKey: userApiKeyVal })
           });
 
           if (!res.ok) {
