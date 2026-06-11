@@ -1300,7 +1300,7 @@
           style="margin-top:6px; padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
           <p
             style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
-            🔑 Want faster drafts during heavy traffic? <span style="font-weight:400; color:#999;">(Optional)</span>
+            🔑 Want faster drafts during heavy traffic? <span style="font-weight:400; color:#999;">(Recommended)</span>
           </p>
           <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
             style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
@@ -3789,37 +3789,170 @@
             );
         }
 
-        // ── Backend API call ────────────────────────────────────
+        // ════════════════════════════════════════════════════════════════
+        // API CALL — Dual-path: BYOK (Direct Gemini) or Backend Proxy
+        // ════════════════════════════════════════════════════════════════
         let responseText = '';
+
         try {
-          const res = await fetch('https://edraft-backend-0trj.onrender.com/api/generate-draft', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ promptText, files: filesArray, userApiKey: userApiKeyVal })
-          });
 
-          if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData?.error || 'HTTP ' + res.status);
+          if (userApiKeyVal) {
+            // ════════════════════════════════════════════════════════
+            // PATH A — BYOK MODE: Direct Gemini API call
+            // User provided their own API key → we skip the Render
+            // backend entirely and call Gemini from the browser.
+            // This eliminates backend load for BYOK users.
+            // ════════════════════════════════════════════════════════
+
+            // ── Build Gemini `parts` array ───────────────────────────
+            // Each PDF is sent as an inlineData block (Base64).
+            // A role-label text part precedes each file so the model
+            // understands which is the main letter vs reference PDFs.
+            // The full prompt string is appended as the final text part.
+            const parts = [];
+            filesArray.forEach(f => {
+              parts.push({
+                text: f.role === 'main'
+                  ? '⭐ This is the MAIN letter PDF (the one to reply to / transform):'
+                  : '📎 This is a REFERENCE PDF (for context only):'
+              });
+              parts.push({
+                inlineData: { mimeType: 'application/pdf', data: f.data }
+              });
+            });
+            parts.push({ text: promptText });   // system + user prompt goes last
+
+            // ── Gemini request payload ───────────────────────────────
+            const geminiPayload = {
+              contents: [{ role: 'user', parts }],
+              generationConfig: {
+                temperature: 0.3,    // deterministic for official letters
+                maxOutputTokens: 8192
+              }
+            };
+
+            // ── Model Fallback Array ─────────────────────────────────
+            // Try each model in order. On 429 / 500 / 503 → skip to
+            // the next model automatically. Break on first success.
+            const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-flash-latest'];
+            const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
+            let byokSuccess = false;
+
+            for (let i = 0; i < BYOK_MODELS.length; i++) {
+              const model = BYOK_MODELS[i];
+
+              // Required console log before every attempt
+              console.log('[BYOK] Trying model ' + (i + 1) + '/' + BYOK_MODELS.length + ': ' + model);
+
+              // ── Fetch: wrap in inner try to catch network errors ───
+              let res;
+              try {
+                res = await fetch(
+                  GEMINI_BASE + model + ':generateContent?key=' + userApiKeyVal,
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(geminiPayload)
+                  }
+                );
+              } catch (networkErr) {
+                // Pure network failure (offline, DNS, CORS pre-flight etc.)
+                console.warn('[BYOK] Network error on "' + model + '":', networkErr.message);
+                // If more models remain, try next; otherwise bubble up
+                if (i < BYOK_MODELS.length - 1) continue;
+                throw new Error('Network error: ' + networkErr.message);
+              }
+
+              // ── Retriable server-side errors → skip to next model ──
+              if (res.status === 429 || res.status === 500 || res.status === 503) {
+                const errBody = await res.json().catch(() => ({}));
+                console.warn(
+                  '[BYOK] Model "' + model + '" returned HTTP ' + res.status + ' — skipping.',
+                  errBody?.error?.message || ''
+                );
+                continue;   // ← go to next model in the array
+              }
+
+              // ── Hard failures (bad key, malformed request, etc.) ───
+              // These will not improve with a different model; throw now.
+              if (!res.ok) {
+                const errBody = await res.json().catch(() => ({}));
+                throw new Error(
+                  errBody?.error?.message || 'Gemini API error: HTTP ' + res.status
+                );
+              }
+
+              // ── Parse successful Gemini response ───────────────────
+              const data = await res.json();
+              const candidate = data?.candidates?.[0];
+              responseText = (candidate?.content?.parts || [])
+                .map(p => p.text || '').join('');
+
+              // Surface unusual finish reasons (SAFETY, RECITATION, etc.)
+              const finishReason = candidate?.finishReason;
+              if (finishReason && finishReason !== 'STOP' && finishReason !== 'MAX_TOKENS') {
+                console.warn('[BYOK] Finish reason:', finishReason);
+                showToast('⚠️ AI പാതിവഴിയിൽ നിർത്തി! കാരണം: ' + finishReason, 6000);
+              }
+
+              if (!responseText) throw new Error('Gemini returned an empty response.');
+
+              console.log('[BYOK] ✅ Success with model: ' + model);
+              byokSuccess = true;
+              break;   // ← valid response received — exit the fallback loop
+            }
+
+            // ── All models exhausted via `continue` (all returned 429/500/503) ──
+            if (!byokSuccess) {
+              throw new Error(
+                'All BYOK models exhausted (429 / 500 / 503). ' +
+                'Please wait a moment and try again, or check your API key quota.'
+              );
+            }
+
+          } else {
+            // ════════════════════════════════════════════════════════
+            // PATH B — BACKEND PROXY MODE: Send to Render backend
+            // No user key present → route through the shared backend.
+            // `userApiKey` is intentionally omitted from the request
+            // body (it is empty; the backend uses its own server key).
+            // ════════════════════════════════════════════════════════
+            const res = await fetch('https://edraft-backend-0trj.onrender.com/api/generate-draft', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ promptText, files: filesArray })
+            });
+
+            if (!res.ok) {
+              const errData = await res.json().catch(() => ({}));
+              throw new Error(errData?.error || 'HTTP ' + res.status);
+            }
+
+            const data = await res.json();
+            responseText = data.text || '';
+
+            if (data.finishReason && data.finishReason !== 'STOP' && data.finishReason !== 'UNKNOWN') {
+              console.warn('Stopped due to:', data.finishReason);
+              showToast('⚠️ AI പാതിവഴിയിൽ നിർത്തി! കാരണം: ' + data.finishReason, 6000);
+            }
+
+            if (!responseText) throw new Error('No text generated.');
           }
-
-          const data = await res.json();
-          responseText = data.text || '';
-
-          if (data.finishReason && data.finishReason !== 'STOP' && data.finishReason !== 'UNKNOWN') {
-            console.warn('Stopped due to:', data.finishReason);
-            showToast('⚠️ AI പാതിവഴിയിൽ നിർത്തി! കാരണം: ' + data.finishReason, 6000);
-          }
-
-          if (!responseText) throw new Error('No text generated.');
 
         } catch (err) {
-          if (err.message.includes('429') || err.message.includes('failed') || err.message.includes('503')) {
+          // ── Unified error handler for both paths ─────────────────
+          if (
+            err.message.includes('429') ||
+            err.message.includes('503') ||
+            err.message.includes('exhausted') ||
+            err.message.includes('quota') ||
+            err.message.includes('failed')
+          ) {
             showToast('⚠️ സിസ്റ്റത്തിൽ ആളുകൾ കൂടുതലാണ് (Heavy Traffic). ദയവായി ഒരു മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.', 6000);
           } else {
             showToast('❌ AI Error: ' + err.message, 6000);
           }
-          console.error('Backend API error:', err);
+          console.error('API call error:', err);
           return;
         }
 
