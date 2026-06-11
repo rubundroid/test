@@ -1296,8 +1296,10 @@
         </div>
 
         <!-- ══ BYOK: Bring Your Own Gemini API Key ══ -->
-        <div style="margin-top:6px; padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
-          <p style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
+        <div
+          style="margin-top:6px; padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
+          <p
+            style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
             🔑 Want faster drafts during heavy traffic? <span style="font-weight:400; color:#999;">(Optional)</span>
           </p>
           <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
@@ -3790,7 +3792,7 @@
         // ── Backend API call ────────────────────────────────────
         let responseText = '';
         try {
-          const res = await fetch('https://edraft-backend.onrender.com/api/generate-draft', {
+          const res = await fetch('https://edraft-backend-0trj.onrender.com/api/generate-draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ promptText, files: filesArray, userApiKey: userApiKeyVal })
