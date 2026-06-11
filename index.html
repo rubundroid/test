@@ -1300,7 +1300,7 @@
           style="margin-top:6px; padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
           <p
             style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
-            🔑 Want faster drafts during heavy traffic? <span style="font-weight:400; color:#999;">(Recommended)</span>
+            🔑 Want faster drafts during heavy traffic? <span style="font-weight:900; color:#999;">(Recommended)</span>
           </p>
           <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
             style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
@@ -3863,23 +3863,14 @@
                 throw new Error('Network error: ' + networkErr.message);
               }
 
-              // ── Retriable server-side errors → skip to next model ──
-              if (res.status === 429 || res.status === 500 || res.status === 503) {
+              // ── എന്ത് എറർ വന്നാലും (404, 429, 500) അടുത്ത മോഡലിലേക്ക് പോവുക! ──
+              if (!res.ok) {
                 const errBody = await res.json().catch(() => ({}));
                 console.warn(
-                  '[BYOK] Model "' + model + '" returned HTTP ' + res.status + ' — skipping.',
+                  '[BYOK] Model "' + model + '" failed with HTTP ' + res.status + ' — skipping to next.',
                   errBody?.error?.message || ''
                 );
                 continue;   // ← go to next model in the array
-              }
-
-              // ── Hard failures (bad key, malformed request, etc.) ───
-              // These will not improve with a different model; throw now.
-              if (!res.ok) {
-                const errBody = await res.json().catch(() => ({}));
-                throw new Error(
-                  errBody?.error?.message || 'Gemini API error: HTTP ' + res.status
-                );
               }
 
               // ── Parse successful Gemini response ───────────────────
@@ -3941,6 +3932,7 @@
 
         } catch (err) {
           // ── Unified error handler for both paths ─────────────────
+          const errMsg = (err.message || '').toLowerCase();
           if (
             err.message.includes('429') ||
             err.message.includes('503') ||
