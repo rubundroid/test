@@ -3505,23 +3505,52 @@
           // ULTRA LITE MODE — e-Office: Subject + Reference + Body only
           // ════════════════════════════════════════════════════════
           if (isTransformation) {
-            // Scenario B — Transformation (ultra lite output)
+            // Scenario B — Smart Transformation (ultra lite output)
             promptText =
               'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
-              'Read the attached PDF letter carefully. Also read any reference (📎) PDFs for context. Transform it according to the user request below.\n\n' +
-              'IMPORTANT CONTEXT: This output will be pasted into e-Office software, which automatically\n' +
-              'generates the Sender block, Recipient block, Date, Document Number, Salutation (സർ,),\n' +
-              'and Signature block. DO NOT include any of those elements.\n\n' +
-              'Output ONLY these THREE elements as PLAIN TEXT, separated by ONE blank line each:\n\n' +
-              '1. വിഷയം: [Subject line — update the month reference if applicable, otherwise keep EXACTLY as in original]\n\n' +
-              '2. സൂചന: [Reference line — EXACTLY as in original, updating month if applicable. OMIT this line entirely if not present in original.]\n\n' +
-              '3. [Body paragraphs — EXACTLY as in the original letter, with ONLY the requested month/date substitutions made.\n' +
-              '   Do NOT add or remove any sentences. Separate paragraphs with ONE blank line.]\n\n' +
+              'Read the attached PDF document carefully. Also read any reference (📎) PDFs for context.\n\n' +
+
+              '════ STEP 1 — DETECT DOCUMENT TYPE ════\n' +
+              'Classify the main document as ONE of:\n' +
+              '  [A] Standard Letter  — has a clear Sender, Recipient, and salutation ("സർ," / "Dear Sir")\n' +
+              '  [B] Proceeding / G.O. / Order  — starts with "നടപടി", "G.O.", or "ഉത്തരവ്"\n' +
+              '  [C] Office Memo / Internal Note  — has "MEMO", "കുറിപ്പ്", or similar header\n' +
+              '  [D] Table / Salary Statement / Calculation Sheet  — primarily rows of figures, amounts, dates\n' +
+              '  [E] Other official document\n\n' +
+
+              '════ STEP 2 — SMART MATHEMATICAL CALCULATION (apply if requested) ════\n' +
+              'If the user\'s request mentions a NEW date range (e.g., "April 8 to 30"), act as a smart clerk:\n' +
+              '  (a) Count the new number of days INCLUSIVE. Example: April 8–30 = 23 days.\n' +
+              '  (b) Identify the ORIGINAL number of days and ORIGINAL Salary/Gross/Net amounts from the document.\n' +
+              '  (c) Calculate: New Amount = (Original Amount ÷ Original Days) × New Days.\n' +
+              '      Round every monetary result to the nearest whole number (integer). Do not use decimal places for amounts.\n' +
+              '  (d) Update ALL affected figures in the output (Gross Pay, Deductions, Net Pay, etc.).\n\n' +
+
+              '════ STEP 3 — OUTPUT RULES BY DOCUMENT TYPE ════\n\n' +
+
+              '▶ If document is [A] Standard LETTER:\n' +
+              'IMPORTANT: This output is for e-Office, which auto-generates Sender, Recipient, Date,\n' +
+              'Number, and Salutation. DO NOT include those elements.\n' +
+              'Output ONLY these elements as PLAIN TEXT, separated by ONE blank line:\n' +
+              '  1. വിഷയം: [Subject — update dates/months as requested; else keep EXACTLY as original]\n' +
+              '  2. സൂചന: [Reference — EXACTLY as original; OMIT this line if absent in original]\n' +
+              '  3. [Body paragraphs — EXACTLY as original, with ONLY requested changes applied.\n' +
+              '     Each paragraph separated by ONE blank line.]\n\n' +
+
+              '▶ If document is [B] Proceeding / Order, [C] Memo, [D] Table, or [E] Other:\n' +
+              'DO NOT use the Letter format above. DO NOT add "പ്രേഷകൻ / സ്വീകർത്താവ് / സർ,".\n' +
+              'Reproduce the COMPLETE original document structure as PLAIN TEXT:\n' +
+              '  • Preserve all headings, clause numbers, section labels exactly.\n' +
+              '  • For tables: reproduce each row with values separated by spaces or | character.\n' +
+              '  • Replace ONLY the values requested — dates, month names, day counts, amounts.\n' +
+              '  • Insert newly calculated figures from Step 2 in their exact positions.\n\n' +
+
               'STRICT RULES:\n' +
               '- PLAIN TEXT ONLY. Absolutely NO HTML tags, NO markdown, NO asterisks, NO bold symbols.\n' +
-              '- DO NOT output: any sender/recipient address, date line, letter number, "സർ,", "വിശ്വാസപൂർവ്വം,", or any signature/designation block.\n' +
-              '- TRANSFORMATION ONLY: Do NOT add new sentences. ONLY substitute month names/dates as requested.\n' +
-              '- Use ഭരണഭാഷ official Malayalam throughout.\n\n' +
+              '- TRANSFORMATION ONLY: Do NOT add new sentences or invent content.\n' +
+              '- Use ഭരണഭാഷ official Malayalam (or English if the original is in English) throughout.\n' +
+              '- Do NOT hallucinate any names, figures, or amounts not in the original.\n\n' +
+
               'USER TRANSFORMATION REQUEST:\n' + hints;
           } else {
             // Scenario A — Reply (ultra lite output)
@@ -3550,17 +3579,52 @@
           // PLAIN TEXT MODE — short token-efficient prompts
           // ════════════════════════════════════════════════════════
           if (isTransformation) {
-            // Scenario B — Transformation (plain output)
+            // Scenario B — Smart Transformation (plain output)
             promptText =
               'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
-              'Read the attached PDF letter carefully. Also read any reference (📎) PDFs for context. Transform it according to the user request below.\n' +
-              'Output the transformed letter in ഔദ്യോഗിക Malayalam as PLAIN TEXT ONLY.\n\n' +
-              'RULES:\n' +
-              '- Plain Malayalam text only. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
-              '- Separate each section (number/date, sender, recipient, subject, body, closing) with ONE blank line.\n' +
-              '- Use ഭരണഭാഷ official Malayalam throughout.\n' +
+              'Read the attached PDF document carefully. Also read any reference (📎) PDFs for context.\n\n' +
+
+              '════ STEP 1 — DETECT DOCUMENT TYPE ════\n' +
+              'Classify the main document as ONE of:\n' +
+              '  [A] Standard Letter  — has Sender, Recipient, and salutation ("സർ," / "Dear Sir")\n' +
+              '  [B] Proceeding / G.O. / Order  — starts with "നടപടി", "G.O.", or "ഉത്തരവ്"\n' +
+              '  [C] Office Memo / Internal Note  — has "MEMO" or "കുറിപ്പ്" header\n' +
+              '  [D] Table / Salary Statement / Calculation Sheet  — primarily rows of figures and amounts\n' +
+              '  [E] Other official document\n\n' +
+
+              '════ STEP 2 — SMART MATHEMATICAL CALCULATION (apply if requested) ════\n' +
+              'If the user\'s request mentions a NEW date range (e.g., "April 8 to 30"), act as a smart clerk:\n' +
+              '  (a) Count the new number of days INCLUSIVE. Example: April 8–30 = 23 days.\n' +
+              '  (b) Find the ORIGINAL number of days and ORIGINAL Salary/Gross/Net amounts from the PDF.\n' +
+              '  (c) Calculate: New Amount = (Original Amount ÷ Original Days) × New Days.\n' +
+              '      Round every monetary result to the nearest whole number (integer). Do not use decimal places for amounts.\n' +
+              '  (d) Update ALL affected figures (Gross Pay, Deductions, Net Pay, etc.) in the output.\n\n' +
+
+              '════ STEP 3 — PRODUCE TRANSFORMED OUTPUT ════\n' +
+              'Apply ONLY the requested substitutions and calculated values. Clone all other content EXACTLY.\n\n' +
+
+              '▶ If document is [A] Standard LETTER:\n' +
+              'Output the full transformed letter as PLAIN TEXT with ONE blank line between each section:\n' +
+              '  നമ്പർ / തീയതി → Sender block → Recipient block → സർ, → വിഷയം → സൂചന → Body → Closing/Signature.\n' +
+              '  Update month names, date references, and calculated amounts as requested.\n\n' +
+
+              '▶ If document is [B] Proceeding / Order, [C] Memo, [D] Table, or [E] Other:\n' +
+              'DO NOT use Letter format. DO NOT add "പ്രേഷകൻ / സ്വീകർത്താവ് / സർ,".\n' +
+              'Reproduce the COMPLETE original document structure as PLAIN TEXT:\n' +
+              '  • Preserve all headings, clause numbers, and section labels exactly.\n' +
+              '  • For tables: reproduce each row with column values separated by spaces or | character.\n' +
+              '  • Replace ONLY the values requested — dates, month names, day counts, amounts.\n' +
+              '  • Place newly calculated figures from Step 2 in their exact positions.\n\n' +
+
+              'STRICT RULES:\n' +
+              '- PLAIN TEXT ONLY. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
+              '- TRANSFORMATION ONLY: Do NOT add new sentences or invent content.\n' +
+              '- Separate structural sections with ONE blank line.\n' +
+              '- Use ഭരണഭാഷ official Malayalam (or English if the original is in English) throughout.\n' +
+              '- Do NOT hallucinate any names, figures, or amounts not present in the original PDF.\n' +
               '- Today\'s date: ' + todayDate + '\n\n' +
-              'USER REQUEST:\n' + hints;
+
+              'USER TRANSFORMATION REQUEST:\n' + hints;
           } else {
             // Scenario A — Reply (plain output)
             promptText =
@@ -3589,107 +3653,133 @@
           promptText = isTransformation
 
             // ════════════════════════════════════════════════════════
-            // SCENARIO B — LETTER TRANSFORMATION / MONTH UPDATE
+            // SCENARIO B — SMART FORMAT DETECTION + CALCULATOR
             // ════════════════════════════════════════════════════════
             ? (
               'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government. Your ONLY task is to output a ' +
-              'TRANSFORMED version of the attached letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
-              'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
+              'TRANSFORMED version of the attached document in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
+              'rich-text editor. Output the HTML body ONLY — no preamble, no commentary, ' +
               'no explanations, no code fences, no prose outside the HTML.\n\n' +
 
-              'STEP 1 — READ THE ORIGINAL LETTER:\n' +
-              'Carefully read the main (⭐) PDF. Also read any reference (📎) PDFs for context. If it is a scanned image, use OCR/vision to read it. ' +
-              'Extract the COMPLETE content including:\n' +
-              '  (a) Document/reference number (e.g. ഡി.എം.ഒ.പി.എം./684/2026-G1)\n' +
-              '  (b) Date of the letter\n' +
-              '  (c) ALL month names mentioned anywhere — in the header, subject, body, enclosures\n' +
-              '  (d) Sender (പ്രേഷകൻ) — full name, designation, institution, address\n' +
-              '  (e) Recipient (സ്വീകർത്താവ്) — full name, designation, institution, address\n' +
-              '  (f) Subject (വിഷയം) and Reference (സൂചന) lines\n' +
-              '  (g) Every body paragraph — word for word\n' +
-              '  (h) Closing, signature block, enclosures if any\n\n' +
+              '════════════════════════════════════════════════════════\n' +
+              'STEP 1 — READ & CLASSIFY THE DOCUMENT:\n' +
+              '════════════════════════════════════════════════════════\n' +
+              'Carefully read the main (⭐) PDF. Also read any reference (📎) PDFs for context.\n' +
+              'If it is a scanned image, use OCR/vision to read every word.\n' +
+              'Classify the document as EXACTLY ONE of the following types:\n' +
+              '  [A] Standard Letter     — has a Sender block (പ്രേഷകൻ), Recipient block (സ്വീകർത്താവ്),\n' +
+              '                            and a salutation ("സർ," / "Dear Sir")\n' +
+              '  [B] Proceeding / G.O. / Order — begins with "നടപടി", "G.O.(Ms)No.", "ഉത്തരവ്", or similar\n' +
+              '  [C] Office Memo / Internal Note — has a "MEMO", "കുറിപ്പ്", or "Circular" header\n' +
+              '  [D] Salary / Pay / Table / Calculation Sheet — primarily rows of figures, amounts, dates\n' +
+              '  [E] Other official document\n\n' +
 
-              'STEP 2 — IDENTIFY THE TRANSFORMATION TARGET from the user hints:\n' +
-              'Determine the new target month and/or year the user wants to switch to.\n' +
-              'Example: if hints say "ജൂൺ മാസത്തെ കത്താക്കി മാറ്റുക", target month = ജൂൺ.\n\n' +
+              '════════════════════════════════════════════════════════\n' +
+              'STEP 2 — DETECT TRANSFORMATION TYPE & DO MATH:\n' +
+              '════════════════════════════════════════════════════════\n' +
+              'Read the user request carefully. Identify ALL of the following that apply:\n\n' +
+              '  (i) Month / Date substitution:\n' +
+              '      Replace the OLD month name / date with the NEW one everywhere in the document.\n\n' +
+              '  (ii) Date-range calculation (CRITICAL — act as a smart clerk):\n' +
+              '      If the user specifies a NEW date range (e.g. "April 8 to 30", "Change to 23–31 March"):\n' +
+              '        a. Count NEW days INCLUSIVE. Example: April 8–30 = 23 days.\n' +
+              '        b. Find the ORIGINAL date range and ORIGINAL day count from the PDF.\n' +
+              '        c. Extract the ORIGINAL Gross Salary / Pay / Amount from the document.\n' +
+              '        d. Compute: New Amount = (Original Amount ÷ Original Days) × New Days.\n' +
+              '           Round every monetary result to the nearest whole number (integer). Do not use decimal places for amounts.\n' +
+              '        e. Recompute ALL derived figures proportionally:\n' +
+              '           — Gross Pay, DA, HRA, and other allowances (if listed separately)\n' +
+              '           — Deductions (PF, PT, IT, etc.) if they are proportional to pay\n' +
+              '           — Net Pay = New Gross − New Total Deductions\n' +
+              '        f. Show the CALCULATED numeric values only — no formula text in the output.\n\n' +
+              '  (iii) Other substitutions — apply exactly as the user instructs.\n\n' +
 
-              'STEP 3 — PRODUCE THE TRANSFORMED LETTER:\n' +
-              'Clone the original letter EXACTLY, then make ONLY these targeted substitutions:\n' +
-              '  • Replace every occurrence of the OLD month name with the NEW target month throughout.\n' +
-              '  • Update the letter DATE (തീയതി) to today: ' + todayDate + '\n' +
-              '  • If the reference/document number contains a month abbreviation, serial period, or ' +
-              '    financial-year segment that corresponds to the old month, update it logically.\n' +
-              '  • If body text references attendance, reports, lists, or statistics for the old month, ' +
-              '    update those month references to the new target month.\n' +
-              '  • Keep ALL other content IDENTICAL — same sender, same recipient, same subject structure, ' +
-              '    same body sentences (only month names substituted), same closing, same enclosures.\n\n' +
+              '════════════════════════════════════════════════════════\n' +
+              'STEP 3 — PRODUCE THE TRANSFORMED HTML:\n' +
+              '════════════════════════════════════════════════════════\n' +
+              'Clone ALL content from the original document EXACTLY.\n' +
+              'Apply ONLY the substitutions and calculated values identified in Step 2.\n' +
+              'Choose the HTML structure based on the document type from Step 1:\n\n' +
 
-              'Produce the output in EXACTLY the HTML structure shown in the TEMPLATE below.\n' +
-              'Each section MUST be its own <div> with the correct style="text-align:..." attribute.\n' +
-              'Within address blocks, use <br> for line breaks — no nested tags inside.\n\n' +
-
-              'OUTPUT TEMPLATE — fill with transformed content and output THIS HTML ONLY:\n\n' +
+              '━━━ IF TYPE [A] STANDARD LETTER — use this structure: ━━━\n\n' +
 
               '<div style="text-align:center;"><strong>ഭരണഭാഷ – മാതൃഭാഷ</strong></div>\n' +
 
-              '<div style="text-align:left;">നമ്പർ: [Original reference number, with month/serial updated for new month if applicable]<br>' +
+              '<div style="text-align:left;">നമ്പർ: [Original reference number — update month/serial if applicable]<br>' +
               'തീയതി: ' + todayDate + '</div>\n' +
 
               '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-              '[Sender — EXACTLY as in the original letter]<br>' +
-              '[Designation]<br>' +
-              '[Institution]<br>' +
-              '[Place/Town]</div>\n' +
+              '[Sender name — EXACTLY as original]<br>[Designation]<br>[Institution]<br>[Place]</div>\n' +
 
               '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-              '[Recipient — EXACTLY as in the original letter]<br>' +
-              '[Designation]<br>' +
-              '[Institution]<br>' +
-              '[Full address with PIN code]</div>\n' +
+              '[Recipient name — EXACTLY as original]<br>[Designation]<br>[Institution]<br>[Full address with PIN]</div>\n' +
 
               '<div style="text-align:left;">സർ,</div>\n' +
 
-              '<div style="text-align:justify;"><strong>വിഷയം:</strong> [Subject — EXACTLY as original, old month swapped to new target month if present]</div>\n' +
+              '<div style="text-align:justify;"><strong>വിഷയം:</strong> [Subject — EXACTLY as original, month updated if applicable]</div>\n' +
 
-              '<div style="text-align:justify;"><strong>സൂചന:</strong> [Reference — EXACTLY as original if present; OMIT this div entirely if absent in original]</div>\n' +
+              '<div style="text-align:justify;"><strong>സൂചന:</strong> [Reference — EXACTLY as original; OMIT this div entirely if absent]</div>\n' +
 
               '[Each body paragraph in its OWN <div style="text-align:justify;">...</div> — ' +
-              'text EXACTLY as in original, with every old month name replaced by the new target month.]\n' +
-
+              'EXACTLY as original, with only the requested substitutions and calculated values applied.]\n\n' +
 
               '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
 
               '<div style="text-align:right;">(ഒപ്പ്)<br>' +
-              '[Sender full name — EXACTLY as original]<br>' +
-              '[Designation]<br>' +
-              '[Institution]<br>' +
-              '[Place]</div>\n' +
+              '[Sender full name — EXACTLY as original]<br>[Designation]<br>[Institution]<br>[Place]</div>\n' +
 
-              '[IF enclosures exist in original: ' +
-              '<div style="text-align:left;">ഉള്ളടക്കം: [same enclosures as original, month updated if applicable]</div> ' +
-              '— OMIT entirely if there are no enclosures.]\n\n' +
+              '[IF enclosures in original: <div style="text-align:left;">ഉള്ളടക്കം: [list, month updated if applicable]</div> — OMIT if none]\n\n' +
 
+              '━━━ IF TYPE [B] PROCEEDING / ORDER, [C] MEMO, [D] TABLE, or [E] OTHER — use these rules: ━━━\n\n' +
+
+              'CRITICAL: Do NOT use the Letter template above.\n' +
+              'Do NOT add "പ്രേഷകൻ", "സ്വീകർത്താവ്", or "സർ," to non-Letter documents.\n' +
+              'Instead, STRICTLY REPLICATE the original document layout:\n\n' +
+
+              '  • Document title/heading:\n' +
+              '    <div style="text-align:center;"><strong>[Title exactly as original]</strong></div>\n\n' +
+
+              '  • Reference number / date header:\n' +
+              '    <div style="text-align:left;">[No./Date line exactly as original, updated if requested]</div>\n\n' +
+
+              '  • Each clause, paragraph, or labelled section:\n' +
+              '    <div style="text-align:justify;">[Clause text — EXACTLY as original, substitutions applied]</div>\n\n' +
+
+              '  • For TABULAR data (salary rows, amounts, calculations) — use an HTML table:\n' +
+              '    <table style="border-collapse:collapse;width:100%;">\n' +
+              '      <tr>\n' +
+              '        <th style="border:1px solid black;padding:4px;">[Column Header]</th>\n' +
+              '        ... (one <th> per column, matching original)\n' +
+              '      </tr>\n' +
+              '      <tr>\n' +
+              '        <td style="border:1px solid black;padding:4px;">[Row value — use NEW calculated amount]</td>\n' +
+              '        ... (one <td> per cell)\n' +
+              '      </tr>\n' +
+              '      ... (one <tr> per row of the original table)\n' +
+              '    </table>\n\n' +
+
+              '  • Right-aligned totals or closing lines:\n' +
+              '    <div style="text-align:right;">[Amount or label]</div>\n\n' +
+
+              '  • Signature / authorisation block (if present in original):\n' +
+              '    <div style="text-align:right;">[Designation / Name — EXACTLY as original]</div>\n\n' +
+
+              '════════════════════════════════════════════════════════\n' +
               'STRICT RULES — follow every rule without exception:\n' +
-              '1. Output RAW HTML ONLY. The very first character must be "<" and the last must be ">". ' +
+              '════════════════════════════════════════════════════════\n' +
+              '1. Output RAW HTML ONLY. First character must be "<", last must be ">". ' +
               'Zero prose, zero commentary, zero blank lines before or after the HTML.\n' +
               '2. Do NOT wrap output in code fences (``` or ~~~) under any circumstances.\n' +
-              '3. Do NOT use any markdown formatting whatsoever — ' +
-              'NO **double asterisks**, NO *single asterisks*, NO # headings. ' +
-              'Use <strong>...</strong> tags for bold text only.\n' +
-              '4. Every section must be in its own <div> with the exact style="text-align:..." ' +
-              'shown in the template. Do NOT change, omit, or consolidate these attributes.\n' +
-              '5. Do NOT add any font-family, font-size, color, or other CSS properties — use text-align only.\n' +
-              '6. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
-              '7. Within address blocks — use <br> for line breaks only. No nested tags inside address divs.\n' +
-              '8. Each body paragraph must be in its OWN separate <div style="text-align:justify;"> tag. ' +
-              'Do NOT merge multiple paragraphs into one div.\n' +
-              '9. The closing sentence ("മേൽവിവരം...") must be in its own <div style="text-align:justify;"> ' +
-              'placed immediately before <div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>.\n' +
-              '10. Omit the enclosures div entirely if there are no enclosures.\n' +
-              '11. CRITICAL: Do NOT invent, hallucinate, or alter any names, designations, or institutions. ' +
-              'Copy them exactly as they appear in the original letter. If a name is unclear, leave it blank.\n' +
-              '12. TRANSFORMATION ONLY: Do NOT add new sentences or content. Do NOT rewrite. ' +
-              'ONLY substitute the old month name with the new target month throughout.\n\n' +
+              '3. Do NOT use any markdown — NO **asterisks**, NO # headings. Use <strong> for bold only.\n' +
+              '4. Do NOT add font-family, font-size, color, or other CSS — use text-align only (except table borders).\n' +
+              '5. TRANSFORMATION ONLY: Do NOT invent new sentences, paragraphs, or content not in the original.\n' +
+              '6. Do NOT force the Letter format [A] on documents of type [B], [C], [D], or [E].\n' +
+              '7. CRITICAL: Do NOT hallucinate any names, designations, amounts, or figures not in the original PDF.\n' +
+              '   If a name is unclear, leave it blank.\n' +
+              '8. Each body paragraph or table must be in its OWN element — do NOT merge sections.\n' +
+              '9. Calculated monetary values: output as plain numbers (e.g. 12450.50) — no formula text.\n' +
+              '10. Use ഭരണഭാഷ official Malayalam (or English if the original document is in English).\n' +
+              '11. Update the document DATE (തീയതി) to today: ' + todayDate + ' — for Letter type only.\n\n' +
 
               'USER TRANSFORMATION REQUEST:\n' + hints
             )
