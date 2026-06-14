@@ -3390,7 +3390,13 @@
         list.innerHTML = '';
         const files = Array.from(this.files);
         if (!files.length) return;
-
+        // 🌟 STRICT PDF VALIDATION (പുതിയതായി ചേർത്തത്) 🌟
+        const invalidFiles = files.filter(f => !f.name.toLowerCase().endsWith('.pdf') && f.type !== 'application/pdf');
+        if (invalidFiles.length > 0) {
+          showToast('⚠️ ദയവായി PDF ഫയലുകൾ മാത്രം അപ്‌ലോഡ് ചെയ്യുക (Word/Images അനുവദനീയമല്ല).', 5000);
+          this.value = ''; // തെറ്റായ ഫയൽ കൊടുത്താൽ അത് തനിയെ മാഞ്ഞുപോകും
+          return;
+        }
         files.forEach((file, idx) => {
           const li = document.createElement('li');
           li.style.cssText =
