@@ -1296,22 +1296,30 @@
         </div>
 
         <!-- ══ BYOK: Bring Your Own Gemini API Key ══ -->
-        <div
-          style="margin-top:6px; padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
-          <p
-            style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
-            🔑 Want faster drafts for Large Files? <span style="font-weight:900; color:#999;">(Required for 3+
-              Pages)</span>
-          </p>
-          <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
-            style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
-          <p style="margin:6px 0 0; font-size:0.72rem; color:#777; line-height:1.5;">
-            This is a one-time setup. The key will be saved securely in your own browser's LocalStorage.<br>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank"
-              style="color:#8b6508; font-weight:600; text-decoration:underline;">
-              Click here to get a FREE Gemini API Key from Google AI Studio
-            </a>
-          </p>
+        <p id="advanced-key-toggle" onclick="toggleAdvancedKey()"
+          style="margin:8px 0 0; font-size:0.76rem; color:#8b6508; cursor:pointer; user-select:none; display:flex; align-items:center; gap:4px; width:fit-content;">
+          ⚙️ Advanced: Use Personal API Key (Best for multi-page PDFs)
+          <span id="advanced-key-arrow"
+            style="font-size:0.65rem; display:inline-block; transition:transform 0.3s ease; transform:rotate(0deg);">▼</span>
+        </p>
+        <div id="advanced-key-section"
+          style="max-height:0; overflow:hidden; transition:max-height 0.35s ease; margin-top:4px;">
+          <div style="padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
+            <p
+              style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
+              🔑 Want faster drafts for Large Files? <span style="font-weight:900; color:#999;">(Required for 3+
+                Pages)</span>
+            </p>
+            <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
+              style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
+            <p style="margin:6px 0 0; font-size:0.72rem; color:#777; line-height:1.5;">
+              This is a one-time setup. The key will be saved securely in your own browser's LocalStorage.<br>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                style="color:#8b6508; font-weight:600; text-decoration:underline;">
+                Click here to get a FREE Gemini API Key from Google AI Studio
+              </a>
+            </p>
+          </div>
         </div>
 
       </div>
@@ -3131,6 +3139,14 @@
       }
 
     })();
+    // ── BYOK Advanced Key Toggle ──────────────────────────────────
+    function toggleAdvancedKey() {
+      const section = document.getElementById('advanced-key-section');
+      const arrow = document.getElementById('advanced-key-arrow');
+      const isOpen = section.style.maxHeight !== '' && section.style.maxHeight !== '0px';
+      section.style.maxHeight = isOpen ? '0px' : section.scrollHeight + 'px';
+      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
     /* ══════════════════════════════════════
        AI DRAFT – GEMINI 1.5 FLASH INTEGRATION
     ══════════════════════════════════════ */
@@ -3144,7 +3160,14 @@
         // Don't clear hints — user may want to re-use them
         // ── BYOK: Restore saved Gemini API key from LocalStorage ──
         const savedKey = localStorage.getItem('edraft_user_gemini_key');
-        if (savedKey) document.getElementById('ai-user-api-key').value = savedKey;
+        if (savedKey) {
+          document.getElementById('ai-user-api-key').value = savedKey;
+          // Auto-expand so returning users see their key is active
+          const _s = document.getElementById('advanced-key-section');
+          const _a = document.getElementById('advanced-key-arrow');
+          _s.style.maxHeight = _s.scrollHeight + 'px';
+          _a.style.transform = 'rotate(180deg)';
+        }
         modal.classList.add('open');
       });
 
