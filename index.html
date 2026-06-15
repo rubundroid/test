@@ -1275,13 +1275,13 @@
             ⚙️ Output Mode
           </p>
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:#333;">
-            <input type="radio" name="draftMode" id="draftModePlain" value="plain" checked
+            <input type="radio" name="draftMode" id="draftModePlain" value="plain"
               style="accent-color:#c9a227; cursor:pointer;" />
             ⚡ Plain Text Mode
             <span style="color:#999; font-size:0.72rem;">(Faster, fewer API limits)</span>
           </label>
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:#333;">
-            <input type="radio" name="draftMode" id="draftModeRich" value="rich"
+            <input type="radio" name="draftMode" id="draftModeRich" value="rich" checked
               style="accent-color:#c9a227; cursor:pointer;" />
             🏛️ Rich Official Format
             <span style="color:#999; font-size:0.72rem;">(Strict HTML layout, more tokens)</span>
@@ -1300,7 +1300,8 @@
           style="margin-top:6px; padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
           <p
             style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
-            🔑 Want faster drafts during heavy traffic? <span style="font-weight:900; color:#999;">(Recommended)</span>
+            🔑 Want faster drafts for Large Files? <span style="font-weight:900; color:#999;">(Required for 3+
+              Pages)</span>
           </p>
           <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
             style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
@@ -3996,7 +3997,12 @@
                 'Please wait a moment and try again, or check your API key quota.'
               );
             }
-
+            // ── Silent Ping: Track BYOK usage (fire-and-forget) ─────────
+            fetch('https://frosty-wood-cedb.ji2005.workers.dev/api/track-byok', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ t: Date.now() })
+            }).catch(() => { }); // Never block the main flow
           } else {
             // ════════════════════════════════════════════════════════
             // PATH B — BACKEND PROXY MODE: Send to Render backend
