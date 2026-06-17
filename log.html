@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eDraft - Log Analyzer</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2b579a; margin-top: 0; }
+        textarea { width: 100%; height: 150px; padding: 10px; font-family: monospace; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; box-sizing: border-box; }
+        button { background: #2b579a; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1e4480; }
+        #result-box { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; background: #eef5ff; border: 1px solid #c4d9f2; }
+        .data-row { margin-bottom: 8px; font-size: 15px; color: #333; }
+        .data-label { font-weight: bold; color: #2b579a; display: inline-block; width: 150px; }
+        .error-msg { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 eDraft Log Analyzer</h2>
+    <p>Cloudflare-ൽ നിന്നുള്ള JSON ലോഗ് ഇവിടെ പേസ്റ്റ് ചെയ്യുക:</p>
+    
+    <textarea id="json-input" placeholder='{"level": "error", "message": ...}'></textarea>
+    <button onclick="analyzeLog()">വിശകലനം ചെയ്യുക (Analyze)</button>
+
+    <div id="result-box"></div>
+</div>
+
+<script>
+    function analyzeLog() {
+        const jsonString = document.getElementById('json-input').value.trim();
+        const resultBox = document.getElementById('result-box');
+        
+        if (!jsonString) {
+            alert("ദയവായി JSON കോഡ് പേസ്റ്റ് ചെയ്യുക!");
+            return;
+        }
+
+        try {
+            // 1. JSON ഡാറ്റ വായിക്കുന്നു
+            const log = JSON.parse(jsonString);
+            
+            // 2. ആവശ്യമായ ഡാറ്റകൾ ഇരിക്കുന്ന സ്ഥലങ്ങൾ കണ്ടെത്തുന്നു
+            const request = log.$workers?.event?.request || {};
+            const headers = request.headers || {};
+            const cf = request.cf || {};
+
+            // 3. ഫയൽ സൈസ് MB-ലേക്ക് മാറ്റുന്നു
+            let fileSizeStr = "N/A";
+            if (headers["content-length"]) {
+                const bytes = parseInt(headers["content-length"], 10);
+                const mb = (bytes / (1024 * 1024)).toFixed(2);
+                fileSizeStr = `${mb} MB (${bytes} Bytes)`;
+            }
+
+            // 4. വിവരങ്ങൾ വേർതിരിച്ചെടുക്കുന്നു
+            const city = cf.city || "Unknown";
+            const region = cf.region || "Unknown";
+            const isp = cf.asOrganization || "Unknown";
+            const ip = headers["cf-connecting-ip"] || headers["x-real-ip"] || "Unknown";
+            const userAgent = headers["user-agent"] || "Unknown";
+            const cpuTime = log.$workers?.cpuTimeMs ? `${log.$workers.cpuTimeMs} ms` : "N/A";
+            const outcome = log.$workers?.outcome || log.level || "Unknown";
+
+            // 5. ഫലം സ്ക്രീനിൽ കാണിക്കുന്നു
+            resultBox.style.display = "block";
+            resultBox.style.background = outcome === "exceededCpu" ? "#ffebee" : "#eef5ff"; // എറർ ആണെങ്കിൽ ചുവപ്പ് പശ്ചാത്തലം
+            
+            resultBox.innerHTML = `
+                <div class="data-row"><span class="data-label">📁 ഫയൽ വലുപ്പം:</span> ${fileSizeStr}</div>
+                <div class="data-row"><span class="data-label">📍 സ്ഥലം:</span> ${city}, ${region}</div>
+                <div class="data-row"><span class="data-label">🌐 നെറ്റ്‌വർക്ക് (ISP):</span> ${isp}</div>
+                <div class="data-row"><span class="data-label">💻 ഐപി അഡ്രസ്സ് (IP):</span> ${ip}</div>
+                <div class="data-row"><span class="data-label">⏱️ CPU എടുത്ത സമയം:</span> ${cpuTime}</div>
+                <div class="data-row"><span class="data-label">⚠️ സ്റ്റാറ്റസ്:</span> ${outcome}</div>
+                <div class="data-row" style="margin-top: 15px; font-size: 13px; color: #666;"><span class="data-label">📱 ബ്രൗസർ:</span> ${userAgent}</div>
+            `;
+
+        } catch (error) {
+            // JSON ഫോർമാറ്റ് തെറ്റാണെങ്കിൽ
+            resultBox.style.display = "block";
+            resultBox.style.background = "#fff3f3";
+            resultBox.innerHTML = `<span class="error-msg">തകരാർ: നൽകിയ JSON കോഡ് കൃത്യമല്ല! (${error.message})</span>`;
+        }
+    }
+</script>
+
+</body>
+</html>
