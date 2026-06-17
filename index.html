@@ -3550,6 +3550,14 @@
           showToast('⚠️ Please select at least one PDF.'); return;
         }
 
+        // 🌟 ഫയൽ സൈസ് ചെക്ക് ചെയ്യുന്ന പുതിയ കോഡ് 🌟
+        let totalSize = 0;
+        files.forEach(f => totalSize += f.size);
+        if (totalSize > 2.5 * 1024 * 1024 && !userApiKeyVal) {
+          showToast('⚠️ ഫയൽ സൈസ് വളരെ വലുതാണ് (Max 2.5MB)! വലിയ ഫയലുകൾക്ക് ദയവായി Advanced ഓപ്ഷനിൽ സ്വന്തം API Key നൽകുക.', 7000);
+          return;
+        }
+
         // Determine which file index is the Main Letter
         const mainRadio = document.querySelector('input[name="ai-main-file"]:checked');
         const mainIdx = mainRadio ? parseInt(mainRadio.value, 10) : 0;
