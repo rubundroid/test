@@ -904,6 +904,131 @@
       text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
       max-width: 320px;
     }
+
+    /* ══════════════════════════════════════
+   SIZE LIMIT ALERT — Premium Popup
+══════════════════════════════════════ */
+    #size-limit-alert {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: rgba(10, 18, 40, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #size-limit-alert.active {
+      display: flex;
+      animation: slaFadeIn 0.22s ease;
+    }
+
+    @keyframes slaFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .sla-card {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow:
+        0 32px 72px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
+      padding: 36px 30px 28px;
+      max-width: 420px;
+      width: 92%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+      animation: slaSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slaSlideUp {
+      from {
+        transform: translateY(30px) scale(0.94);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    .sla-icon {
+      width: 74px;
+      height: 74px;
+      background: linear-gradient(135deg, #fff4c2, #ffd94a);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      box-shadow: 0 6px 22px rgba(240, 192, 64, 0.50);
+      flex-shrink: 0;
+    }
+
+    .sla-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+
+    .sla-body {
+      font-size: 0.875rem;
+      line-height: 1.75;
+      color: #444;
+      font-family: 'Noto Sans Malayalam', 'Manjari', 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 12px 16px;
+      background: #fffbee;
+      border: 1.5px solid #f0c040;
+      border-radius: 10px;
+      text-align: left;
+    }
+
+    .sla-ok-btn {
+      margin-top: 4px;
+      padding: 11px 44px;
+      background: linear-gradient(135deg, #2b579a 0%, #1a3e75 100%);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      box-shadow: 0 5px 16px rgba(43, 87, 154, 0.45);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      font-family: 'Noto Sans Malayalam', 'Manjari', 'Segoe UI', sans-serif;
+    }
+
+    .sla-ok-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(43, 87, 154, 0.55);
+    }
+
+    .sla-ok-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(43, 87, 154, 0.38);
+    }
+
+    @media print {
+      #size-limit-alert {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 
@@ -1388,6 +1513,20 @@
         </button>
         <button class="btn" id="ai-draft-cancel-btn">Cancel</button>
       </div>
+    </div>
+  </div>
+  <!-- ══════════════════════════════════════
+   SIZE LIMIT ALERT POPUP
+══════════════════════════════════════ -->
+  <div id="size-limit-alert" role="alertdialog" aria-modal="true" aria-labelledby="sla-title-text">
+    <div class="sla-card">
+      <div class="sla-icon">⚠️</div>
+      <p class="sla-title" id="sla-title-text">ഫയൽ സൈസ് കൂടുതലാണ്!</p>
+      <p class="sla-body">
+        ⚠️ ഫയൽ സൈസ് വളരെ വലുതാണ് (Max 2.5MB)! വലിയ ഫയലുകൾക്ക് ദയവായി
+        Advanced ഓപ്ഷനിൽ സ്വന്തം API Key നൽകുക.
+      </p>
+      <button class="sla-ok-btn" id="sla-ok-btn">🔑 OK, API Key നൽകാം</button>
     </div>
   </div>
   <!-- ══════════════════════════════════════
@@ -3550,11 +3689,10 @@
           showToast('⚠️ Please select at least one PDF.'); return;
         }
 
-        // 🌟 ഫയൽ സൈസ് ചെക്ക് ചെയ്യുന്ന പുതിയ കോഡ് 🌟
-        let totalSize = 0;
-        files.forEach(f => totalSize += f.size);
+        // ── File Size Limit Check (2.5 MB cap for shared backend) ──
+        const totalSize = files.reduce((sum, f) => sum + f.size, 0);
         if (totalSize > 2.5 * 1024 * 1024 && !userApiKeyVal) {
-          showToast('⚠️ ഫയൽ സൈസ് വളരെ വലുതാണ് (Max 2.5MB)! വലിയ ഫയലുകൾക്ക് ദയവായി Advanced ഓപ്ഷനിൽ സ്വന്തം API Key നൽകുക.', 7000);
+          document.getElementById('size-limit-alert').classList.add('active');
           return;
         }
 
@@ -4160,9 +4298,24 @@
 
         closeAiModal();
         showToast('✅ AI reply drafted! Review and edit before sending.', 4500);
+      });          // ← closes the generate btn click listener
+
+      // ── Size Limit Alert: OK Button Handler ────────────────────
+      document.getElementById('sla-ok-btn').addEventListener('click', () => {
+        // 1. Hide the popup
+        document.getElementById('size-limit-alert').classList.remove('active');
+
+        // 2. Expand the Advanced Key section (reuse existing toggle;
+        //    guard against calling it when already open)
+        const section = document.getElementById('advanced-key-section');
+        const isOpen = section.style.maxHeight !== '' && section.style.maxHeight !== '0px';
+        if (!isOpen) toggleAdvancedKey();
+
+        // 3. Focus after the 0.35s CSS transition finishes
+        setTimeout(() => document.getElementById('ai-user-api-key').focus(), 400);
       });
 
-    })();
+    })();          // ← closes the outer IIFE
   </script>
   <script>
     // Service Worker Registration
@@ -4183,6 +4336,7 @@
       <div class="ai-overlay-text">⏳ AI കത്ത് തയ്യാറാക്കുകയാണ്...<br>ദയവായി കാത്തിരിക്കുക</div>
     </div>
   </div>
+
 </body>
 
 </html>
