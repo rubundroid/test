@@ -3671,6 +3671,7 @@
 
       // ── Generate button ────────────────────────────────────────
       document.getElementById('ai-draft-generate-btn').addEventListener('click', async () => {
+        const WORKER_SECRET = 'edraft-2026-secret'; // Worker env-മായി match ആകണം
         const hints = document.getElementById('ai-draft-hints').value.trim();
         const draftMode = document.querySelector('input[name="draftMode"]:checked')?.value ?? 'plain';
         const fileInp = document.getElementById('ai-draft-pdf-input');
@@ -4164,7 +4165,7 @@
             // ── Model Fallback Array ─────────────────────────────────
             // Try each model in order. On 429 / 500 / 503 → skip to
             // the next model automatically. Break on first success.
-            const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-flash-latest'];
+            const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
             const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
             let byokSuccess = false;
 
@@ -4233,7 +4234,7 @@
             // ── Silent Ping: Track BYOK usage (fire-and-forget) ─────────
             fetch('https://frosty-wood-cedb.ji2005.workers.dev/api/track-byok', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET },
               body: JSON.stringify({ t: Date.now() })
             }).catch(() => { }); // Never block the main flow
           } else {
@@ -4245,7 +4246,7 @@
             // ════════════════════════════════════════════════════════
             const res = await fetch('https://frosty-wood-cedb.ji2005.workers.dev/api/generate-draft', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET },
               body: JSON.stringify({ promptText, files: filesArray })
             });
 
