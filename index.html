@@ -3608,6 +3608,34 @@
           .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
           .join('\n');
       }
+      // ── Post-process rich HTML: letter formatting ───────────────────────
+      function applyLetterFormatting(html) {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = html;
+        wrap.querySelectorAll('div').forEach(div => {
+          const txt = div.textContent || '';
+          // Address indent after label
+          if (/^(പ്രേഷകൻ|സ്വീകർത്താവ്)/.test(txt.trim())) {
+            const raw = div.innerHTML.replace(/<\/?span[^>]*>/gi, '');
+            const m = raw.match(/<br\s*\/?>/i);
+            if (m) {
+              const pos = raw.indexOf(m[0]);
+              const after = raw.slice(pos + m[0].length).trim();
+              if (after) {
+                div.innerHTML = raw.slice(0, pos) + '<br>' +
+                  `<span style="display:block;margin-left:40px;">${after}</span>`;
+              }
+            }
+          }
+          // വിഷയം / സൂചന indent
+          if (/വിഷയം:|സൂചന:/.test(txt)) {
+            const cur = div.getAttribute('style') || '';
+            if (!cur.includes('margin-left'))
+              div.setAttribute('style', (cur + ';margin-left:40px;').replace(/^;/, ''));
+          }
+        });
+        return wrap.innerHTML;
+      }
       // ── File input → build role-selection list ─────────────────
       document.getElementById('ai-draft-pdf-input').addEventListener('change', function () {
         const list = document.getElementById('ai-draft-file-list');
@@ -3950,16 +3978,16 @@
               '<div style="text-align:right;">തീയതി: ' + todayDate + '</div>\n' +
 
               '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-              '<span style="display:block; margin-left:40px;">[Designation — if original has a personal name too, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Place]</span></div>\n' +
+              '[Designation (if personal name also present in original, write "Name / Designation" on same line — never a blank line)]<br>[Institution]<br>[Place]</div>\n' +
 
               '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-              '<span style="display:block; margin-left:40px;">[Designation — if original has a personal name too, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Full address with PIN]</span></div>\n' +
+              '[Designation (if personal name also present in original, write "Name / Designation" on same line — never a blank line)]<br>[Institution]<br>[Full address with PIN]</div>\n' +
 
               '<div style="text-align:left;">സർ,</div>\n' +
 
-              '<div style="text-align:justify; margin-left:40px;"><strong>വിഷയം:</strong> [Subject — EXACTLY as original, month updated if applicable]</div>\n' +
+              '<div style="text-align:justify;"><strong>വിഷയം:</strong> [Subject — EXACTLY as original, month updated if applicable]</div>\n' +
 
-              '<div style="text-align:justify; margin-left:40px;"><strong>സൂചന:</strong> [Reference — EXACTLY as original; OMIT this div entirely if absent]</div>\n' +
+              '<div style="text-align:justify;"><strong>സൂചന:</strong> [Reference — EXACTLY as original; OMIT this div entirely if absent]</div>\n' +
 
               '[Each body paragraph in its OWN <div style="text-align:justify;">...</div> — ' +
               'EXACTLY as original, with only the requested substitutions and calculated values applied.]\n\n' +
@@ -4048,7 +4076,7 @@
               'Replace every [...] placeholder with the actual extracted or drafted content.\n' +
               'Each section MUST be its own <div> element with the correct style="text-align:..." ' +
               'attribute — do NOT merge multiple sections into one <div>.\n' +
-              'Within address blocks, use <span style="display:block; margin-left:40px;"> to wrap the address lines after the label, separating lines with <br>. Do NOT use nested <div> or <p> tags.\n\n' +
+              'Within address blocks, separate lines with <br> — do NOT use nested <div> or <p> tags inside.\n\n' +
 
               'OUTPUT TEMPLATE — fill every placeholder and output THIS HTML ONLY:\n\n' +
 
@@ -4058,16 +4086,21 @@
               '<div style="text-align:right;">തീയതി: ' + todayDate + '</div>\n' +
 
               '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-              '<span style="display:block; margin-left:40px;">[Designation of Reply Sender — if a personal name is also present, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Place/Town]</span></div>\n' +
+              '[Designation of Reply Sender (if personal name present, write "Name / Designation" on same line — never a blank line)]<br>' +
+              '[Institution]<br>' +
+              '[Place/Town]</div>\n' +
 
               '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-              '<span style="display:block; margin-left:40px;">[Designation of Reply Recipient — if a personal name is also present, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Full office address with PIN code]</span></div>\n' +
+              '[Designation of Reply Recipient (if personal name present, write "Name / Designation" on same line — never a blank line)]<br>' +
+              '[Institution]<br>' +
+              '[Full office address with PIN code]</div>\n' +
 
               '<div style="text-align:left;">സർ,</div>\n' +
 
-              '<div style="text-align:justify; margin-left:40px;"><strong>വിഷയം:</strong> [One concise formal Malayalam sentence clearly stating the subject of this reply]</div>\n' +
+              '<div style="text-align:justify;"><strong>വിഷയം:</strong> [One concise formal Malayalam sentence clearly stating the subject of this reply]</div>\n' +
 
-              '<div style="text-align:justify; margin-left:40px;"><strong>സൂചന:</strong> [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 dated 01-06-2026"]</div>\n' +
+              '<div style="text-align:justify;"><strong>സൂചന:</strong> [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 dated 01-06-2026"]</div>\n' +
+
               '<div style="text-align:justify;">[Body Paragraph 1: Open formally, e.g. "സൂചന കത്തിലെ നിർദ്ദേശപ്രകാരം..." — ' +
               'link the subject and the reference letter in one or two sentences.]</div>\n' +
 
@@ -4282,8 +4315,8 @@
 
         // ── Insert into TinyMCE ─────────────────────────────────
         const htmlContent = (draftMode === 'plain' || draftMode === 'ultralite')
-          ? plainTextToEditorHtml(responseText)   // plain/ultralite \n → <p>/<br>
-          : responseText.trim();                  // rich: raw HTML as-is
+          ? plainTextToEditorHtml(responseText)          // plain/ultralite
+          : applyLetterFormatting(responseText.trim());  // rich: JS formats
         const ed = getEditor();
         if (ed) {
           ed.setContent(htmlContent);
