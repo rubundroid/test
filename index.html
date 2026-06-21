@@ -3950,10 +3950,10 @@
               '<div style="text-align:right;">തീയതി: ' + todayDate + '</div>\n' +
 
               '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-              '<span style="display:block; padding-left:40px;">[Sender name — EXACTLY as original]<br>[Designation]<br>[Institution]<br>[Place]</span></div>\n' +
+              '<span style="display:block; margin-left:40px;">[Designation — if original has a personal name too, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Place]</span></div>\n' +
 
               '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-              '<span style="display:block; padding-left:40px;">[Recipient name — EXACTLY as original]<br>[Designation]<br>[Institution]<br>[Full address with PIN]</span></div>\n' +
+              '<span style="display:block; margin-left:40px;">[Designation — if original has a personal name too, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Full address with PIN]</span></div>\n' +
 
               '<div style="text-align:left;">സർ,</div>\n' +
 
@@ -4048,7 +4048,7 @@
               'Replace every [...] placeholder with the actual extracted or drafted content.\n' +
               'Each section MUST be its own <div> element with the correct style="text-align:..." ' +
               'attribute — do NOT merge multiple sections into one <div>.\n' +
-              'Within address blocks, separate lines with <br> — do NOT use nested <div> or <p> tags inside.\n\n' +
+              'Within address blocks, use <span style="display:block; margin-left:40px;"> for indented address lines after the label — separate those lines with <br>. Do NOT use nested <div> or <p> tags inside.\n\n' +
 
               'OUTPUT TEMPLATE — fill every placeholder and output THIS HTML ONLY:\n\n' +
 
@@ -4058,10 +4058,10 @@
               '<div style="text-align:right;">തീയതി: ' + todayDate + '</div>\n' +
 
               '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-              '<span style="display:block; padding-left:40px;">[Name of Reply Sender — originally the Recipient of the incoming letter]<br>[Designation]<br>[Institution]<br>[Place/Town]</span></div>\n' +
+              '<span style="display:block; margin-left:40px;">[Designation of Reply Sender — if a personal name is also present, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Place/Town]</span></div>\n' +
 
               '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-              '<span style="display:block; padding-left:40px;">[Name of Reply Recipient — originally the Sender of the incoming letter]<br>[Designation]<br>[Institution]<br>[Full office address with PIN code]</span></div>\n' +
+              '<span style="display:block; margin-left:40px;">[Designation of Reply Recipient — if a personal name is also present, write "Name / Designation" on ONE line. NEVER output a blank line.]<br>[Institution]<br>[Full office address with PIN code]</span></div>\n' +
 
               '<div style="text-align:left;">സർ,</div>\n' +
 
