@@ -3612,28 +3612,55 @@
       function applyLetterFormatting(html) {
         const wrap = document.createElement('div');
         wrap.innerHTML = html;
-        wrap.querySelectorAll('div').forEach(div => {
-          const txt = div.textContent || '';
-          // Address indent after label
-          if (/^(പ്രേഷകൻ|സ്വീകർത്താവ്)/.test(txt.trim())) {
-            const raw = div.innerHTML.replace(/<\/?span[^>]*>/gi, '');
-            const m = raw.match(/<br\s*\/?>/i);
-            if (m) {
-              const pos = raw.indexOf(m[0]);
-              const after = raw.slice(pos + m[0].length).trim();
-              if (after) {
-                div.innerHTML = raw.slice(0, pos) + '<br>' +
+
+        const elems = Array.from(wrap.children);
+        let addrMode = false;
+
+        for (const el of elems) {
+          if (el.tagName !== 'DIV') continue;
+          const txt = (el.textContent || '').trim();
+          const raw = el.innerHTML;
+
+          // ── Address label ─────────────────────────────────────────────────────
+          if (/^(പ്രേഷകൻ|സ്വീകർത്താവ്)/.test(txt)) {
+            const brm = raw.match(/<br\s*\/?>/i);
+            if (brm) {
+              // Case A: label<br>lines all in one div
+              const pos = raw.indexOf(brm[0]);
+              const after = raw.slice(pos + brm[0].length).trim()
+                .replace(/<\/?span[^>]*>/gi, '');
+              if (after)
+                el.innerHTML = raw.slice(0, pos) + '<br>' +
                   `<span style="display:block;margin-left:40px;">${after}</span>`;
-              }
+              addrMode = false;
+            } else {
+              // Case B: label-only div → next divs are address lines
+              addrMode = true;
+            }
+            continue;
+          }
+
+          // ── Separate address-line divs ────────────────────────────────────────
+          if (addrMode) {
+            if (/^സർ,?/.test(txt) || /^വിശ്വാസ/.test(txt)) {
+              addrMode = false; // body started — stop indenting
+            } else {
+              const cur = el.getAttribute('style') || '';
+              if (!cur.includes('margin-left'))
+                el.setAttribute('style',
+                  (cur + ';margin-left:40px;').replace(/^;/, ''));
             }
           }
-          // വിഷയം / സൂചന indent
-          if (/വിഷയം:|സൂചന:/.test(txt)) {
-            const cur = div.getAttribute('style') || '';
+
+          // ── വിഷയം / സൂചന ─────────────────────────────────────────────────────
+          if (/വിഷയം:|സൂചന:/.test(raw)) {
+            const cur = el.getAttribute('style') || '';
             if (!cur.includes('margin-left'))
-              div.setAttribute('style', (cur + ';margin-left:40px;').replace(/^;/, ''));
+              el.setAttribute('style',
+                (cur + ';margin-left:40px;').replace(/^;/, ''));
           }
-        });
+        }
+
         return wrap.innerHTML;
       }
       // ── File input → build role-selection list ─────────────────
@@ -4316,10 +4343,26 @@
         // ── Insert into TinyMCE ─────────────────────────────────
         const htmlContent = (draftMode === 'plain' || draftMode === 'ultralite')
           ? plainTextToEditorHtml(responseText)          // plain/ultralite
-          : applyLetterFormatting(responseText.trim());  // rich: JS formats
+          : responseText.trim();                         // rich: indent via DOM below
         const ed = getEditor();
         if (ed) {
           ed.setContent(htmlContent);
+          if (draftMode !== 'plain' && draftMode !== 'ultralite') {
+            let inAddr = false;
+            Array.from(ed.getBody().children).forEach(el => {
+              if (!/^(DIV|P)$/.test(el.tagName)) return;
+              const txt = (el.textContent || '').trim();
+              if (/^(പ്രേഷകൻ|സ്വീകർത്താവ്)/.test(txt)) {
+                inAddr = true; return;
+              }
+              if (inAddr) {
+                if (/^(സർ,?|വിശ്വാസ)/.test(txt)) { inAddr = false; return; }
+                el.style.paddingLeft = '40px'; return;
+              }
+              if (/വിഷയം:|സൂചന:/.test(el.innerHTML))
+                el.style.paddingLeft = '40px';
+            });
+          }
           updateWordCount();
         }
 
