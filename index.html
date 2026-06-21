@@ -3608,61 +3608,7 @@
           .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
           .join('\n');
       }
-      // ── Post-process rich HTML: letter formatting ───────────────────────
-      function applyLetterFormatting(html) {
-        const wrap = document.createElement('div');
-        wrap.innerHTML = html;
 
-        const elems = Array.from(wrap.children);
-        let addrMode = false;
-
-        for (const el of elems) {
-          if (el.tagName !== 'DIV') continue;
-          const txt = (el.textContent || '').trim();
-          const raw = el.innerHTML;
-
-          // ── Address label ─────────────────────────────────────────────────────
-          if (/^(പ്രേഷകൻ|സ്വീകർത്താവ്)/.test(txt)) {
-            const brm = raw.match(/<br\s*\/?>/i);
-            if (brm) {
-              // Case A: label<br>lines all in one div
-              const pos = raw.indexOf(brm[0]);
-              const after = raw.slice(pos + brm[0].length).trim()
-                .replace(/<\/?span[^>]*>/gi, '');
-              if (after)
-                el.innerHTML = raw.slice(0, pos) + '<br>' +
-                  `<span style="display:block;margin-left:40px;">${after}</span>`;
-              addrMode = false;
-            } else {
-              // Case B: label-only div → next divs are address lines
-              addrMode = true;
-            }
-            continue;
-          }
-
-          // ── Separate address-line divs ────────────────────────────────────────
-          if (addrMode) {
-            if (/^സർ,?/.test(txt) || /^വിശ്വാസ/.test(txt)) {
-              addrMode = false; // body started — stop indenting
-            } else {
-              const cur = el.getAttribute('style') || '';
-              if (!cur.includes('margin-left'))
-                el.setAttribute('style',
-                  (cur + ';margin-left:40px;').replace(/^;/, ''));
-            }
-          }
-
-          // ── വിഷയം / സൂചന ─────────────────────────────────────────────────────
-          if (/വിഷയം:|സൂചന:/.test(raw)) {
-            const cur = el.getAttribute('style') || '';
-            if (!cur.includes('margin-left'))
-              el.setAttribute('style',
-                (cur + ';margin-left:40px;').replace(/^;/, ''));
-          }
-        }
-
-        return wrap.innerHTML;
-      }
       // ── File input → build role-selection list ─────────────────
       document.getElementById('ai-draft-pdf-input').addEventListener('change', function () {
         const list = document.getElementById('ai-draft-file-list');
