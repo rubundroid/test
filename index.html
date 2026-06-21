@@ -4353,7 +4353,19 @@
               if (!/^(DIV|P)$/.test(el.tagName)) return;
               const txt = (el.textContent || '').trim();
               if (/^(പ്രേഷകൻ|സ്വീകർത്താവ്)/.test(txt)) {
-                inAddr = true; return;
+                const brm = el.innerHTML.match(/<br\s*\/?>/i);
+                if (brm) {
+                  // Same div: label<br>address lines — wrap address in indent span
+                  const pos = el.innerHTML.indexOf(brm[0]);
+                  const after = el.innerHTML.slice(pos + brm[0].length).trim();
+                  if (after)
+                    el.innerHTML = el.innerHTML.slice(0, pos) + '<br>' +
+                      `<span style="display:block;padding-left:40px;">${after}</span>`;
+                  inAddr = false;
+                } else {
+                  inAddr = true; // label-only div: next siblings are address lines
+                }
+                return;
               }
               if (inAddr) {
                 if (/^(സർ,?|വിശ്വാസ)/.test(txt)) { inAddr = false; return; }
