@@ -4329,7 +4329,7 @@
                 if (/^(സർ,?|വിശ്വാസ)/.test(txt)) { inAddr = false; return; }
                 el.innerHTML = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + el.innerHTML; return;
               }
-              if (/വിഷയം|സൂചന/.test(el.innerHTML))
+              if (/^(വിഷയം:|സൂചന:)/.test(txt))
                 el.innerHTML = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + el.innerHTML;
             });
           }
