@@ -4304,9 +4304,13 @@
                   // Same div: label<br>address lines — wrap address in indent span
                   const pos = el.innerHTML.indexOf(brm[0]);
                   const after = el.innerHTML.slice(pos + brm[0].length).trim();
-                  if (after)
-                    el.innerHTML = el.innerHTML.slice(0, pos) + '<br>' +
-                      `<span style="display:block;padding-left:40px;">${after}</span>`;
+                  if (after) {
+                    const SP = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
+                    const indented = after.split(/<br\s*\/?>/i)
+                      .map(l => l.trim()).filter(l => l)
+                      .map(l => SP + l).join('<br>');
+                    el.innerHTML = el.innerHTML.slice(0, pos) + '<br>' + indented;
+                  }
                   inAddr = false;
                 } else {
                   inAddr = true; // label-only div: next siblings are address lines
@@ -4315,10 +4319,10 @@
               }
               if (inAddr) {
                 if (/^(സർ,?|വിശ്വാസ)/.test(txt)) { inAddr = false; return; }
-                el.style.paddingLeft = '40px'; return;
+                el.innerHTML = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + el.innerHTML; return;
               }
-              if (/വിഷയം:|സൂചന:/.test(el.innerHTML))
-                el.style.paddingLeft = '40px';
+              if (/വിഷയം|സൂചന/.test(el.innerHTML))
+                el.innerHTML = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + el.innerHTML;
             });
           }
           updateWordCount();
