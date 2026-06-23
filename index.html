@@ -4267,17 +4267,25 @@
 
         } catch (err) {
           // ── Unified error handler for both paths ─────────────────
-          const errMsg = (err.message || '').toLowerCase();
-          if (
-            err.message.includes('429') ||
-            err.message.includes('503') ||
-            err.message.includes('exhausted') ||
-            err.message.includes('quota') ||
-            err.message.includes('failed')
+          const errMsg = err.message || '';
+          if (errMsg.startsWith('GEMINI_BUSY:')) {
+            // Worker: server busy/timeout — show message + auto-expand BYOK
+            showToast('⚠️ ' + errMsg.replace('GEMINI_BUSY:', ''), 8000);
+            const sec = document.getElementById('advanced-key-section');
+            const arr = document.getElementById('advanced-key-arrow');
+            const isOpen = sec.style.maxHeight !== '' && sec.style.maxHeight !== '0px';
+            if (!isOpen) {
+              sec.style.maxHeight = sec.scrollHeight + 'px';
+              arr.style.transform = 'rotate(180deg)';
+            }
+            setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+          } else if (
+            errMsg.includes('429') || errMsg.includes('503') ||
+            errMsg.includes('exhausted') || errMsg.includes('quota') || errMsg.includes('failed')
           ) {
-            showToast('⚠️ സിസ്റ്റത്തിൽ ആളുകൾ കൂടുതലാണ് (Heavy Traffic). ദയവായി ഒരു മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.', 6000);
+            showToast('⚠️ സിസ്റ്റത്തിൽ ആളുകൾ കൂടുതലാണ് (Heavy Traffic). ദയവായി Personal API Key ഉപയോഗിക്കുക, അല്ലെങ്കിൽ ഒരു മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.', 6000);
           } else {
-            showToast('❌ AI Error: ' + err.message, 6000);
+            showToast('❌ AI Error: ' + errMsg, 6000);
           }
           console.error('API call error:', err);
           return;
