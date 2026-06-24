@@ -2782,18 +2782,43 @@
        COPY PLAIN TEXT
     ══════════════════════════════════════ */
     document.getElementById('btn-copy-text').addEventListener('click', async () => {
-      const text = getEditor()?.getContent({ format: 'text' }) || '';
+      const ed = getEditor();
+      if (!ed) return;
+      const html = ed.getContent();                      // full HTML — formatting intact
+      const text = ed.getContent({ format: 'text' });   // plain text fallback
+
       try {
-        await navigator.clipboard.writeText(text);
-        showToast('📋 Plain text copied!');
+        // Modern API — copies both HTML and plain text to clipboard
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/html': new Blob([html], { type: 'text/html' }),
+            'text/plain': new Blob([text], { type: 'text/plain' }),
+          })
+        ]);
+        showToast('📋 Formatting-സഹിതം copy ആയി!');
       } catch {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
-        showToast('📋 Copied!');
+        // Fallback: select rendered TinyMCE content → execCommand
+        try {
+          const body = ed.getBody();
+          const doc = ed.getDoc();
+          const range = doc.createRange();
+          range.selectNodeContents(body);
+          const sel = doc.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          doc.execCommand('copy');
+          sel.removeAllRanges();
+          showToast('📋 Copied!');
+        } catch {
+          // Final fallback: plain text
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          showToast('📋 Plain text copied!');
+        }
       }
     });
 
