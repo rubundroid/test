@@ -3698,6 +3698,11 @@
       // ── Generate button ────────────────────────────────────────
       document.getElementById('ai-draft-generate-btn').addEventListener('click', async () => {
         const WORKER_SECRET = 'edraft-2026-secret'; // Worker env-മായി match ആകണം
+        const WORKERS = [
+          'https://frosty-wood-cedb.ji2005.workers.dev',
+          'https://wispy-cherry-7de2.rubundroid.workers.dev',
+        ];
+        const workerBase = WORKERS[Math.floor(Math.random() * WORKERS.length)];
         const hints = document.getElementById('ai-draft-hints').value.trim();
         const draftMode = document.querySelector('input[name="draftMode"]:checked')?.value ?? 'plain';
         const fileInp = document.getElementById('ai-draft-pdf-input');
@@ -4256,7 +4261,7 @@
               );
             }
             // ── Silent Ping: Track BYOK usage (fire-and-forget) ─────────
-            fetch('https://frosty-wood-cedb.ji2005.workers.dev/api/track-byok', {
+            fetch(workerBase + '/api/track-byok', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET },
               body: JSON.stringify({ t: Date.now() })
@@ -4268,7 +4273,7 @@
             // `userApiKey` is intentionally omitted from the request
             // body (it is empty; the backend uses its own server key).
             // ════════════════════════════════════════════════════════
-            const res = await fetch('https://frosty-wood-cedb.ji2005.workers.dev/api/generate-draft', {
+            const res = await fetch(workerBase + '/api/generate-draft', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET },
               body: JSON.stringify({ promptText, files: filesArray })
