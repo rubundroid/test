@@ -1,92 +1,385 @@
 <!DOCTYPE html>
 <html lang="ml">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eDraft - Log Analyzer</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #2b579a; margin-top: 0; }
-        textarea { width: 100%; height: 150px; padding: 10px; font-family: monospace; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; box-sizing: border-box; }
-        button { background: #2b579a; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #1e4480; }
-        #result-box { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; background: #eef5ff; border: 1px solid #c4d9f2; }
-        .data-row { margin-bottom: 8px; font-size: 15px; color: #333; }
-        .data-label { font-weight: bold; color: #2b579a; display: inline-block; width: 150px; }
-        .error-msg { color: red; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eDraft Admin</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f1117;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  /* ── Login ── */
+  #login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    gap: 1rem;
+    width: 100%;
+    max-width: 320px;
+  }
+  #login h1 { font-size: 1.4rem; color: #94a3b8; letter-spacing: .05em; }
+  #login input {
+    width: 100%;
+    padding: .75rem 1rem;
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 1rem;
+    outline: none;
+  }
+  #login input:focus { border-color: #4ade80; }
+  #login button {
+    width: 100%;
+    padding: .75rem;
+    background: #4ade80;
+    color: #0f1117;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  #login button:hover { background: #22c55e; }
+  #login .err { color: #f87171; font-size: .85rem; }
+
+  /* ── Dashboard ── */
+  #dash { display: none; width: 100%; max-width: 800px; }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  header h1 { font-size: 1.3rem; color: #4ade80; letter-spacing: .03em; }
+  .meta { font-size: .75rem; color: #64748b; }
+
+  /* ── Total card ── */
+  .total-card {
+    background: linear-gradient(135deg, #1a2744, #1e2d1e);
+    border: 1px solid #2d4a2d;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .total-card .big {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #4ade80;
+    line-height: 1;
+  }
+  .total-card .label {
+    font-size: .8rem;
+    color: #86efac;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-top: .25rem;
+  }
+  .total-card .sub {
+    font-size: .85rem;
+    color: #64748b;
+    text-align: right;
+  }
+  .total-card .sub span { color: #94a3b8; }
+
+  /* ── Grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+  }
+  .card .num {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: .3rem;
+  }
+  .card .lbl {
+    font-size: .75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .card.server .num { color: #60a5fa; }
+  .card.byok   .num { color: #a78bfa; }
+  .card.fail   .num { color: #f87171; }
+
+  /* ── Worker table ── */
+  .section-title {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: #475569;
+    margin-bottom: .75rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  th {
+    text-align: left;
+    padding: .7rem 1rem;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #475569;
+    background: #161c2c;
+    border-bottom: 1px solid #2d3748;
+  }
+  td {
+    padding: .8rem 1rem;
+    font-size: .9rem;
+    border-bottom: 1px solid #1a2030;
+  }
+  tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    padding: .15rem .5rem;
+    border-radius: 4px;
+    font-size: .7rem;
+    font-weight: 700;
+  }
+  .badge.w1 { background: #1e3a5f; color: #60a5fa; }
+  .badge.w2 { background: #2d1b4e; color: #a78bfa; }
+
+  /* ── Footer ── */
+  .actions {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: .5rem 1rem;
+    border-radius: 6px;
+    font-size: .8rem;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+  }
+  .btn-refresh { background: #1e3a5f; color: #60a5fa; }
+  .btn-refresh:hover { background: #1e4a7a; }
+  .btn-logout { background: #2d1a1a; color: #f87171; }
+  .btn-logout:hover { background: #3d2020; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid #2d3748;
+    border-top-color: #4ade80;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: .5rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .err-msg { color: #f87171; font-size: .8rem; margin-bottom: 1rem; }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <h2>📊 eDraft Log Analyzer</h2>
-    <p>Cloudflare-ൽ നിന്നുള്ള JSON ലോഗ് ഇവിടെ പേസ്റ്റ് ചെയ്യുക:</p>
-    
-    <textarea id="json-input" placeholder='{"level": "error", "message": ...}'></textarea>
-    <button onclick="analyzeLog()">വിശകലനം ചെയ്യുക (Analyze)</button>
+<!-- Login -->
+<div id="login">
+  <h1>🌿 eDraft Admin</h1>
+  <input type="password" id="pwd" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
+  <button onclick="login()">Login</button>
+  <div class="err" id="lerr"></div>
+</div>
 
-    <div id="result-box"></div>
+<!-- Dashboard -->
+<div id="dash">
+  <header>
+    <h1>🌿 eDraft Stats</h1>
+    <div class="meta" id="updated">Loading...</div>
+  </header>
+
+  <div id="err-msg" class="err-msg" style="display:none"></div>
+
+  <!-- Total -->
+  <div class="total-card">
+    <div>
+      <div class="big" id="t-total">—</div>
+      <div class="label">Total PDFs Generated</div>
+    </div>
+    <div class="sub">
+      Server keys: <span id="t-server">—</span><br>
+      Personal key: <span id="t-byok">—</span><br>
+      Failed: <span id="t-fail">—</span>
+    </div>
+  </div>
+
+  <!-- Cards -->
+  <div class="grid">
+    <div class="card server">
+      <div class="num" id="c-server">—</div>
+      <div class="lbl">Server Key PDFs</div>
+    </div>
+    <div class="card byok">
+      <div class="num" id="c-byok">—</div>
+      <div class="lbl">Personal Key PDFs</div>
+    </div>
+    <div class="card fail">
+      <div class="num" id="c-fail">—</div>
+      <div class="lbl">Failed Requests</div>
+    </div>
+  </div>
+
+  <!-- Per-worker table -->
+  <div class="section-title">Worker Breakdown</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Worker</th>
+        <th>Server PDFs</th>
+        <th>BYOK PDFs</th>
+        <th>Failed</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody id="worker-rows">
+      <tr><td colspan="5" style="color:#475569;text-align:center">Loading...</td></tr>
+    </tbody>
+  </table>
+
+  <div class="actions">
+    <button class="btn btn-refresh" onclick="load()">↻ Refresh</button>
+    <button class="btn btn-logout" onclick="logout()">Logout</button>
+  </div>
 </div>
 
 <script>
-    function analyzeLog() {
-        const jsonString = document.getElementById('json-input').value.trim();
-        const resultBox = document.getElementById('result-box');
-        
-        if (!jsonString) {
-            alert("ദയവായി JSON കോഡ് പേസ്റ്റ് ചെയ്യുക!");
-            return;
-        }
+  const PASS     = 'edraft-admin-2026'; // ← change this
+  const WORKERS  = [
+    'https://frosty-wood-cedb.ji2005.workers.dev',
+    'https://wispy-cherry-7de2.rubundroid.workers.dev',
+  ];
 
-        try {
-            // 1. JSON ഡാറ്റ വായിക്കുന്നു
-            const log = JSON.parse(jsonString);
-            
-            // 2. ആവശ്യമായ ഡാറ്റകൾ ഇരിക്കുന്ന സ്ഥലങ്ങൾ കണ്ടെത്തുന്നു
-            const request = log.$workers?.event?.request || {};
-            const headers = request.headers || {};
-            const cf = request.cf || {};
-
-            // 3. ഫയൽ സൈസ് MB-ലേക്ക് മാറ്റുന്നു
-            let fileSizeStr = "N/A";
-            if (headers["content-length"]) {
-                const bytes = parseInt(headers["content-length"], 10);
-                const mb = (bytes / (1024 * 1024)).toFixed(2);
-                fileSizeStr = `${mb} MB (${bytes} Bytes)`;
-            }
-
-            // 4. വിവരങ്ങൾ വേർതിരിച്ചെടുക്കുന്നു
-            const city = cf.city || "Unknown";
-            const region = cf.region || "Unknown";
-            const isp = cf.asOrganization || "Unknown";
-            const ip = headers["cf-connecting-ip"] || headers["x-real-ip"] || "Unknown";
-            const userAgent = headers["user-agent"] || "Unknown";
-            const cpuTime = log.$workers?.cpuTimeMs ? `${log.$workers.cpuTimeMs} ms` : "N/A";
-            const outcome = log.$workers?.outcome || log.level || "Unknown";
-
-            // 5. ഫലം സ്ക്രീനിൽ കാണിക്കുന്നു
-            resultBox.style.display = "block";
-            resultBox.style.background = outcome === "exceededCpu" ? "#ffebee" : "#eef5ff"; // എറർ ആണെങ്കിൽ ചുവപ്പ് പശ്ചാത്തലം
-            
-            resultBox.innerHTML = `
-                <div class="data-row"><span class="data-label">📁 ഫയൽ വലുപ്പം:</span> ${fileSizeStr}</div>
-                <div class="data-row"><span class="data-label">📍 സ്ഥലം:</span> ${city}, ${region}</div>
-                <div class="data-row"><span class="data-label">🌐 നെറ്റ്‌വർക്ക് (ISP):</span> ${isp}</div>
-                <div class="data-row"><span class="data-label">💻 ഐപി അഡ്രസ്സ് (IP):</span> ${ip}</div>
-                <div class="data-row"><span class="data-label">⏱️ CPU എടുത്ത സമയം:</span> ${cpuTime}</div>
-                <div class="data-row"><span class="data-label">⚠️ സ്റ്റാറ്റസ്:</span> ${outcome}</div>
-                <div class="data-row" style="margin-top: 15px; font-size: 13px; color: #666;"><span class="data-label">📱 ബ്രൗസർ:</span> ${userAgent}</div>
-            `;
-
-        } catch (error) {
-            // JSON ഫോർമാറ്റ് തെറ്റാണെങ്കിൽ
-            resultBox.style.display = "block";
-            resultBox.style.background = "#fff3f3";
-            resultBox.innerHTML = `<span class="error-msg">തകരാർ: നൽകിയ JSON കോഡ് കൃത്യമല്ല! (${error.message})</span>`;
-        }
+  function login() {
+    const v = document.getElementById('pwd').value;
+    if (v === PASS) {
+      localStorage.setItem('edraft-admin', '1');
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('dash').style.display  = 'block';
+      load();
+    } else {
+      document.getElementById('lerr').textContent = 'Wrong password';
     }
-</script>
+  }
 
+  function logout() {
+    localStorage.removeItem('edraft-admin');
+    location.reload();
+  }
+
+  async function load() {
+    document.getElementById('updated').innerHTML =
+      'Fetching... <span class="spinner"></span>';
+    document.getElementById('err-msg').style.display = 'none';
+
+    const results = await Promise.allSettled(
+      WORKERS.map(w =>
+        fetch(w + '/api/stats', { cache: 'no-store' }).then(r => r.json())
+      )
+    );
+
+    let totalServer = 0, totalByok = 0, totalFail = 0;
+    const rows = [];
+
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled') {
+        const d = r.value;
+        totalServer += d.success_server || 0;
+        totalByok   += d.success_byok   || 0;
+        totalFail   += d.failed         || 0;
+        rows.push({
+          id:     d.worker || `W${i+1}`,
+          server: d.success_server || 0,
+          byok:   d.success_byok   || 0,
+          fail:   d.failed         || 0,
+          total:  d.total          || 0,
+        });
+      } else {
+        rows.push({ id: `W${i+1}`, error: true });
+        document.getElementById('err-msg').style.display = 'block';
+        document.getElementById('err-msg').textContent =
+          `W${i+1} fetch failed — check worker or CORS.`;
+      }
+    });
+
+    const grand = totalServer + totalByok;
+
+    // Update totals
+    document.getElementById('t-total').textContent  = grand.toLocaleString();
+    document.getElementById('t-server').textContent = totalServer.toLocaleString();
+    document.getElementById('t-byok').textContent   = totalByok.toLocaleString();
+    document.getElementById('t-fail').textContent   = totalFail.toLocaleString();
+    document.getElementById('c-server').textContent = totalServer.toLocaleString();
+    document.getElementById('c-byok').textContent   = totalByok.toLocaleString();
+    document.getElementById('c-fail').textContent   = totalFail.toLocaleString();
+
+    // Worker table
+    document.getElementById('worker-rows').innerHTML = rows.map(r =>
+      r.error
+        ? `<tr>
+            <td><span class="badge w${r.id.replace('W','')}">${r.id}</span></td>
+            <td colspan="4" style="color:#f87171">Fetch error</td>
+           </tr>`
+        : `<tr>
+            <td><span class="badge w${r.id.replace('W','')}">${r.id}</span></td>
+            <td style="color:#60a5fa">${r.server.toLocaleString()}</td>
+            <td style="color:#a78bfa">${r.byok.toLocaleString()}</td>
+            <td style="color:#f87171">${r.fail.toLocaleString()}</td>
+            <td style="font-weight:700">${r.total.toLocaleString()}</td>
+           </tr>`
+    ).join('');
+
+    document.getElementById('updated').textContent =
+      'Updated: ' + new Date().toLocaleTimeString('en-IN', { hour12: true });
+  }
+
+  // Auto-check login on load
+  if (localStorage.getItem('edraft-admin') === '1') {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('dash').style.display  = 'block';
+    load();
+  }
+
+  // Auto-refresh every 60 seconds
+  setInterval(() => {
+    if (localStorage.getItem('edraft-admin') === '1') load();
+  }, 60000);
+</script>
 </body>
 </html>
