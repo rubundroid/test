@@ -20,197 +20,114 @@
 
   /* ── Login ── */
   #login {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-    gap: 1rem;
-    width: 100%;
-    max-width: 320px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 80vh;
+    gap: 1rem; width: 100%; max-width: 320px;
   }
   #login h1 { font-size: 1.4rem; color: #94a3b8; letter-spacing: .05em; }
   #login input {
-    width: 100%;
-    padding: .75rem 1rem;
-    background: #1e2433;
-    border: 1px solid #2d3748;
-    border-radius: 8px;
-    color: #e2e8f0;
-    font-size: 1rem;
-    outline: none;
+    width: 100%; padding: .75rem 1rem;
+    background: #1e2433; border: 1px solid #2d3748;
+    border-radius: 8px; color: #e2e8f0; font-size: 1rem; outline: none;
   }
   #login input:focus { border-color: #4ade80; }
   #login button {
-    width: 100%;
-    padding: .75rem;
-    background: #4ade80;
-    color: #0f1117;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
+    width: 100%; padding: .75rem; background: #4ade80;
+    color: #0f1117; border: none; border-radius: 8px;
+    font-weight: 700; font-size: 1rem; cursor: pointer;
   }
   #login button:hover { background: #22c55e; }
   #login .err { color: #f87171; font-size: .85rem; }
 
   /* ── Dashboard ── */
-  #dash { display: none; width: 100%; max-width: 800px; }
+  #dash { display: none; width: 100%; max-width: 860px; }
 
   header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: .5rem;
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 1.5rem;
+    flex-wrap: wrap; gap: .5rem;
   }
   header h1 { font-size: 1.3rem; color: #4ade80; letter-spacing: .03em; }
   .meta { font-size: .75rem; color: #64748b; }
 
+  /* ── Section label ── */
+  .section-label {
+    font-size: .65rem; text-transform: uppercase;
+    letter-spacing: .14em; color: #475569;
+    margin-bottom: .6rem; margin-top: 1.4rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: #1e2433;
+  }
+
+  /* ── Today banner ── */
+  .today-card {
+    background: linear-gradient(135deg, #1a2744, #1e2d1e);
+    border: 1px solid #2d4a2d; border-radius: 12px;
+    padding: 1.4rem 1.8rem;
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    margin-bottom: .25rem;
+  }
+  .today-card .big { font-size: 2.8rem; font-weight: 800; color: #4ade80; line-height: 1; }
+  .today-card .label { font-size: .72rem; color: #86efac; text-transform: uppercase; letter-spacing: .1em; margin-top: .2rem; }
+  .today-card .sub { font-size: .82rem; color: #64748b; text-align: right; }
+  .today-card .sub span { color: #94a3b8; }
+  .date-pill {
+    display: inline-block; padding: .2rem .7rem;
+    background: #1a2744; border: 1px solid #2d3a5a;
+    border-radius: 20px; font-size: .7rem; color: #60a5fa;
+    margin-bottom: .5rem;
+  }
+
   /* ── Total card ── */
   .total-card {
-    background: linear-gradient(135deg, #1a2744, #1e2d1e);
-    border: 1px solid #2d4a2d;
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
+    background: #161c2c; border: 1px solid #1e2840;
+    border-radius: 12px; padding: 1rem 1.8rem;
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    margin-bottom: .25rem;
   }
-  .total-card .big {
-    font-size: 3rem;
-    font-weight: 800;
-    color: #4ade80;
-    line-height: 1;
-  }
-  .total-card .label {
-    font-size: .8rem;
-    color: #86efac;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    margin-top: .25rem;
-  }
-  .total-card .sub {
-    font-size: .85rem;
-    color: #64748b;
-    text-align: right;
-  }
-  .total-card .sub span { color: #94a3b8; }
+  .total-card .big { font-size: 2rem; font-weight: 700; color: #94a3b8; line-height: 1; }
+  .total-card .label { font-size: .65rem; color: #475569; text-transform: uppercase; letter-spacing: .1em; margin-top: .2rem; }
+  .total-card .sub { font-size: .78rem; color: #475569; text-align: right; }
+  .total-card .sub span { color: #64748b; }
 
-  /* ── Grid ── */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .card {
-    background: #1e2433;
-    border: 1px solid #2d3748;
-    border-radius: 10px;
-    padding: 1.2rem 1.4rem;
-  }
-  .card .num {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: .3rem;
-  }
-  .card .lbl {
-    font-size: .75rem;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-  }
+  /* ── Stat cards ── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .75rem; margin-bottom: .25rem; }
+  .card { background: #1e2433; border: 1px solid #2d3748; border-radius: 10px; padding: 1rem 1.2rem; }
+  .card .num { font-size: 1.7rem; font-weight: 700; line-height: 1; margin-bottom: .25rem; }
+  .card .sub-num { font-size: .8rem; color: #475569; margin-bottom: .25rem; }
+  .card .lbl { font-size: .68rem; color: #475569; text-transform: uppercase; letter-spacing: .08em; }
   .card.server .num { color: #60a5fa; }
   .card.byok   .num { color: #a78bfa; }
   .card.fail   .num { color: #f87171; }
+  .card .today-num { font-size: .75rem; }
+  .card .today-num b { color: #4ade80; }
 
   /* ── Worker table ── */
-  .section-title {
-    font-size: .7rem;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    color: #475569;
-    margin-bottom: .75rem;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #1e2433;
-    border: 1px solid #2d3748;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-  }
-  th {
-    text-align: left;
-    padding: .7rem 1rem;
-    font-size: .7rem;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: #475569;
-    background: #161c2c;
-    border-bottom: 1px solid #2d3748;
-  }
-  td {
-    padding: .8rem 1rem;
-    font-size: .9rem;
-    border-bottom: 1px solid #1a2030;
-  }
+  table { width: 100%; border-collapse: collapse; background: #1e2433; border: 1px solid #2d3748; border-radius: 10px; overflow: hidden; }
+  th { text-align: left; padding: .6rem 1rem; font-size: .65rem; text-transform: uppercase; letter-spacing: .08em; color: #475569; background: #161c2c; border-bottom: 1px solid #2d3748; }
+  td { padding: .75rem 1rem; font-size: .88rem; border-bottom: 1px solid #1a2030; }
   tr:last-child td { border-bottom: none; }
-  .badge {
-    display: inline-block;
-    padding: .15rem .5rem;
-    border-radius: 4px;
-    font-size: .7rem;
-    font-weight: 700;
-  }
+  .badge { display: inline-block; padding: .15rem .5rem; border-radius: 4px; font-size: .68rem; font-weight: 700; }
   .badge.w1 { background: #1e3a5f; color: #60a5fa; }
   .badge.w2 { background: #2d1b4e; color: #a78bfa; }
+  .today-val { color: #4ade80; font-size: .75rem; display: block; }
 
   /* ── Footer ── */
-  .actions {
-    display: flex;
-    gap: .75rem;
-    flex-wrap: wrap;
-  }
-  .btn {
-    padding: .5rem 1rem;
-    border-radius: 6px;
-    font-size: .8rem;
-    cursor: pointer;
-    border: none;
-    font-weight: 600;
-  }
+  .actions { display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1.2rem; }
+  .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; cursor: pointer; border: none; font-weight: 600; }
   .btn-refresh { background: #1e3a5f; color: #60a5fa; }
   .btn-refresh:hover { background: #1e4a7a; }
   .btn-logout { background: #2d1a1a; color: #f87171; }
   .btn-logout:hover { background: #3d2020; }
-
-  .spinner {
-    width: 18px; height: 18px;
-    border: 2px solid #2d3748;
-    border-top-color: #4ade80;
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: .5rem;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
   .err-msg { color: #f87171; font-size: .8rem; margin-bottom: 1rem; }
 </style>
 </head>
 <body>
 
-<!-- Login -->
 <div id="login">
   <h1>🌿 eDraft Admin</h1>
   <input type="password" id="pwd" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
@@ -218,16 +135,31 @@
   <div class="err" id="lerr"></div>
 </div>
 
-<!-- Dashboard -->
 <div id="dash">
   <header>
     <h1>🌿 eDraft Stats</h1>
-    <div class="meta" id="updated">Loading...</div>
+    <div class="meta" id="updated">—</div>
   </header>
 
   <div id="err-msg" class="err-msg" style="display:none"></div>
 
-  <!-- Total -->
+  <!-- TODAY -->
+  <div class="section-label">🌅 ഇന്ന്</div>
+  <div class="today-card">
+    <div>
+      <div class="date-pill" id="today-date">—</div>
+      <div class="big" id="td-total">—</div>
+      <div class="label">ഇന്നത്തെ PDFs</div>
+    </div>
+    <div class="sub">
+      Server keys: <span id="td-server">—</span><br>
+      Personal key: <span id="td-byok">—</span><br>
+      Failed: <span id="td-fail">—</span>
+    </div>
+  </div>
+
+  <!-- ALL TIME -->
+  <div class="section-label">📊 മൊത്തം</div>
   <div class="total-card">
     <div>
       <div class="big" id="t-total">—</div>
@@ -244,20 +176,23 @@
   <div class="grid">
     <div class="card server">
       <div class="num" id="c-server">—</div>
+      <div class="today-num">ഇന്ന്: <b id="cd-server">—</b></div>
       <div class="lbl">Server Key PDFs</div>
     </div>
     <div class="card byok">
       <div class="num" id="c-byok">—</div>
+      <div class="today-num">ഇന്ന്: <b id="cd-byok">—</b></div>
       <div class="lbl">Personal Key PDFs</div>
     </div>
     <div class="card fail">
       <div class="num" id="c-fail">—</div>
+      <div class="today-num">ഇന്ന്: <b id="cd-fail">—</b></div>
       <div class="lbl">Failed Requests</div>
     </div>
   </div>
 
-  <!-- Per-worker table -->
-  <div class="section-title">Worker Breakdown</div>
+  <!-- Worker table -->
+  <div class="section-label">⚙️ Worker Breakdown</div>
   <table>
     <thead>
       <tr>
@@ -280,15 +215,14 @@
 </div>
 
 <script>
-  const PASS     = 'edraft-admin-2026'; // ← change this
-  const WORKERS  = [
+  const PASS    = 'edraft-admin-2026';
+  const WORKERS = [
     'https://frosty-wood-cedb.ji2005.workers.dev',
     'https://wispy-cherry-7de2.rubundroid.workers.dev',
   ];
 
   function login() {
-    const v = document.getElementById('pwd').value;
-    if (v === PASS) {
+    if (document.getElementById('pwd').value === PASS) {
       localStorage.setItem('edraft-admin', '1');
       document.getElementById('login').style.display = 'none';
       document.getElementById('dash').style.display  = 'block';
@@ -303,65 +237,80 @@
     location.reload();
   }
 
+  function n(v) { return (v || 0).toLocaleString(); }
+
   async function load() {
-    document.getElementById('updated').innerHTML =
-      'Fetching... <span class="spinner"></span>';
+    document.getElementById('updated').textContent = 'Fetching...';
     document.getElementById('err-msg').style.display = 'none';
 
     const results = await Promise.allSettled(
-      WORKERS.map(w =>
-        fetch(w + '/api/stats', { cache: 'no-store' }).then(r => r.json())
-      )
+      WORKERS.map(w => fetch(w + '/api/stats', { cache: 'no-store' }).then(r => r.json()))
     );
 
-    let totalServer = 0, totalByok = 0, totalFail = 0;
+    let ts = 0, tb = 0, tf = 0, ds = 0, db = 0, df = 0;
     const rows = [];
+    let todayDate = '';
 
     results.forEach((r, i) => {
       if (r.status === 'fulfilled') {
         const d = r.value;
-        totalServer += d.success_server || 0;
-        totalByok   += d.success_byok   || 0;
-        totalFail   += d.failed         || 0;
-        rows.push({
-          id:     d.worker || `W${i+1}`,
-          server: d.success_server || 0,
-          byok:   d.success_byok   || 0,
-          fail:   d.failed         || 0,
-          total:  d.total          || 0,
+        ts += d.success_server || 0;
+        tb += d.success_byok   || 0;
+        tf += d.failed         || 0;
+        ds += d.today?.success_server || 0;
+        db += d.today?.success_byok   || 0;
+        df += d.today?.failed         || 0;
+        if (!todayDate) todayDate = d.today?.date || '';
+        rows.push({ id: d.worker || `W${i+1}`,
+          server: d.success_server || 0, byok: d.success_byok || 0,
+          fail: d.failed || 0, total: d.total || 0,
+          ds: d.today?.success_server || 0,
+          db: d.today?.success_byok   || 0,
+          df: d.today?.failed         || 0,
         });
       } else {
         rows.push({ id: `W${i+1}`, error: true });
         document.getElementById('err-msg').style.display = 'block';
-        document.getElementById('err-msg').textContent =
-          `W${i+1} fetch failed — check worker or CORS.`;
+        document.getElementById('err-msg').textContent = `W${i+1} fetch failed.`;
       }
     });
 
-    const grand = totalServer + totalByok;
+    // Today
+    document.getElementById('today-date').textContent   = todayDate;
+    document.getElementById('td-total').textContent     = n(ds + db);
+    document.getElementById('td-server').textContent    = n(ds);
+    document.getElementById('td-byok').textContent      = n(db);
+    document.getElementById('td-fail').textContent      = n(df);
 
-    // Update totals
-    document.getElementById('t-total').textContent  = grand.toLocaleString();
-    document.getElementById('t-server').textContent = totalServer.toLocaleString();
-    document.getElementById('t-byok').textContent   = totalByok.toLocaleString();
-    document.getElementById('t-fail').textContent   = totalFail.toLocaleString();
-    document.getElementById('c-server').textContent = totalServer.toLocaleString();
-    document.getElementById('c-byok').textContent   = totalByok.toLocaleString();
-    document.getElementById('c-fail').textContent   = totalFail.toLocaleString();
+    // All time
+    document.getElementById('t-total').textContent      = n(ts + tb);
+    document.getElementById('t-server').textContent     = n(ts);
+    document.getElementById('t-byok').textContent       = n(tb);
+    document.getElementById('t-fail').textContent       = n(tf);
 
-    // Worker table
+    // Cards
+    document.getElementById('c-server').textContent    = n(ts);
+    document.getElementById('c-byok').textContent      = n(tb);
+    document.getElementById('c-fail').textContent      = n(tf);
+    document.getElementById('cd-server').textContent   = n(ds);
+    document.getElementById('cd-byok').textContent     = n(db);
+    document.getElementById('cd-fail').textContent     = n(df);
+
+    // Worker rows
     document.getElementById('worker-rows').innerHTML = rows.map(r =>
       r.error
-        ? `<tr>
-            <td><span class="badge w${r.id.replace('W','')}">${r.id}</span></td>
-            <td colspan="4" style="color:#f87171">Fetch error</td>
-           </tr>`
+        ? `<tr><td><span class="badge w${r.id.replace('W','')}">${r.id}</span></td>
+           <td colspan="4" style="color:#f87171">Fetch error</td></tr>`
         : `<tr>
             <td><span class="badge w${r.id.replace('W','')}">${r.id}</span></td>
-            <td style="color:#60a5fa">${r.server.toLocaleString()}</td>
-            <td style="color:#a78bfa">${r.byok.toLocaleString()}</td>
-            <td style="color:#f87171">${r.fail.toLocaleString()}</td>
-            <td style="font-weight:700">${r.total.toLocaleString()}</td>
+            <td style="color:#60a5fa">${n(r.server)}
+              <span class="today-val">ഇന്ന്: ${n(r.ds)}</span></td>
+            <td style="color:#a78bfa">${n(r.byok)}
+              <span class="today-val">ഇന്ന്: ${n(r.db)}</span></td>
+            <td style="color:#f87171">${n(r.fail)}
+              <span class="today-val">ഇന്ന്: ${n(r.df)}</span></td>
+            <td style="font-weight:700">${n(r.total)}
+              <span class="today-val">ഇന്ന്: ${n(r.ds+r.db)}</span></td>
            </tr>`
     ).join('');
 
@@ -369,14 +318,11 @@
       'Updated: ' + new Date().toLocaleTimeString('en-IN', { hour12: true });
   }
 
-  // Auto-check login on load
   if (localStorage.getItem('edraft-admin') === '1') {
     document.getElementById('login').style.display = 'none';
     document.getElementById('dash').style.display  = 'block';
     load();
   }
-
-
 </script>
 </body>
 </html>
