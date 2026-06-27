@@ -3140,13 +3140,18 @@
        VISITOR COUNTER FETCH
     ══════════════════════════════════════ */
 
-    const counterKey = 'count-value';
+    /* ══════════════════════════════════════
+   VISITOR COUNTER FETCH
+══════════════════════════════════════ */
 
-    fetch('https://api.counterapi.dev/v1/edraft-sumteck/${counterKey}/up')
+    // നിങ്ങളുടെ പുതിയ Cloudflare Worker ലിങ്ക് (edraft പ്രോജക്റ്റിനായി)
+    const apiUrl = "https://sumteck.tksumesh85.workers.dev/?site=edraft";
+
+    fetch(apiUrl)
       .then(response => response.json())
       .then(data => {
-        // CounterAPI സാധാരണയായി count എന്ന പേരിലാണ് ഡാറ്റ നൽകുന്നത്
-        document.getElementById('count-value').innerText = data.count;
+        // പുതിയ Cloudflare ഡാറ്റാബേസിൽ നിന്നും 'views' എന്ന പേരിലാണ് ഡാറ്റ വരുന്നത്
+        document.getElementById('count-value').innerText = data.views;
       })
       .catch(err => {
         document.getElementById('count-value').innerText = "0";
@@ -4298,7 +4303,9 @@
         } catch (err) {
           // ── Unified error handler for both paths ─────────────────
           const errMsg = err.message || '';
-          if (errMsg.startsWith('GEMINI_BUSY:')) {
+          if (errMsg.startsWith('PDF_ERROR:')) {
+            showToast('📄 ' + errMsg.replace('PDF_ERROR:', ''), 10000);
+          } else if (errMsg.startsWith('GEMINI_BUSY:')) {
             // Worker: server busy/timeout — show message + auto-expand BYOK
             showToast('⚠️ ' + errMsg.replace('GEMINI_BUSY:', ''), 8000);
             const sec = document.getElementById('advanced-key-section');
