@@ -3848,8 +3848,9 @@
               '- DO NOT output: any sender/recipient address, date line, letter number, "സർ,", "വിശ്വാസപൂർവ്വം,", or any signature/designation block.\n' +
               '- Use ഭരണഭാഷ official Malayalam throughout.\n' +
               '- Do NOT invent names — leave blank if unclear.\n\n' +
+              'CRITICAL — You MUST include EVERY point below exactly as stated. Do NOT skip, ignore, or paraphrase away any hint. Do NOT add facts not in the PDF or hints.\n' +
               'HINTS / POINTS TO INCLUDE IN THE BODY:\n' +
-              (hints || '(No hints provided — draft a complete contextually appropriate reply.)');
+              (hints || 'No hints provided. Draft a complete reply with minimum 3 substantive paragraphs relevant to the letter content.');
           }
         } else if (draftMode === 'plain') {
           // ════════════════════════════════════════════════════════
@@ -3920,8 +3921,9 @@
               '- Plain Malayalam text only. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
               '- Use ഭരണഭാഷ official Malayalam throughout.\n' +
               '- Do NOT invent names — leave blank if unclear.\n\n' +
+              'CRITICAL — You MUST include EVERY point below exactly as stated. Do NOT skip, ignore, or paraphrase away any hint. Do NOT add facts not in the PDF or hints.\n' +
               'HINTS / POINTS TO INCLUDE:\n' +
-              (hints || '(No hints provided — draft a complete contextually appropriate reply.)');
+              (hints || 'No hints provided. Draft a complete reply with minimum 3 substantive paragraphs relevant to the letter content.');
           }
         } else {
           // ════════════════════════════════════════════════════════
@@ -4149,8 +4151,9 @@
               '10. Omit the enclosures div entirely if there are no enclosures to list.\n' +
               '11. CRITICAL: If the exact full name of the sender or recipient is not explicitly found in the PDF, do NOT invent or hallucinate any names (like Prakash, Suresh, etc.). Instead, leave it blank so the user can type it manually.\n\n' +
 
+              'CRITICAL — You MUST incorporate EVERY point listed below into the body exactly as stated. Do NOT ignore any hint. Do NOT add names, figures, or content NOT present in the PDF or hints.\n' +
               'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
-              (hints || '(No specific hints provided — draft a contextually appropriate and complete body based on the letter content.)')
+              (hints || 'No hints provided. Draft a COMPLETE and DETAILED reply body with:\n  • Para 1: Formally acknowledge the reference letter\n  • Para 2: State action taken / current status clearly\n  • Para 3: Additional details or formal closing request\n  Each paragraph must be substantive and specific to the letter content.')
             );
         }
 
