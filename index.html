@@ -4216,7 +4216,7 @@
             const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-3.1-flash-lite'];
             const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
             let byokSuccess = false;
-
+            let successModel = BYOK_MODELS[0];
             for (let i = 0; i < BYOK_MODELS.length; i++) {
               const model = BYOK_MODELS[i];
 
@@ -4268,8 +4268,9 @@
               if (!responseText) throw new Error('Gemini returned an empty response.');
 
               console.log('[BYOK] ✅ Success with model: ' + model);
+              successModel = model;
               byokSuccess = true;
-              break;   // ← valid response received — exit the fallback loop
+              break;
             }
 
             // ── All models exhausted via `continue` (all returned 429/500/503) ──
