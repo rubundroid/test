@@ -2784,7 +2784,18 @@
     document.getElementById('btn-copy-text').addEventListener('click', async () => {
       const ed = getEditor();
       if (!ed) return;
-      const html = ed.getContent();                      // full HTML — formatting intact
+      const rawHtml = ed.getContent();
+      // eOffice: table → plain div (no indent, user adds manually; Mandaram via lang detection)
+      const wrap = document.createElement('div');
+      wrap.innerHTML = rawHtml;
+      wrap.querySelectorAll('table').forEach(tbl => {
+        if (tbl.rows.length === 1 && tbl.rows[0].cells.length === 2) {
+          const div = document.createElement('div');
+          div.innerHTML = tbl.rows[0].cells[1].innerHTML;
+          tbl.parentNode.replaceChild(div, tbl);
+        }
+      });
+      const html = wrap.innerHTML;
       const text = ed.getContent({ format: 'text' });   // plain text fallback
 
       try {
@@ -4202,7 +4213,7 @@
             // ── Model Fallback Array ─────────────────────────────────
             // Try each model in order. On 429 / 500 / 503 → skip to
             // the next model automatically. Break on first success.
-            const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+            const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-3.1-flash-lite'];
             const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
             let byokSuccess = false;
 
@@ -4377,7 +4388,6 @@
                 td1.style.cssText = 'width:40px;min-width:40px;padding:0;vertical-align:top';
                 const td2 = document.createElement('td');
                 td2.style.cssText = 'padding:0;text-align:justify';
-                td2.setAttribute('lang', 'ml');
                 td2.innerHTML = el.innerHTML;
                 tr.appendChild(td1); tr.appendChild(td2);
                 tbl.appendChild(tr);
