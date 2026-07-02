@@ -4284,7 +4284,7 @@
             fetch(workerBase + '/api/track-byok', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET },
-              body: JSON.stringify({ t: Date.now(), model: model })
+              body: JSON.stringify({ t: Date.now(), model: successModel })
             }).catch(() => { }); // Never block the main flow
           } else {
             // ════════════════════════════════════════════════════════
