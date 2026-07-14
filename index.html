@@ -6,7 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>eDraft – Office Document Editor</title>
-
+  <link rel="icon" type="image/png" href="https://sumteck.github.io/edraft/logo192.png" />
   <!-- Google Fonts: Malayalam + English -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -4213,7 +4213,7 @@
             // ── Model Fallback Array ─────────────────────────────────
             // Try each model in order. On 429 / 500 / 503 → skip to
             // the next model automatically. Break on first success.
-            const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-3.1-flash-lite'];
+            const BYOK_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash'];
             const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
             let byokSuccess = false;
             let successModel = BYOK_MODELS[0];
