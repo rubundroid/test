@@ -1523,7 +1523,7 @@
       <div class="sla-icon">⚠️</div>
       <p class="sla-title" id="sla-title-text">ഫയൽ സൈസ് കൂടുതലാണ്!</p>
       <p class="sla-body">
-        ⚠️ ഫയൽ സൈസ് വളരെ വലുതാണ് (Max 2.5MB)! വലിയ ഫയലുകൾക്ക് ദയവായി
+        ⚠️ ഫയൽ സൈസ് വളരെ വലുതാണ് (Max 4MB)! വലിയ ഫയലുകൾക്ക് ദയവായി
         Advanced ഓപ്ഷനിൽ സ്വന്തം API Key നൽകുക.
       </p>
       <button class="sla-ok-btn" id="sla-ok-btn">🔑 OK, API Key നൽകാം</button>
@@ -3739,7 +3739,7 @@
 
         // ── File Size Limit Check (2.5 MB cap for shared backend) ──
         const totalSize = files.reduce((sum, f) => sum + f.size, 0);
-        if (totalSize > 2.5 * 1024 * 1024 && !userApiKeyVal) {
+        if (totalSize > 4 * 1024 * 1024 && !userApiKeyVal) {
           document.getElementById('size-limit-alert').classList.add('active');
           return;
         }
