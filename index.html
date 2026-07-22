@@ -1717,7 +1717,7 @@
         );
         const data = await res.json();
         if (data[0] === 'SUCCESS' && data[1]?.[0]?.[1]) return data[1][0][1];
-      } catch (e) { console.error('ML suggestion error:', e); }
+      } catch (e) {console.error('ML suggestion error:', e);}
       return [];
     }
 
@@ -1732,7 +1732,7 @@
       const iframeEl = win.frameElement;          // the <iframe> in the main doc
       if (!iframeEl) return null;
       const fr = iframeEl.getBoundingClientRect();
-      return { top: fr.top + rect.top, left: fr.left + rect.left, bottom: fr.top + rect.bottom };
+      return {top: fr.top + rect.top, left: fr.left + rect.left, bottom: fr.top + rect.bottom};
     }
 
     // Re-renders the dropdown items with the current highlight
@@ -1751,7 +1751,7 @@
 
     // Shows the dropdown positioned below (or above) the cursor
     function showMLDropdown(suggestions, win) {
-      if (!suggestions.length) { hideMLDropdown(); return; }
+      if (!suggestions.length) {hideMLDropdown(); return;}
       mlSuggestions = suggestions;
       mlHighlightedIndex = 0;
       mlDropdownVisible = true;
@@ -1782,11 +1782,11 @@
       const mlWord = mlSuggestions[index];
       const node = mlCurrentNode;
       const win = mlCurrentWin;
-      if (!mlWord || !node || !win) { hideMLDropdown(); return; }
+      if (!mlWord || !node || !win) {hideMLDropdown(); return;}
 
       const textUpToCursor = node.textContent.slice(0, mlCurrentOffset);
       const wordMatch = textUpToCursor.match(/([a-zA-Z]+)$/);
-      if (!wordMatch) { hideMLDropdown(); return; }
+      if (!wordMatch) {hideMLDropdown(); return;}
 
       const wordStart = mlCurrentOffset - wordMatch[0].length;
       const wordEnd = wordStart + mlCurrentWord.length;
@@ -1812,7 +1812,7 @@
 
     // Shared keyup logic: triggers live suggestions for a given win/node/offset
     function mlHandleLetterKeyup(key, win, getNodeFn) {
-      if (!isMalayalamEnabled) { if (mlDropdownVisible) hideMLDropdown(); return; }
+      if (!isMalayalamEnabled) {if (mlDropdownVisible) hideMLDropdown(); return;}
       if (['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(key)) return;
 
       if (key === ' ') {
@@ -1824,19 +1824,19 @@
         return;
       }
 
-      if (key === 'Backspace' || key === 'Delete') { hideMLDropdown(); return; }
+      if (key === 'Backspace' || key === 'Delete') {hideMLDropdown(); return;}
 
       if (/^[a-zA-Z]$/.test(key)) {
         const sel = win.getSelection();
-        if (!sel.rangeCount) { hideMLDropdown(); return; }
+        if (!sel.rangeCount) {hideMLDropdown(); return;}
         const range = sel.getRangeAt(0);
         const node = range.startContainer;
         const offset = range.startOffset;
-        if (node.nodeType !== 3) { hideMLDropdown(); return; }
+        if (node.nodeType !== 3) {hideMLDropdown(); return;}
 
         const textUpToCursor = node.textContent.slice(0, offset);
         const wordMatch = textUpToCursor.match(/([a-zA-Z]+)$/);
-        if (!wordMatch) { hideMLDropdown(); return; }
+        if (!wordMatch) {hideMLDropdown(); return;}
 
         const word = wordMatch[1];
         mlCurrentWord = word;
@@ -2116,8 +2116,8 @@
     const LS_KEY = 'edraft_documents';
 
     function getAllDocs() {
-      try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
-      catch { return []; }
+      try {return JSON.parse(localStorage.getItem(LS_KEY) || '[]');}
+      catch {return [];}
     }
 
     function saveDocs(docs) {
@@ -2127,7 +2127,7 @@
     function saveDocEntry(name, html) {
       const docs = getAllDocs();
       const id = Date.now().toString();
-      const now = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      const now = new Date().toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'});
       const idx = docs.findIndex(d => d.name === name);
       if (idx > -1) {
         docs[idx].html = html;
@@ -2136,7 +2136,7 @@
         saveDocs(docs);
         return;
       }
-      docs.unshift({ id, name, html, saved: now });
+      docs.unshift({id, name, html, saved: now});
       saveDocs(docs);
     }
 
@@ -2155,7 +2155,7 @@
           if (el) el.style.display = 'none';
         }
       });
-      if (dd.style.display === 'block') { dd.style.display = 'none'; return; }
+      if (dd.style.display === 'block') {dd.style.display = 'none'; return;}
 
       dd.style.top = '140px';
       dd.style.left = '50%';
@@ -2371,8 +2371,8 @@
           updateWordCount();
           mlHandleLetterKeyup(e.key, editor.getWin());
         });
-        editor.on('mousedown', () => { hideMLDropdown(); });
-        editor.on('blur', () => { hideMLDropdown(); });
+        editor.on('mousedown', () => {hideMLDropdown();});
+        editor.on('blur', () => {hideMLDropdown();});
         let _savedBgStyle = '';
         editor.on('BeforeSetContent', () => {
           const body = editor.getBody();
@@ -2436,7 +2436,7 @@
       }
     });
 
-    function getEditor() { return tinymce.get('the-editor'); }
+    function getEditor() {return tinymce.get('the-editor');}
 
     /* ══════════════════════════════════════
        WORD COUNT
@@ -2444,7 +2444,7 @@
     function updateWordCount() {
       const ed = getEditor();
       if (!ed) return;
-      const text = (ed.getContent({ format: 'text' }) || '').trim();
+      const text = (ed.getContent({format: 'text'}) || '').trim();
       const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
       document.getElementById('word-count').textContent =
         `Words: ${words.toLocaleString()} \u00A0|\u00A0 Characters: ${text.length.toLocaleString()}`;
@@ -2468,7 +2468,7 @@
       const val = this.value;
       if (!val) return;
       const ed = getEditor();
-      const existing = (ed?.getContent({ format: 'text' }) || '').trim();
+      const existing = (ed?.getContent({format: 'text'}) || '').trim();
       if (existing.length > 10) {
         if (!confirm('Loading a template will replace current content. Continue?')) {
           this.value = ''; return;
@@ -2520,11 +2520,11 @@
 
     document.getElementById('modal-save-btn').addEventListener('click', () => {
       const name = document.getElementById('save-name-input').value.trim();
-      if (!name) { showToast('⚠️ Please enter a name for this draft.'); return; }
+      if (!name) {showToast('⚠️ Please enter a name for this draft.'); return;}
       const html = getEditor()?.getContent() || '';
       saveDocEntry(name, html);
       document.getElementById('doc-title-input').value = name;
-      localStorage.setItem('edraft_last', JSON.stringify({ name, html }));
+      localStorage.setItem('edraft_last', JSON.stringify({name, html}));
       renderSavedList();
       showToast('💾 Draft saved: ' + name);
     });
@@ -2564,13 +2564,13 @@
       const doc = getAllDocs().find(d => d.id === id);
       if (!doc) return;
       const ed = getEditor();
-      const existing = (ed?.getContent({ format: 'text' }) || '').trim();
+      const existing = (ed?.getContent({format: 'text'}) || '').trim();
       if (existing.length > 10) {
         if (!confirm(`Load "${doc.name}"? Current unsaved content will be lost.`)) return;
       }
       ed?.setContent(doc.html || '');
       document.getElementById('doc-title-input').value = doc.name;
-      localStorage.setItem('edraft_last', JSON.stringify({ name: doc.name, html: doc.html }));
+      localStorage.setItem('edraft_last', JSON.stringify({name: doc.name, html: doc.html}));
       closeModal();
       showToast(`📂 "${doc.name}" loaded`);
       updateWordCount();
@@ -2588,7 +2588,7 @@
     /* ══════════════════════════════════════
        MARGINS & ORIENTATION LOGIC
     ══════════════════════════════════════ */
-    let currentMargins = { top: 25, right: 20, bottom: 25, left: 20 };
+    let currentMargins = {top: 25, right: 20, bottom: 25, left: 20};
     let currentOrientation = 'portrait';
 
     function toggleDropdown(ddId, btnId) {
@@ -2596,7 +2596,7 @@
       ['margins-dropdown', 'orientation-dropdown'].forEach(o => {
         if (o !== ddId) document.getElementById(o).style.display = 'none';
       });
-      if (dd.style.display === 'block') { dd.style.display = 'none'; return; }
+      if (dd.style.display === 'block') {dd.style.display = 'none'; return;}
       const btn = document.getElementById(btnId);
       const rect = btn.getBoundingClientRect();
       const w = parseInt(dd.style.width) || 260;
@@ -2642,7 +2642,7 @@
     });
 
     function applyMargins(top, right, bottom, left) {
-      currentMargins = { top, right, bottom, left };
+      currentMargins = {top, right, bottom, left};
       var ed = getEditor();
       if (ed) {
         var body = ed.getBody();
@@ -2706,7 +2706,7 @@
 
     function updatePrintStyle() {
       var el = document.getElementById('dyn-print-css');
-      if (!el) { el = document.createElement('style'); el.id = 'dyn-print-css'; document.head.appendChild(el); }
+      if (!el) {el = document.createElement('style'); el.id = 'dyn-print-css'; document.head.appendChild(el);}
       var m = currentMargins;
       var sz = currentOrientation === 'landscape' ? 'A4 landscape' : 'A4 portrait';
       el.textContent = '@media print { @page { size:' + sz + '; margin:' + m.top + 'mm ' + m.right + 'mm ' + m.bottom + 'mm ' + m.left + 'mm; } }';
@@ -2718,8 +2718,8 @@
     document.getElementById('btn-download').addEventListener('click', () => {
       const html = getEditor()?.getContent() || '';
       const name = document.getElementById('doc-title-input').value.trim() || 'document';
-      const payload = JSON.stringify({ version: '2.0', name, content: html });
-      const blob = new Blob([payload], { type: 'application/json' });
+      const payload = JSON.stringify({version: '2.0', name, content: html});
+      const blob = new Blob([payload], {type: 'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -2806,14 +2806,14 @@
         }
       });
       const html = wrap.innerHTML;
-      const text = ed.getContent({ format: 'text' });   // plain text fallback
+      const text = ed.getContent({format: 'text'});   // plain text fallback
 
       try {
         // Modern API — copies both HTML and plain text to clipboard
         await navigator.clipboard.write([
           new ClipboardItem({
-            'text/html': new Blob([html], { type: 'text/html' }),
-            'text/plain': new Blob([text], { type: 'text/plain' }),
+            'text/html': new Blob([html], {type: 'text/html'}),
+            'text/plain': new Blob([text], {type: 'text/plain'}),
           })
         ]);
         showToast('📋 Formatting-സഹിതം copy ആയി!');
@@ -2897,7 +2897,7 @@
 
       function eventToBodyCoords(e) {
         const body = iframeBody();
-        if (!body) return { x: 0, y: 0 };
+        if (!body) return {x: 0, y: 0};
         const br = body.getBoundingClientRect();
         return {
           x: e.clientX - br.left + body.scrollLeft,
@@ -2977,7 +2977,7 @@
         range.selectNodeContents(box);
         range.collapse(false);
         const sel = doc.getSelection();
-        if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+        if (sel) {sel.removeAllRanges(); sel.addRange(range);}
 
         return box;
       }
@@ -3028,7 +3028,7 @@
 
       function onDragMove(e) {
         if (!_dragState) return;
-        const { box, startX, startY, origLeft, origTop } = _dragState;
+        const {box, startX, startY, origLeft, origTop} = _dragState;
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
         box.style.left = `${origLeft + dx}px`;
@@ -3037,7 +3037,7 @@
 
       function onDragEnd(e) {
         if (!_dragState) return;
-        const { box } = _dragState;
+        const {box} = _dragState;
         const doc = iframeDoc();
         box.style.cursor = 'auto';
         box.style.opacity = '';
@@ -3134,7 +3134,7 @@
         }
       }
 
-      return { init, reattachDragHandlers, togglePlaceMode, toggleDeleteMode };
+      return {init, reattachDragHandlers, togglePlaceMode, toggleDeleteMode};
     })();
 
     (function waitForEditor() {
@@ -3198,7 +3198,7 @@
       installPopup.classList.remove('show');
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        const {outcome} = await deferredPrompt.userChoice;
         console.log(`User response: ${outcome}`);
         deferredPrompt = null;
       }
@@ -3228,7 +3228,7 @@
         } else {
           const iv = setInterval(() => {
             const e = tinymce.get('the-editor');
-            if (e && e.initialized) { clearInterval(iv); attachFocusHooks(e); }
+            if (e && e.initialized) {clearInterval(iv); attachFocusHooks(e);}
           }, 150);
         }
       })();
@@ -3286,7 +3286,7 @@
 
       // ── Recognition lifecycle ─────────────────────────────────────────
       function startVoice() {
-        if (recognition) { try { recognition.abort(); } catch (_) { } }
+        if (recognition) {try {recognition.abort();} catch (_) { } }
         recognition = new SpeechRecognition();
         recognition.lang = 'ml-IN';
         recognition.continuous = true;
@@ -3318,17 +3318,17 @@
         // Auto-restart on natural pause / service timeout
         recognition.onend = () => {
           if (voiceActive) {
-            try { recognition.start(); } catch (_) { }
+            try {recognition.start();} catch (_) { }
           }
         };
 
-        try { recognition.start(); } catch (_) { }
+        try {recognition.start();} catch (_) { }
       }
 
       function stopVoice() {
         voiceActive = false;
         if (recognition) {
-          try { recognition.abort(); } catch (_) { }
+          try {recognition.abort();} catch (_) { }
           recognition = null;
         }
       }
@@ -3353,7 +3353,7 @@
         const box = _vFloat;
         const ed = getEditor();
         const iDoc = ed ? ed.getDoc() : null;
-        if (!iDoc) { insertInTinyMCE(text); return; }
+        if (!iDoc) {insertInTinyMCE(text); return;}
 
         // Re-focus the box (it lost focus when user clicked the ribbon btn)
         box.focus();
@@ -3421,12 +3421,12 @@
       });
 
       // ── Close modal ────────────────────────────────────────────
-      function closeAiModal() { modal.classList.remove('open'); }
-      function showAiOverlay() { document.getElementById('ai-loading-overlay').classList.add('active'); }
-      function hideAiOverlay() { document.getElementById('ai-loading-overlay').classList.remove('active'); }
+      function closeAiModal() {modal.classList.remove('open');}
+      function showAiOverlay() {document.getElementById('ai-loading-overlay').classList.add('active');}
+      function hideAiOverlay() {document.getElementById('ai-loading-overlay').classList.remove('active');}
       document.getElementById('ai-draft-modal-close').addEventListener('click', closeAiModal);
       document.getElementById('ai-draft-cancel-btn').addEventListener('click', closeAiModal);
-      modal.addEventListener('click', e => { if (e.target === modal) closeAiModal(); });
+      modal.addEventListener('click', e => {if (e.target === modal) closeAiModal();});
       // ══════════════════════════════════════
       // TEXTAREA MANGLISH TRANSLITERATION
       // Target: #ai-draft-hints
@@ -3450,14 +3450,14 @@
           const pos = ta.selectionStart;
           const m = ta.value.slice(0, pos).match(/([a-zA-Z]+)$/);
           if (!m) return null;
-          return { word: m[1], start: pos - m[1].length, end: pos };
+          return {word: m[1], start: pos - m[1].length, end: pos};
         }
 
         /* ── Substitute the English token with mlWord and park the
               caret immediately after it ──────────────────────────── */
         function taReplaceWord(mlWord, addSpace = false) {
           const match = taGetWordBeforeCursor();
-          if (!match || !mlWord) { hideMLDropdown(); taOwnsDropdown = false; return; }
+          if (!match || !mlWord) {hideMLDropdown(); taOwnsDropdown = false; return;}
           const insert = addSpace ? mlWord + ' ' : mlWord;
           ta.value = ta.value.slice(0, match.start) + insert + ta.value.slice(match.end);
           ta.selectionStart = ta.selectionEnd = match.start + insert.length;
@@ -3486,7 +3486,7 @@
         /* ── Show the dropdown anchored to the bottom-left of the
               textarea (simple, reliable, no caret-pixel math) ────── */
         function taShowDropdown(suggestions) {
-          if (!suggestions.length) { hideMLDropdown(); return; }
+          if (!suggestions.length) {hideMLDropdown(); return;}
           mlSuggestions = suggestions;
           mlHighlightedIndex = 0;
           mlDropdownVisible = true;
@@ -3543,7 +3543,7 @@
         ════════════════════════════════════════ */
         ta.addEventListener('keyup', async e => {
           if (!isMalayalamEnabled) {
-            if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+            if (taOwnsDropdown) {hideMLDropdown(); taOwnsDropdown = false;}
             return;
           }
           // Navigation was already fully handled in keydown
@@ -3576,14 +3576,14 @@
           }
 
           if (e.key === 'Backspace' || e.key === 'Delete') {
-            if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+            if (taOwnsDropdown) {hideMLDropdown(); taOwnsDropdown = false;}
             return;
           }
 
           /* ── Letter: debounced live-suggestion fetch ──────────── */
           if (/^[a-zA-Z]$/.test(e.key)) {
             const match = taGetWordBeforeCursor();
-            if (!match) { if (taOwnsDropdown) hideMLDropdown(); return; }
+            if (!match) {if (taOwnsDropdown) hideMLDropdown(); return;}
 
             const word = match.word;
             mlCurrentWord = word;
@@ -3604,14 +3604,14 @@
           }
 
           // Any other key (punctuation, Tab, etc.): close dropdown
-          if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+          if (taOwnsDropdown) {hideMLDropdown(); taOwnsDropdown = false;}
         });
 
         /* ── BLUR: dismiss dropdown, but delay 150 ms so a mousedown
               on a dropdown item fires and completes first ────────── */
         ta.addEventListener('blur', () => {
           setTimeout(() => {
-            if (taOwnsDropdown) { hideMLDropdown(); taOwnsDropdown = false; }
+            if (taOwnsDropdown) {hideMLDropdown(); taOwnsDropdown = false;}
           }, 150);
         });
 
@@ -3791,7 +3791,7 @@
 
         // ── Build prompt ────────────────────────────────────────
         const todayDate = new Date()
-          .toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+          .toLocaleDateString('en-IN', {day: '2-digit', month: '2-digit', year: 'numeric'})
           .replace(/\//g, '-');                    // → "DD-MM-YYYY"
 
         // ── Detect scenario: Transformation vs Reply ────────────
@@ -4101,99 +4101,100 @@
 
                 'USER TRANSFORMATION REQUEST:\n' + hints
               )
-} // end isEnglish else
-            // ════════════════════════════════════════════════════════
-            // SCENARIO A — DEFAULT REPLY (original logic, unchanged)
-            // ════════════════════════════════════════════════════════
-            : (
-            'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government. Your ONLY task is to output a ' +
-            'complete formal reply letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
-            'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
-            'no explanations, no code fences, no prose outside the HTML.\n\n' +
 
-            'STEP 1 — READ THE MAIN LETTER:\n' +
-            'Carefully read the main (⭐) PDF. Also read any reference (📎) PDFs for context. If it is a scanned image, use OCR/vision to read it. Extract:\n' +
-            '  (a) SENDER of the incoming letter — name, designation, institution, full address.\n' +
-            '  (b) RECIPIENT of the incoming letter — name, designation, institution, full address.\n' +
-            '  (c) Reference letter number and its date.\n' +
-            '  (d) Subject/purpose of the letter.\n\n' +
+              // ════════════════════════════════════════════════════════
+              // SCENARIO A — DEFAULT REPLY (original logic, unchanged)
+              // ════════════════════════════════════════════════════════
+              : (
+                'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government. Your ONLY task is to output a ' +
+                'complete formal reply letter in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
+                'rich-text editor. Output the HTML letter body ONLY — no preamble, no commentary, ' +
+                'no explanations, no code fences, no prose outside the HTML.\n\n' +
 
-            'STEP 2 — DRAFT THE REPLY:\n' +
-            'In a reply letter, the original RECIPIENT becomes the new SENDER (പ്രേഷകൻ), ' +
-            'and the original SENDER becomes the new RECIPIENT (സ്വീകർത്താവ്).\n\n' +
-            'Produce the output in EXACTLY the HTML structure shown in the TEMPLATE below.\n' +
-            'Replace every [...] placeholder with the actual extracted or drafted content.\n' +
-            'Each section MUST be its own <div> element with the correct style="text-align:..." ' +
-            'attribute — do NOT merge multiple sections into one <div>.\n' +
-            'Within address blocks, separate lines with <br> — do NOT use nested <div> or <p> tags inside.\n\n' +
+                'STEP 1 — READ THE MAIN LETTER:\n' +
+                'Carefully read the main (⭐) PDF. Also read any reference (📎) PDFs for context. If it is a scanned image, use OCR/vision to read it. Extract:\n' +
+                '  (a) SENDER of the incoming letter — name, designation, institution, full address.\n' +
+                '  (b) RECIPIENT of the incoming letter — name, designation, institution, full address.\n' +
+                '  (c) Reference letter number and its date.\n' +
+                '  (d) Subject/purpose of the letter.\n\n' +
 
-            'OUTPUT TEMPLATE — fill every placeholder and output THIS HTML ONLY:\n\n' +
+                'STEP 2 — DRAFT THE REPLY:\n' +
+                'In a reply letter, the original RECIPIENT becomes the new SENDER (പ്രേഷകൻ), ' +
+                'and the original SENDER becomes the new RECIPIENT (സ്വീകർത്താവ്).\n\n' +
+                'Produce the output in EXACTLY the HTML structure shown in the TEMPLATE below.\n' +
+                'Replace every [...] placeholder with the actual extracted or drafted content.\n' +
+                'Each section MUST be its own <div> element with the correct style="text-align:..." ' +
+                'attribute — do NOT merge multiple sections into one <div>.\n' +
+                'Within address blocks, separate lines with <br> — do NOT use nested <div> or <p> tags inside.\n\n' +
 
-            '<div style="text-align:center;"><strong>ഭരണഭാഷ – മാതൃഭാഷ</strong></div>\n' +
+                'OUTPUT TEMPLATE — fill every placeholder and output THIS HTML ONLY:\n\n' +
 
-            '<div style="text-align:left;">നമ്പർ: [Construct a logical reply letter number from the reference series]</div>' +
-            '<div style="text-align:right;">തീയതി: ' + todayDate + '</div>\n' +
+                '<div style="text-align:center;"><strong>ഭരണഭാഷ – മാതൃഭാഷ</strong></div>\n' +
 
-            '<div style="text-align:left;">പ്രേഷകൻ<br>' +
-            '[Designation of Reply Sender (if personal name present, write "Name / Designation" on same line — never a blank line)]<br>' +
-            '[Institution]<br>' +
-            '[Place/Town]</div>\n' +
+                '<div style="text-align:left;">നമ്പർ: [Construct a logical reply letter number from the reference series]</div>' +
+                '<div style="text-align:right;">തീയതി: ' + todayDate + '</div>\n' +
 
-            '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
-            '[Designation of Reply Recipient (if personal name present, write "Name / Designation" on same line — never a blank line)]<br>' +
-            '[Institution]<br>' +
-            '[Full office address with PIN code]</div>\n' +
+                '<div style="text-align:left;">പ്രേഷകൻ<br>' +
+                '[Designation of Reply Sender (if personal name present, write "Name / Designation" on same line — never a blank line)]<br>' +
+                '[Institution]<br>' +
+                '[Place/Town]</div>\n' +
 
-            '<div style="text-align:left;">സർ,</div>\n' +
+                '<div style="text-align:left;">സ്വീകർത്താവ്<br>' +
+                '[Designation of Reply Recipient (if personal name present, write "Name / Designation" on same line — never a blank line)]<br>' +
+                '[Institution]<br>' +
+                '[Full office address with PIN code]</div>\n' +
 
-            '<div style="text-align:justify;"><strong>വിഷയം:</strong> [One concise formal Malayalam sentence clearly stating the subject of this reply]</div>\n' +
+                '<div style="text-align:left;">സർ,</div>\n' +
 
-            '<div style="text-align:justify;"><strong>സൂചന:</strong> [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 dated 01-06-2026"]</div>\n' +
+                '<div style="text-align:justify;"><strong>വിഷയം:</strong> [One concise formal Malayalam sentence clearly stating the subject of this reply]</div>\n' +
 
-            '<div style="text-align:justify;">[Body Paragraph 1: Open formally, e.g. "സൂചന കത്തിലെ നിർദ്ദേശപ്രകാരം..." — ' +
-            'link the subject and the reference letter in one or two sentences.]</div>\n' +
+                '<div style="text-align:justify;"><strong>സൂചന:</strong> [Cite the incoming letter precisely — e.g. "DMOMPM/684/2026-G1 dated 01-06-2026"]</div>\n' +
 
-            '[Each additional body paragraph in its OWN separate <div style="text-align:justify;">...</div> tag. ' +
-            'Use as many paragraphs as needed based on the hints below. ' +
-            'Maintain formal ഔദ്യോഗിക മലയാളം throughout.]\n' +
+                '<div style="text-align:justify;">[Body Paragraph 1: Open formally, e.g. "സൂചന കത്തിലെ നിർദ്ദേശപ്രകാരം..." — ' +
+                'link the subject and the reference letter in one or two sentences.]</div>\n' +
+
+                '[Each additional body paragraph in its OWN separate <div style="text-align:justify;">...</div> tag. ' +
+                'Use as many paragraphs as needed based on the hints below. ' +
+                'Maintain formal ഔദ്യോഗിക മലയാളം throughout.]\n' +
 
 
-            '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
+                '<div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>\n' +
 
-            '<div style="text-align:right;">(ഒപ്പ്)<br>' +
-            '[Full Name of the Reply Sender]<br>' +
-            '[Designation]<br>' +
-            '[Institution]<br>' +
-            '[Place]</div>\n' +
+                '<div style="text-align:right;">(ഒപ്പ്)<br>' +
+                '[Full Name of the Reply Sender]<br>' +
+                '[Designation]<br>' +
+                '[Institution]<br>' +
+                '[Place]</div>\n' +
 
-            '[IF enclosures exist, output exactly this div: ' +
-            '<div style="text-align:left;">ഉള്ളടക്കം: [comma-separated list of enclosures]</div> ' +
-            '— OMIT this div entirely if there are no enclosures to list.]\n\n' +
+                '[IF enclosures exist, output exactly this div: ' +
+                '<div style="text-align:left;">ഉള്ളടക്കം: [comma-separated list of enclosures]</div> ' +
+                '— OMIT this div entirely if there are no enclosures to list.]\n\n' +
 
-            'STRICT RULES — follow every rule without exception:\n' +
-            '1. Output RAW HTML ONLY. The very first character must be "<" and the last must be ">". ' +
-            'Zero prose, zero commentary, zero blank lines before or after the HTML.\n' +
-            '2. Do NOT wrap output in code fences (``` or ~~~) under any circumstances.\n' +
-            '3. Do NOT use any markdown formatting whatsoever — ' +
-            'NO **double asterisks**, NO *single asterisks*, NO # headings. ' +
-            'Use <strong>...</strong> tags for bold text only.\n' +
-            '4. Every section must be in its own <div> with the exact style="text-align:..." ' +
-            'shown in the template. Do NOT change, omit, or consolidate these attributes.\n' +
-            '5. Do NOT add any font-family, font-size, color, or other CSS properties to any element — ' +
-            'use text-align only.\n' +
-            '6. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
-            '7. Within address blocks — use <br> for line breaks only. No nested tags inside address divs.\n' +
-            '8. Each body paragraph must be in its OWN separate <div style="text-align:justify;"> tag. ' +
-            'Do NOT merge multiple paragraphs into one div.\n' +
-            '9. The closing sentence ("മേൽവിവരം...") must be in its own <div style="text-align:justify;"> ' +
-            'placed immediately before <div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>.\n' +
-            '10. Omit the enclosures div entirely if there are no enclosures to list.\n' +
-            '11. CRITICAL: If the exact full name of the sender or recipient is not explicitly found in the PDF, do NOT invent or hallucinate any names (like Prakash, Suresh, etc.). Instead, leave it blank so the user can type it manually.\n\n' +
+                'STRICT RULES — follow every rule without exception:\n' +
+                '1. Output RAW HTML ONLY. The very first character must be "<" and the last must be ">". ' +
+                'Zero prose, zero commentary, zero blank lines before or after the HTML.\n' +
+                '2. Do NOT wrap output in code fences (``` or ~~~) under any circumstances.\n' +
+                '3. Do NOT use any markdown formatting whatsoever — ' +
+                'NO **double asterisks**, NO *single asterisks*, NO # headings. ' +
+                'Use <strong>...</strong> tags for bold text only.\n' +
+                '4. Every section must be in its own <div> with the exact style="text-align:..." ' +
+                'shown in the template. Do NOT change, omit, or consolidate these attributes.\n' +
+                '5. Do NOT add any font-family, font-size, color, or other CSS properties to any element — ' +
+                'use text-align only.\n' +
+                '6. ഔദ്യോഗിക മലയാളം ONLY. No English except numbers, proper names, and reference codes.\n' +
+                '7. Within address blocks — use <br> for line breaks only. No nested tags inside address divs.\n' +
+                '8. Each body paragraph must be in its OWN separate <div style="text-align:justify;"> tag. ' +
+                'Do NOT merge multiple paragraphs into one div.\n' +
+                '9. The closing sentence ("മേൽവിവരം...") must be in its own <div style="text-align:justify;"> ' +
+                'placed immediately before <div style="text-align:right;">വിശ്വാസപൂർവ്വം,</div>.\n' +
+                '10. Omit the enclosures div entirely if there are no enclosures to list.\n' +
+                '11. CRITICAL: If the exact full name of the sender or recipient is not explicitly found in the PDF, do NOT invent or hallucinate any names (like Prakash, Suresh, etc.). Instead, leave it blank so the user can type it manually.\n\n' +
 
-            'CRITICAL — You MUST incorporate EVERY point listed below into the body exactly as stated. Do NOT ignore any hint. Do NOT add names, figures, or content NOT present in the PDF or hints.\n' +
-            'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
-            (hints || 'No hints provided. Draft a COMPLETE and DETAILED reply body with:\n  • Para 1: Formally acknowledge the reference letter\n  • Para 2: State action taken / current status clearly\n  • Para 3: Additional details or formal closing request\n  Each paragraph must be substantive and specific to the letter content.')
-          );
+                'CRITICAL — You MUST incorporate EVERY point listed below into the body exactly as stated. Do NOT ignore any hint. Do NOT add names, figures, or content NOT present in the PDF or hints.\n' +
+                'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
+                (hints || 'No hints provided. Draft a COMPLETE and DETAILED reply body with:\n  • Para 1: Formally acknowledge the reference letter\n  • Para 2: State action taken / current status clearly\n  • Para 3: Additional details or formal closing request\n  Each paragraph must be substantive and specific to the letter content.')
+              );
+          }
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -4224,7 +4225,7 @@
                   : '📎 This is a REFERENCE PDF (for context only):'
               });
               parts.push({
-                inlineData: { mimeType: 'application/pdf', data: f.data }
+                inlineData: {mimeType: 'application/pdf', data: f.data}
               });
             });
             parts.push({
@@ -4237,7 +4238,7 @@
 
             // ── Gemini request payload ───────────────────────────────
             const geminiPayload = {
-              contents: [{ role: 'user', parts }],
+              contents: [{role: 'user', parts}],
               generationConfig: {
                 temperature: 0.3,    // deterministic for official letters
                 maxOutputTokens: 8192
@@ -4264,7 +4265,7 @@
                   GEMINI_BASE + model + ':generateContent?key=' + userApiKeyVal,
                   {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(geminiPayload)
                   }
                 );
@@ -4317,8 +4318,8 @@
             // ── Silent Ping: Track BYOK usage (fire-and-forget) ─────────
             fetch(workerBase + '/api/track-byok', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET },
-              body: JSON.stringify({ t: Date.now(), model: successModel })
+              headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET},
+              body: JSON.stringify({t: Date.now(), model: successModel})
             }).catch(() => { }); // Never block the main flow
           } else {
             // ════════════════════════════════════════════════════════
@@ -4329,8 +4330,8 @@
             // ════════════════════════════════════════════════════════
             const res = await fetch(workerBase + '/api/generate-draft', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET },
-              body: JSON.stringify({ promptText, files: filesArray })
+              headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WORKER_SECRET},
+              body: JSON.stringify({promptText, files: filesArray})
             });
 
             if (!res.ok) {
@@ -4364,7 +4365,7 @@
               sec.style.maxHeight = sec.scrollHeight + 'px';
               arr.style.transform = 'rotate(180deg)';
             }
-            setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+            setTimeout(() => sec.scrollIntoView({behavior: 'smooth', block: 'center'}), 400);
           } else if (
             errMsg.includes('429') || errMsg.includes('503') ||
             errMsg.includes('exhausted') || errMsg.includes('quota') || errMsg.includes('failed')
@@ -4412,7 +4413,7 @@
                 return;
               }
               if (inAddr) {
-                if (/^(സർ,?|വിശ്വാസ)/.test(txt)) { inAddr = false; return; }
+                if (/^(സർ,?|വിശ്വാസ)/.test(txt)) {inAddr = false; return;}
                 el.innerHTML = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + el.innerHTML; return;
               }
               if (/^(വിഷയം:|സൂചന:)/.test(txt)) {
