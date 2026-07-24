@@ -1,1105 +1,856 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TDS RPU Reconciliation Tool — Form 138 / 24Q</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <style>
-    :root {
-      --ink: #152438;
-      --ink-soft: #4a5a70;
-      --line: #d8e0e9;
-      --line-soft: #e9eef3;
-      --bg: #f5f7fa;
-      --panel: #ffffff;
-      --accent: #1f4e5f;
-      --accent-soft: #e4eef0;
-      --good: #1c6b4a;
-      --good-bg: #e7f4ee;
-      --warn: #9a5b13;
-      --warn-bg: #fbf0e0;
-      --mono: "SF Mono", "Consolas", "Menlo", monospace;
-      --sans: -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.5;
-      padding: 0 0 60px 0;
-    }
-
-    header {
-      background: var(--accent);
-      color: #fff;
-      padding: 22px 24px 20px;
-    }
-
-    header h1 {
-      margin: 0 0 4px;
-      font-size: 1.35rem;
-      font-weight: 650;
-      letter-spacing: .2px;
-    }
-
-    header p {
-      margin: 0;
-      color: #cfe0e2;
-      font-size: .88rem;
-    }
-
-    .wrap {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 22px 18px 0;
-    }
-
-    .step {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 18px 20px;
-      margin-bottom: 16px;
-    }
-
-    .step.disabled {
-      opacity: .45;
-      pointer-events: none;
-    }
-
-    .step h2 {
-      font-size: .95rem;
-      margin: 0 0 12px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-
-    .step h2 .num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .78rem;
-      flex: none;
-    }
-
-    .hint {
-      color: var(--ink-soft);
-      font-size: .82rem;
-      margin: 2px 0 12px;
-    }
-
-    .file-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    input[type=file] {
-      font-size: .85rem;
-      border: 1px dashed var(--line);
-      border-radius: 8px;
-      padding: 10px 12px;
-      background: #fbfcfd;
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .filetag {
-      font-size: .72rem;
-      padding: 2px 8px;
-      border-radius: 20px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-weight: 600;
-      display: none;
-    }
-
-    .status-line {
-      font-size: .82rem;
-      margin-top: 8px;
-      min-height: 18px;
-    }
-
-    .status-line.ok {
-      color: var(--good);
-    }
-
-    .status-line.err {
-      color: #a3302f;
-    }
-
-    label.field-label {
-      font-size: .74rem;
-      text-transform: uppercase;
-      letter-spacing: .03em;
-      color: var(--ink-soft);
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .field-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 11px 14px;
-    }
-
-    .field-grid input {
-      width: 100%;
-      padding: 7px 9px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      font-size: .86rem;
-      font-family: var(--sans);
-      color: var(--ink);
-      background: #fff;
-    }
-
-    .field-grid input:focus {
-      outline: 2px solid var(--accent);
-      outline-offset: 1px;
-    }
-
-    .field-grid input::placeholder {
-      color: var(--warn);
-      font-style: italic;
-    }
-
-    fieldset {
-      border: 1px solid var(--line-soft);
-      border-radius: 8px;
-      padding: 12px 14px 14px;
-      margin: 0 0 14px;
-    }
-
-    legend {
-      font-size: .8rem;
-      font-weight: 650;
-      color: var(--accent);
-      padding: 0 6px;
-    }
-
-    table.recon {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .83rem;
-      margin-top: 4px;
-    }
-
-    table.recon th {
-      text-align: left;
-      font-size: .7rem;
-      text-transform: uppercase;
-      letter-spacing: .02em;
-      color: var(--ink-soft);
-      border-bottom: 1px solid var(--line);
-      padding: 6px 8px;
-      white-space: nowrap;
-    }
-
-    table.recon td {
-      border-bottom: 1px solid var(--line-soft);
-      padding: 6px 8px;
-      vertical-align: top;
-    }
-
-    table.recon input {
-      width: 100%;
-      border: 1px solid transparent;
-      background: transparent;
-      font-size: .83rem;
-      font-family: var(--mono);
-      padding: 3px 4px;
-      border-radius: 4px;
-      color: var(--ink);
-    }
-
-    table.recon input:hover,
-    table.recon input:focus {
-      border-color: var(--line);
-      background: #fff;
-    }
-
-    .challan-block {
-      margin-bottom: 14px;
-      border: 1px solid var(--line-soft);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .challan-head {
-      background: var(--line-soft);
-      padding: 8px 12px;
-      font-size: .82rem;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 6px 16px;
-    }
-
-    .challan-head b {
-      color: var(--accent);
-    }
-
-    .warn-box {
-      background: var(--warn-bg);
-      color: var(--warn);
-      border: 1px solid #ecd3ad;
-      border-radius: 8px;
-      padding: 10px 13px;
-      font-size: .83rem;
-      margin-bottom: 12px;
-    }
-
-    .ok-box {
-      background: var(--good-bg);
-      color: var(--good);
-      border: 1px solid #bfe3d1;
-      border-radius: 8px;
-      padding: 10px 13px;
-      font-size: .83rem;
-      margin-bottom: 12px;
-    }
-
-    button {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 7px;
-      font-size: .88rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: var(--sans);
-    }
-
-    button:hover {
-      filter: brightness(1.08);
-    }
-
-    button.secondary {
-      background: #fff;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-    }
-
-    button:disabled {
-      background: #b9c2cb;
-      color: #fff;
-      cursor: not-allowed;
-    }
-
-    .dl-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .dl-card {
-      flex: 1;
-      min-width: 240px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px 16px;
-      background: #fbfcfd;
-    }
-
-    .dl-card h3 {
-      margin: 0 0 4px;
-      font-size: .86rem;
-    }
-
-    .dl-card p {
-      margin: 0 0 10px;
-      font-size: .78rem;
-      color: var(--ink-soft);
-    }
-
-    .dl-card pre {
-      max-height: 110px;
-      overflow: auto;
-      background: #0f1c2b;
-      color: #bcd6d9;
-      font-size: .68rem;
-      padding: 8px 10px;
-      border-radius: 6px;
-      margin: 0 0 10px;
-      font-family: var(--mono);
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    footer.note {
-      max-width: 920px;
-      margin: 20px auto 0;
-      padding: 0 18px;
-      font-size: .76rem;
-      color: var(--ink-soft);
-    }
-
-    .small-btn-row {
-      margin-top: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDS RPU Reconciliation Tool — Form 138 / 24Q</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --ink:#152438; --ink-soft:#4a5a70; --line:#d8e0e9; --line-soft:#e9eef3;
+    --bg:#f5f7fa; --panel:#ffffff; --accent:#1f4e5f; --accent-soft:#e4eef0;
+    --good:#1c6b4a; --good-bg:#e7f4ee; --warn:#9a5b13; --warn-bg:#fbf0e0;
+    --mono: "SF Mono", "Consolas", "Menlo", monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--sans); background:var(--bg); color:var(--ink);
+    line-height:1.5; padding:0 0 60px 0;
+  }
+  header{
+    background:var(--accent); color:#fff; padding:22px 24px 20px;
+  }
+  header h1{margin:0 0 4px; font-size:1.35rem; font-weight:650; letter-spacing:.2px;}
+  header p{margin:0; color:#cfe0e2; font-size:.88rem;}
+  .wrap{max-width:920px; margin:0 auto; padding:22px 18px 0;}
+  .step{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; margin-bottom:16px;
+  }
+  .step.disabled{opacity:.45; pointer-events:none;}
+  .step h2{
+    font-size:.95rem; margin:0 0 12px; display:flex; align-items:center; gap:9px;
+  }
+  .step h2 .num{
+    width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.78rem; flex:none;
+  }
+  .hint{color:var(--ink-soft); font-size:.82rem; margin:2px 0 12px;}
+  .file-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  input[type=file]{
+    font-size:.85rem; border:1px dashed var(--line); border-radius:8px; padding:10px 12px;
+    background:#fbfcfd; flex:1; min-width:220px;
+  }
+  .filetag{
+    font-size:.72rem; padding:2px 8px; border-radius:20px; background:var(--accent-soft);
+    color:var(--accent); font-weight:600; display:none;
+  }
+  .status-line{font-size:.82rem; margin-top:8px; min-height:18px;}
+  .status-line.ok{color:var(--good);}
+  .status-line.err{color:#a3302f;}
+  label.field-label{
+    font-size:.74rem; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-soft);
+    display:block; margin-bottom:3px;
+  }
+  .field-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:11px 14px;}
+  .field-grid input{
+    width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px;
+    font-size:.86rem; font-family:var(--sans); color:var(--ink); background:#fff;
+  }
+  .field-grid input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .field-grid input::placeholder{color:var(--warn); font-style:italic;}
+  fieldset{border:1px solid var(--line-soft); border-radius:8px; padding:12px 14px 14px; margin:0 0 14px;}
+  legend{font-size:.8rem; font-weight:650; color:var(--accent); padding:0 6px;}
+  table.recon{width:100%; border-collapse:collapse; font-size:.83rem; margin-top:4px;}
+  table.recon th{
+    text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.02em;
+    color:var(--ink-soft); border-bottom:1px solid var(--line); padding:6px 8px; white-space:nowrap;
+  }
+  table.recon td{border-bottom:1px solid var(--line-soft); padding:6px 8px; vertical-align:top;}
+  table.recon input{
+    width:100%; border:1px solid transparent; background:transparent; font-size:.83rem;
+    font-family:var(--mono); padding:3px 4px; border-radius:4px; color:var(--ink);
+  }
+  table.recon input:hover, table.recon input:focus{border-color:var(--line); background:#fff;}
+  .challan-block{margin-bottom:14px; border:1px solid var(--line-soft); border-radius:8px; overflow:hidden;}
+  .challan-head{
+    background:var(--line-soft); padding:8px 12px; font-size:.82rem; display:flex;
+    justify-content:space-between; flex-wrap:wrap; gap:6px 16px;
+  }
+  .challan-head b{color:var(--accent);}
+  .warn-box{
+    background:var(--warn-bg); color:var(--warn); border:1px solid #ecd3ad; border-radius:8px;
+    padding:10px 13px; font-size:.83rem; margin-bottom:12px;
+  }
+  .ok-box{
+    background:var(--good-bg); color:var(--good); border:1px solid #bfe3d1; border-radius:8px;
+    padding:10px 13px; font-size:.83rem; margin-bottom:12px;
+  }
+  button{
+    background:var(--accent); color:#fff; border:none; padding:10px 20px; border-radius:7px;
+    font-size:.88rem; font-weight:600; cursor:pointer; font-family:var(--sans);
+  }
+  button:hover{filter:brightness(1.08);}
+  button.secondary{background:#fff; color:var(--accent); border:1px solid var(--accent);}
+  button:disabled{background:#b9c2cb; color:#fff; cursor:not-allowed;}
+  .dl-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:14px;}
+  .dl-card{
+    flex:1; min-width:240px; border:1px solid var(--line); border-radius:8px; padding:14px 16px;
+    background:#fbfcfd;
+  }
+  .dl-card h3{margin:0 0 4px; font-size:.86rem;}
+  .dl-card p{margin:0 0 10px; font-size:.78rem; color:var(--ink-soft);}
+  .dl-card pre{
+    max-height:110px; overflow:auto; background:#0f1c2b; color:#bcd6d9; font-size:.68rem;
+    padding:8px 10px; border-radius:6px; margin:0 0 10px; font-family:var(--mono); white-space:pre-wrap;
+    word-break:break-all;
+  }
+  footer.note{max-width:920px; margin:20px auto 0; padding:0 18px; font-size:.76rem; color:var(--ink-soft);}
+  .small-btn-row{margin-top:10px;}
+</style>
 </head>
-
 <body>
 
-  <header>
-    <div class="wrap" style="padding:0;">
-      <h1>TDS RPU Reconciliation Tool</h1>
-      <p>Form 138 (24Q) · BIN view + SPARK reconciliation → RPU-ready output, generated locally in your browser</p>
+<header>
+  <div class="wrap" style="padding:0;">
+    <h1>TDS RPU Reconciliation Tool</h1>
+    <p>Form 138 (24Q) · BIN view + SPARK reconciliation → RPU-ready output, generated locally in your browser</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- STEP 1: BIN upload -->
+  <div class="step" id="step1">
+    <h2><span class="num">1</span> BIN data (CSV, XLSX or PDF — any one)</h2>
+    <p class="hint">Upload the BIN view export in whichever format you have it. The tool detects the format from the file extension.</p>
+    <div class="file-row">
+      <input type="file" id="binFile" accept=".csv,.xlsx,.pdf">
+      <span class="filetag" id="binTag"></span>
     </div>
-  </header>
-
-  <div class="wrap">
-
-    <!-- STEP 1: BIN upload -->
-    <div class="step" id="step1">
-      <h2><span class="num">1</span> BIN data (CSV, XLSX or PDF — any one)</h2>
-      <p class="hint">Upload the BIN view export in whichever format you have it. The tool detects the format from the
-        file extension.</p>
-      <div class="file-row">
-        <input type="file" id="binFile" accept=".csv,.xlsx,.pdf">
-        <span class="filetag" id="binTag"></span>
-      </div>
-      <div class="status-line" id="binStatus"></div>
-    </div>
-
-    <!-- STEP 2: SPARK upload -->
-    <div class="step" id="step2">
-      <h2><span class="num">2</span> SPARK-generated Form 138 (24Q) PDF</h2>
-      <p class="hint">The quarterly statement PDF printed from SPARK, with Annexure I attached.</p>
-      <div class="file-row">
-        <input type="file" id="sparkFile" accept=".pdf">
-      </div>
-      <div class="status-line" id="sparkStatus"></div>
-    </div>
-
-    <!-- STEP 3: Deductor details (editable, prefilled from SPARK) -->
-    <div class="step disabled" id="step3">
-      <h2><span class="num">3</span> Deductor &amp; responsible person details</h2>
-      <p class="hint">Pulled from the SPARK PDF where possible. SPARK's own address fields don't always match what your
-        TDS filing needs (e.g. district vs. town) — check and correct before generating.</p>
-
-      <fieldset>
-        <legend>Deductor</legend>
-        <div class="field-grid">
-          <div><label class="field-label">TAN</label><input id="f_tan"></div>
-          <div><label class="field-label">Deductor PAN</label><input id="f_deductor_pan"></div>
-          <div><label class="field-label">Office / deductor name</label><input id="f_deductor_name"></div>
-          <div><label class="field-label">Road / street</label><input id="f_road"></div>
-          <div><label class="field-label">Area / locality</label><input id="f_area"></div>
-          <div><label class="field-label">Additional locality</label><input id="f_locality_extra"
-              placeholder="needs manual entry"></div>
-          <div><label class="field-label">District</label><input id="f_district" placeholder="needs manual entry"></div>
-          <div><label class="field-label">State code</label><input id="f_state_code"></div>
-          <div><label class="field-label">Pincode</label><input id="f_pincode"></div>
-          <div><label class="field-label">STD code</label><input id="f_std_code" placeholder="needs manual entry"></div>
-          <div><label class="field-label">Phone</label><input id="f_phone" placeholder="needs manual entry"></div>
-          <div><label class="field-label">E-mail</label><input id="f_email"></div>
-          <div><label class="field-label">AIN</label><input id="f_ain" placeholder="needs manual entry — 7 digit AIN">
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Person responsible for deduction</legend>
-        <div class="field-grid">
-          <div><label class="field-label">Name</label><input id="f_resp_name"></div>
-          <div><label class="field-label">Designation</label><input id="f_resp_designation"></div>
-          <div><label class="field-label">PAN</label><input id="f_resp_pan" placeholder="needs manual entry"></div>
-          <div><label class="field-label">Road / street</label><input id="f_resp_road"></div>
-          <div><label class="field-label">Area / locality</label><input id="f_resp_area"></div>
-          <div><label class="field-label">Additional locality</label><input id="f_resp_locality_extra"
-              placeholder="needs manual entry"></div>
-          <div><label class="field-label">District</label><input id="f_resp_district" placeholder="needs manual entry">
-          </div>
-          <div><label class="field-label">State code</label><input id="f_resp_state_code"></div>
-          <div><label class="field-label">Pincode</label><input id="f_resp_pincode"></div>
-          <div><label class="field-label">STD code</label><input id="f_resp_std_code" placeholder="needs manual entry">
-          </div>
-          <div><label class="field-label">Phone</label><input id="f_resp_phone" placeholder="needs manual entry"></div>
-          <div><label class="field-label">E-mail</label><input id="f_resp_email"></div>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Filing</legend>
-        <div class="field-grid">
-          <div><label class="field-label">Financial year (e.g. 2026-2027)</label><input id="f_fy_hyphen"></div>
-          <div><label class="field-label">Assessment year (e.g. 2027-2028)</label><input id="f_ay_hyphen"></div>
-          <div><label class="field-label">Quarter</label><input id="f_quarter"></div>
-          <div><label class="field-label">Original / correction receipt no. (leave blank if this is an original
-              filing)</label><input id="f_provisional_receipt_no" placeholder="blank = original filing"></div>
-        </div>
-      </fieldset>
-    </div>
-
-    <!-- STEP 4: reconciliation -->
-    <div class="step disabled" id="step4">
-      <h2><span class="num">4</span> Reconciliation</h2>
-      <p class="hint">Each BIN transfer voucher matched against SPARK's Annexure I totals for that month. Edit any cell
-        if something looks off, then generate.</p>
-      <div id="reconMsgs"></div>
-      <div id="reconTables"></div>
-      <div class="small-btn-row">
-        <button id="btnGenerate" disabled>Generate output files</button>
-      </div>
-    </div>
-
-    <!-- STEP 5: downloads -->
-    <div class="step disabled" id="step5">
-      <h2><span class="num">5</span> Download</h2>
-      <div class="dl-row">
-        <div class="dl-card">
-          <h3>Format A — RPU-style (FH/BH/CD/DD)</h3>
-          <p id="fnameA" class="hint" style="margin:0 0 8px;"></p>
-          <pre id="previewA"></pre>
-          <button id="dlA">Download .txt</button>
-        </div>
-        <div class="dl-card">
-          <h3>Format B — output_TAN_Form_FY_Quarter style</h3>
-          <p id="fnameB" class="hint" style="margin:0 0 8px;"></p>
-          <pre id="previewB"></pre>
-          <button id="dlB">Download</button>
-        </div>
-      </div>
-    </div>
-
+    <div class="status-line" id="binStatus"></div>
   </div>
 
-  <footer class="note">
-    Everything above runs in this browser tab — files are read locally and nothing is uploaded anywhere.
-    PDF/CSV/XLSX parsing libraries load once from a CDN, so the first run needs internet; the data itself never leaves
-    your machine.
-  </footer>
+  <!-- STEP 2: SPARK upload -->
+  <div class="step" id="step2">
+    <h2><span class="num">2</span> SPARK-generated Form 138 (24Q) PDF</h2>
+    <p class="hint">The quarterly statement PDF printed from SPARK, with Annexure I attached.</p>
+    <div class="file-row">
+      <input type="file" id="sparkFile" accept=".pdf">
+    </div>
+    <div class="status-line" id="sparkStatus"></div>
+  </div>
 
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  <!-- STEP 3: Deductor details (editable, prefilled from SPARK) -->
+  <div class="step disabled" id="step3">
+    <h2><span class="num">3</span> Deductor &amp; responsible person details</h2>
+    <p class="hint">Pulled from the SPARK PDF where possible. SPARK's own address fields don't always match what your TDS filing needs (e.g. district vs. town) — check and correct before generating.</p>
 
-    // ============================================================
-    // STATE
-    // ============================================================
-    let binEntries = null;     // [{receipt_no, ddo_serial, tv_date(DD/MM/YYYY), nature, tv_amount, status}]
-    let sparkData = null;      // {deductor:{...}, employees:[{pan,name,entries:[{date_payment,taxable,tds}]}]}
-    let challans = null;       // reconciled, editable in the DOM
+    <fieldset>
+      <legend>Deductor</legend>
+      <div class="field-grid">
+        <div><label class="field-label">TAN</label><input id="f_tan"></div>
+        <div><label class="field-label">Deductor PAN</label><input id="f_deductor_pan"></div>
+        <div><label class="field-label">Office / deductor name</label><input id="f_deductor_name"></div>
+        <div><label class="field-label">Road / street</label><input id="f_road"></div>
+        <div><label class="field-label">Area / locality</label><input id="f_area"></div>
+        <div><label class="field-label">Additional locality</label><input id="f_locality_extra" placeholder="needs manual entry"></div>
+        <div><label class="field-label">District</label><input id="f_district" placeholder="needs manual entry"></div>
+        <div><label class="field-label">State code</label><input id="f_state_code"></div>
+        <div><label class="field-label">Pincode</label><input id="f_pincode"></div>
+        <div><label class="field-label">STD code</label><input id="f_std_code" placeholder="needs manual entry"></div>
+        <div><label class="field-label">Phone</label><input id="f_phone" placeholder="needs manual entry"></div>
+        <div><label class="field-label">E-mail</label><input id="f_email"></div>
+        <div><label class="field-label">AIN</label><input id="f_ain" placeholder="needs manual entry — 7 digit AIN"></div>
+      </div>
+    </fieldset>
 
-    // ============================================================
-    // HELPERS
-    // ============================================================
-    function el(id) { return document.getElementById(id); }
-    function setStatus(id, msg, cls) {
-      const n = el(id);
-      n.textContent = msg;
-      n.className = "status-line" + (cls ? " " + cls : "");
-    }
-    function pad5(s) { s = String(s); while (s.length < 5) s = "0" + s; return s; }
-    function fmtAmt(n) { return (Math.round(n * 100) / 100).toFixed(2); }
-    function ddmmyyyyFromSlash(s) { return s.split('/').join(''); } // "30/04/2026" -> "30042026"
-    function monthKey(dateSlash) { const p = dateSlash.split('/'); return p[2] + '-' + p[1]; } // YYYY-MM
+    <fieldset>
+      <legend>Person responsible for deduction</legend>
+      <div class="field-grid">
+        <div><label class="field-label">Name</label><input id="f_resp_name"></div>
+        <div><label class="field-label">Designation</label><input id="f_resp_designation"></div>
+        <div><label class="field-label">PAN</label><input id="f_resp_pan" placeholder="needs manual entry"></div>
+        <div><label class="field-label">Road / street</label><input id="f_resp_road"></div>
+        <div><label class="field-label">Area / locality</label><input id="f_resp_area"></div>
+        <div><label class="field-label">Additional locality</label><input id="f_resp_locality_extra" placeholder="needs manual entry"></div>
+        <div><label class="field-label">District</label><input id="f_resp_district" placeholder="needs manual entry"></div>
+        <div><label class="field-label">State code</label><input id="f_resp_state_code"></div>
+        <div><label class="field-label">Pincode</label><input id="f_resp_pincode"></div>
+        <div><label class="field-label">STD code</label><input id="f_resp_std_code" placeholder="needs manual entry"></div>
+        <div><label class="field-label">Phone</label><input id="f_resp_phone" placeholder="needs manual entry"></div>
+        <div><label class="field-label">E-mail</label><input id="f_resp_email"></div>
+      </div>
+    </fieldset>
 
-    // ============================================================
-    // BIN PARSERS
-    // ============================================================
-    function parseBinCSVText(text) {
-      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-      return parsed.data.map(row => ({
-        receipt_no: String(row['RecieptNumber'] || row['ReceiptNumber'] || '').trim(),
-        ddo_serial: String(row['DDO Serial Number'] || '').trim(),
-        tv_date: String(row['Transfer Voucher Date'] || '').trim(),
-        nature: String(row['NatureOfPayment'] || '').trim(),
-        tv_amount: parseFloat(row['Transfer Voucher Amount']),
-        status: String(row['Bin Status'] || '').trim(),
-      })).filter(e => e.receipt_no && !isNaN(e.tv_amount));
-    }
+    <fieldset>
+      <legend>Filing</legend>
+      <div class="field-grid">
+        <div><label class="field-label">Financial year (e.g. 2026-2027)</label><input id="f_fy_hyphen"></div>
+        <div><label class="field-label">Assessment year (e.g. 2027-2028)</label><input id="f_ay_hyphen"></div>
+        <div><label class="field-label">Quarter</label><input id="f_quarter"></div>
+        <div><label class="field-label">Original / correction receipt no. (leave blank if this is an original filing)</label><input id="f_provisional_receipt_no" placeholder="blank = original filing"></div>
+      </div>
+    </fieldset>
+  </div>
 
-    function normalizeDateToSlash(raw) {
-      raw = String(raw).trim();
-      let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-      m = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-      if (m) return raw;
-      return raw;
-    }
+  <!-- STEP 4: reconciliation -->
+  <div class="step disabled" id="step4">
+    <h2><span class="num">4</span> Reconciliation</h2>
+    <p class="hint">Each BIN transfer voucher matched against SPARK's Annexure I totals for that month. Edit any cell if something looks off, then generate.</p>
+    <div id="reconMsgs"></div>
+    <div id="reconTables"></div>
+    <div class="small-btn-row">
+      <button id="btnGenerate" disabled>Generate output files</button>
+    </div>
+  </div>
 
-    function parseBinXLSXBuffer(buf) {
-      const wb = XLSX.read(buf, { type: 'array', cellDates: false });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
-      const dataRows = rows.slice(1).filter(r => r && r[0] !== undefined && r[0] !== '');
-      // Positional: first 6 columns, regardless of (possibly mislabeled) headers.
-      return dataRows.map(r => ({
-        receipt_no: String(r[0]).trim(),
-        ddo_serial: String(typeof r[1] === 'number' ? Math.round(r[1]) : r[1]).trim(),
-        tv_date: normalizeDateToSlash(r[2]),
-        nature: String(r[3] || '').trim(),
-        tv_amount: parseFloat(r[4]),
-        status: String(r[5] || '').trim(),
-      })).filter(e => e.receipt_no && !isNaN(e.tv_amount));
-    }
+  <!-- STEP 5: downloads -->
+  <div class="step disabled" id="step5">
+    <h2><span class="num">5</span> Download</h2>
+    <div id="genWarnings"></div>
+    <div class="dl-row">
+      <div class="dl-card">
+        <h3>Format A — RPU-style (FH/BH/CD/DD)</h3>
+        <p id="fnameA" class="hint" style="margin:0 0 8px;"></p>
+        <pre id="previewA"></pre>
+        <button id="dlA">Download .txt</button>
+      </div>
+      <div class="dl-card">
+        <h3>Format B — output_TAN_Form_FY_Quarter style</h3>
+        <p id="fnameB" class="hint" style="margin:0 0 8px;"></p>
+        <pre id="previewB"></pre>
+        <button id="dlB">Download</button>
+      </div>
+    </div>
+  </div>
 
-    // ---- PDF BIN parsing: geometric row/column reconstruction ----
-    // The BIN-view PDF export uses a very narrow 14-column table, so text
-    // wraps hard within every cell (even splitting numbers across lines).
-    // We rebuild rows from Y-gaps and columns from X-gaps, then keep only
-    // numeric-safe fragments for the amount/date columns (a neighbouring
-    // column's stray character can sit right on a column boundary).
-    async function parseBinPDFBuffer(buf) {
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      const N_COLS = 14;
-      let allEntries = [];
+</div>
 
-      for (let p = 1; p <= pdf.numPages; p++) {
-        const page = await pdf.getPage(p);
-        const viewport = page.getViewport({ scale: 1 });
-        const content = await page.getTextContent();
-        // Text item transforms are in raw PDF space, which ignores the page's
-        // own /Rotate flag — a page rotated 90° has its "reading" axis swapped
-        // vs. the raw x/y. Combining with the viewport transform gives x/y in
-        // properly-oriented, top-down display space regardless of rotation.
-        const words = content.items
-          .filter(it => it.str && it.str.trim() !== '')
-          .map(it => {
-            const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
-            return { text: it.str, x0: tx[4], y0: tx[5] };
-          });
-        if (words.length === 0) continue;
+<footer class="note">
+  Everything above runs in this browser tab — files are read locally and nothing is uploaded anywhere.
+  PDF/CSV/XLSX parsing libraries load once from a CDN, so the first run needs internet; the data itself never leaves your machine.
+</footer>
 
-        // --- row segmentation via Y0 gaps ---
-        const yVals = [...new Set(words.map(w => Math.round(w.y0 * 10) / 10))].sort((a, b) => a - b);
-        const gaps = [];
-        for (let i = 0; i < yVals.length - 1; i++) gaps.push(yVals[i + 1] - yVals[i]);
-        const ROW_GAP = 13.0;
-        let rowBounds = [yVals[0] - 0.5];
-        for (let i = 0; i < gaps.length; i++) { if (gaps[i] > ROW_GAP) rowBounds.push(yVals[i + 1] - 0.5); }
-        rowBounds.push(999999);
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-        const rows = rowBounds.slice(0, -1).map(() => []);
-        for (const w of words) {
-          const yr = Math.round(w.y0 * 10) / 10;
-          for (let i = 0; i < rowBounds.length - 1; i++) {
-            if (yr >= rowBounds[i] && yr < rowBounds[i + 1]) { rows[i].push(w); break; }
-          }
-        }
+// ============================================================
+// STATE
+// ============================================================
+let binEntries = null;     // [{receipt_no, ddo_serial, tv_date(DD/MM/YYYY), nature, tv_amount, status}]
+let sparkData = null;      // {deductor:{...}, employees:[{pan,name,entries:[{date_payment,taxable,tds}]}]}
+let challans = null;       // reconciled, editable in the DOM
 
-        // --- column separators via X0 gaps (top N_COLS-1 gaps across all words) ---
-        const xVals = [...new Set(words.map(w => Math.round(w.x0 * 10) / 10))].sort((a, b) => a - b);
-        const xDiffs = [];
-        for (let i = 0; i < xVals.length - 1; i++) xDiffs.push([xVals[i + 1] - xVals[i], xVals[i + 1]]);
-        xDiffs.sort((a, b) => b[0] - a[0]);
-        const separators = xDiffs.slice(0, N_COLS - 1).map(d => d[1]).sort((a, b) => a - b);
-        function colIndex(x0) {
-          let ci = 0;
-          for (const s of separators) { if (x0 >= s - 0.5) ci++; else break; }
-          return ci;
-        }
+// ============================================================
+// HELPERS
+// ============================================================
+function el(id){ return document.getElementById(id); }
+function setStatus(id, msg, cls){
+  const n = el(id);
+  n.textContent = msg;
+  n.className = "status-line" + (cls ? " " + cls : "");
+}
+function pad5(s){ s = String(s); while(s.length < 5) s = "0" + s; return s; }
+function fmtAmt(n){ return (Math.round(n * 100) / 100).toFixed(2); }
+function ddmmyyyyFromSlash(s){ return s.split('/').join(''); } // "30/04/2026" -> "30042026"
+function monthKey(dateSlash){ const p = dateSlash.split('/'); return p[2] + '-' + p[1]; } // YYYY-MM
+function looksLikePan(v){ return /^[A-Z]{5}[0-9]{4}[A-Z]$/i.test((v||'').trim()); }
 
-        for (const rowWords of rows) {
-          const cols = {};
-          const sorted = [...rowWords].sort((a, b) => (colIndex(a.x0) - colIndex(b.x0)) || (a.y0 - b.y0));
-          for (const w of sorted) {
-            const ci = colIndex(w.x0);
-            // Some PDF text runs carry trailing/leading padding spaces baked
-            // into the glyph string itself (e.g. "04-30 ") — strip those so
-            // the numeric-fragment filters below match reliably.
-            (cols[ci] = cols[ci] || []).push(w.text.trim());
-          }
-          const col0 = (cols[0] || []).join('');
-          if (!/^\d+$/.test(col0)) continue; // header / non-data row
+// ============================================================
+// BIN PARSERS
+// ============================================================
+function parseBinCSVText(text){
+  // Read positionally (same approach as the XLSX parser below), rather
+  // than trusting exact header text — BIN exports have been seen with
+  // mislabeled headers (see parseBinXLSXBuffer), and header wording can
+  // also vary slightly between offices/portal versions. The six fields
+  // are consistently in the same column order regardless of the header
+  // row's exact text, so we skip the header row and read by position.
+  const parsed = Papa.parse(text, {header:false, skipEmptyLines:true});
+  const rows = parsed.data.slice(1); // drop header row
+  return rows.map(r => ({
+    receipt_no: String(r[0] ?? '').trim(),
+    ddo_serial: String(r[1] ?? '').trim(),
+    tv_date: normalizeDateToSlash(r[2] ?? ''),
+    nature: String(r[3] ?? '').trim(),
+    tv_amount: parseFloat(r[4]),
+    status: String(r[5] ?? '').trim(),
+  })).filter(e => e.receipt_no && /^\d+$/.test(e.receipt_no) && !isNaN(e.tv_amount));
+}
 
-          const amountFrags = (cols[4] || []).filter(f => /^[\d.]+$/.test(f));
-          const dateFrags = (cols[2] || []).filter(f => /^[\d.\-\/]+$/.test(f));
-          const dateRaw = dateFrags.length ? dateFrags.join('') : (cols[2] || []).join('');
-          const tvDate = normalizeDateToSlash(dateRaw);
+function normalizeDateToSlash(raw){
+  raw = String(raw).trim();
+  let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+  m = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (m) return raw;
+  return raw;
+}
 
-          allEntries.push({
-            receipt_no: col0,
-            ddo_serial: (cols[1] || []).join(''),
-            tv_date: tvDate,
-            nature: (cols[3] || []).join(' '),
-            tv_amount: parseFloat(amountFrags.join('')),
-            status: (cols[5] || []).join(''),
-          });
-        }
+function parseBinXLSXBuffer(buf){
+  const wb = XLSX.read(buf, {type:'array', cellDates:false});
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true});
+  const dataRows = rows.slice(1).filter(r => r && r[0] !== undefined && r[0] !== '');
+  // Positional: first 6 columns, regardless of (possibly mislabeled) headers.
+  return dataRows.map(r => ({
+    receipt_no: String(r[0]).trim(),
+    ddo_serial: String(typeof r[1] === 'number' ? Math.round(r[1]) : r[1]).trim(),
+    tv_date: normalizeDateToSlash(r[2]),
+    nature: String(r[3] || '').trim(),
+    tv_amount: parseFloat(r[4]),
+    status: String(r[5] || '').trim(),
+  })).filter(e => e.receipt_no && !isNaN(e.tv_amount));
+}
+
+// ---- PDF BIN parsing: geometric row/column reconstruction ----
+// The BIN-view PDF export uses a very narrow 14-column table, so text
+// wraps hard within every cell (even splitting numbers across lines).
+// We rebuild rows from Y-gaps and columns from X-gaps, then keep only
+// numeric-safe fragments for the amount/date columns (a neighbouring
+// column's stray character can sit right on a column boundary).
+async function parseBinPDFBuffer(buf){
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  const N_COLS = 14;
+  let allEntries = [];
+
+  for (let p = 1; p <= pdf.numPages; p++){
+    const page = await pdf.getPage(p);
+    const viewport = page.getViewport({ scale: 1 });
+    const content = await page.getTextContent();
+    // Text item transforms are in raw PDF space, which ignores the page's
+    // own /Rotate flag — a page rotated 90° has its "reading" axis swapped
+    // vs. the raw x/y. Combining with the viewport transform gives x/y in
+    // properly-oriented, top-down display space regardless of rotation.
+    const words = content.items
+      .filter(it => it.str && it.str.trim() !== '')
+      .map(it => {
+        const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
+        return { text: it.str, x0: tx[4], y0: tx[5] };
+      });
+    if (words.length === 0) continue;
+
+    // --- row segmentation via Y0 gaps ---
+    const yVals = [...new Set(words.map(w => Math.round(w.y0*10)/10))].sort((a,b)=>a-b);
+    const gaps = [];
+    for (let i=0;i<yVals.length-1;i++) gaps.push(yVals[i+1]-yVals[i]);
+    const ROW_GAP = 13.0;
+    let rowBounds = [yVals[0]-0.5];
+    for (let i=0;i<gaps.length;i++){ if (gaps[i] > ROW_GAP) rowBounds.push(yVals[i+1]-0.5); }
+    rowBounds.push(999999);
+
+    const rows = rowBounds.slice(0,-1).map(()=>[]);
+    for (const w of words){
+      const yr = Math.round(w.y0*10)/10;
+      for (let i=0;i<rowBounds.length-1;i++){
+        if (yr >= rowBounds[i] && yr < rowBounds[i+1]){ rows[i].push(w); break; }
       }
-      return allEntries.filter(e => e.receipt_no && !isNaN(e.tv_amount));
     }
 
-    // ============================================================
-    // SPARK PDF PARSER
-    // ============================================================
-    // Reconstructs a pdftotext-layout-like text blob (line-grouped by Y,
-    // words ordered by X within each line) so the same label-anchored
-    // patterns that were validated against real pdftotext output can run
-    // unchanged here.
-    async function extractLayoutText(buf) {
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      let fullText = "";
-      for (let p = 1; p <= pdf.numPages; p++) {
-        const page = await pdf.getPage(p);
-        const viewport = page.getViewport({ scale: 1 });
-        const content = await page.getTextContent();
-        // See the note in parseBinPDFBuffer above: combine with the viewport
-        // transform so rotated pages (this SPARK PDF is rotated 90°) still
-        // yield correctly-oriented top-down x/y.
-        const items = content.items
-          .filter(it => it.str !== undefined)
-          .map(it => {
-            const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
-            return { text: it.str, x: tx[4], y: tx[5] };
-          });
-        if (items.length === 0) { fullText += "\n\f\n"; continue; }
+    // --- column separators via X0 gaps (top N_COLS-1 gaps across all words) ---
+    const xVals = [...new Set(words.map(w => Math.round(w.x0*10)/10))].sort((a,b)=>a-b);
+    const xDiffs = [];
+    for (let i=0;i<xVals.length-1;i++) xDiffs.push([xVals[i+1]-xVals[i], xVals[i+1]]);
+    xDiffs.sort((a,b)=>b[0]-a[0]);
+    const separators = xDiffs.slice(0, N_COLS-1).map(d=>d[1]).sort((a,b)=>a-b);
+    function colIndex(x0){
+      let ci = 0;
+      for (const s of separators){ if (x0 >= s - 0.5) ci++; else break; }
+      return ci;
+    }
 
-        const yVals = [...new Set(items.map(it => Math.round(it.y * 10) / 10))].sort((a, b) => a - b);
-        const LINE_GAP = 4.0;
-        let lineBounds = [yVals[0] - 0.5];
-        for (let i = 0; i < yVals.length - 1; i++) {
-          if (yVals[i + 1] - yVals[i] > LINE_GAP) lineBounds.push(yVals[i + 1] - 0.5);
-        }
-        lineBounds.push(999999);
-
-        const lines = lineBounds.slice(0, -1).map(() => []);
-        for (const it of items) {
-          const yr = Math.round(it.y * 10) / 10;
-          for (let i = 0; i < lineBounds.length - 1; i++) {
-            if (yr >= lineBounds[i] && yr < lineBounds[i + 1]) { lines[i].push(it); break; }
-          }
-        }
-
-        let pageText = "";
-        for (const lineItems of lines) {
-          const sorted = [...lineItems].sort((a, b) => a.x - b.x);
-          let lineStr = "";
-          let lastEnd = null;
-          for (const it of sorted) {
-            if (lastEnd !== null) {
-              const gap = it.x - lastEnd;
-              lineStr += gap > 1.5 ? " " : "";
-            }
-            lineStr += it.text;
-            lastEnd = it.x + (it.text.length * 4.5); // rough width estimate for spacing decisions
-          }
-          pageText += lineStr + "\n";
-        }
-        fullText += pageText + "\f\n";
+    for (const rowWords of rows){
+      const cols = {};
+      const sorted = [...rowWords].sort((a,b)=> (colIndex(a.x0)-colIndex(b.x0)) || (a.y0-b.y0));
+      for (const w of sorted){
+        const ci = colIndex(w.x0);
+        // Some PDF text runs carry trailing/leading padding spaces baked
+        // into the glyph string itself (e.g. "04-30 ") — strip those so
+        // the numeric-fragment filters below match reliably.
+        (cols[ci] = cols[ci] || []).push(w.text.trim());
       }
-      return fullText;
-    }
+      const col0 = (cols[0]||[]).join('');
+      if (!/^\d+$/.test(col0)) continue; // header / non-data row
 
-    function grabAfterLabel(label, text) {
-      const lines = text.split("\n");
-      for (const line of lines) {
-        const idx = line.indexOf(label);
-        if (idx !== -1) return line.slice(idx + label.length).trim();
+      const amountFrags = (cols[4]||[]).filter(f => /^[\d.]+$/.test(f));
+      const dateFrags = (cols[2]||[]).filter(f => /^[\d.\-\/]+$/.test(f));
+      const dateRaw = dateFrags.length ? dateFrags.join('') : (cols[2]||[]).join('');
+      const tvDate = normalizeDateToSlash(dateRaw);
+
+      allEntries.push({
+        receipt_no: col0,
+        ddo_serial: (cols[1]||[]).join(''),
+        tv_date: tvDate,
+        nature: (cols[3]||[]).join(' '),
+        tv_amount: parseFloat(amountFrags.join('')),
+        status: (cols[5]||[]).join(''),
+      });
+    }
+  }
+  return allEntries.filter(e => e.receipt_no && !isNaN(e.tv_amount));
+}
+
+// ============================================================
+// SPARK PDF PARSER
+// ============================================================
+// Reconstructs a pdftotext-layout-like text blob (line-grouped by Y,
+// words ordered by X within each line) so the same label-anchored
+// patterns that were validated against real pdftotext output can run
+// unchanged here.
+async function extractLayoutText(buf){
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  let fullText = "";
+  for (let p = 1; p <= pdf.numPages; p++){
+    const page = await pdf.getPage(p);
+    const viewport = page.getViewport({ scale: 1 });
+    const content = await page.getTextContent();
+    // See the note in parseBinPDFBuffer above: combine with the viewport
+    // transform so rotated pages (this SPARK PDF is rotated 90°) still
+    // yield correctly-oriented top-down x/y.
+    const items = content.items
+      .filter(it => it.str !== undefined)
+      .map(it => {
+        const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
+        return { text: it.str, x: tx[4], y: tx[5] };
+      });
+    if (items.length === 0){ fullText += "\n\f\n"; continue; }
+
+    const yVals = [...new Set(items.map(it => Math.round(it.y*10)/10))].sort((a,b)=>a-b);
+    const LINE_GAP = 4.0;
+    let lineBounds = [yVals[0]-0.5];
+    for (let i=0;i<yVals.length-1;i++){
+      if (yVals[i+1]-yVals[i] > LINE_GAP) lineBounds.push(yVals[i+1]-0.5);
+    }
+    lineBounds.push(999999);
+
+    const lines = lineBounds.slice(0,-1).map(()=>[]);
+    for (const it of items){
+      const yr = Math.round(it.y*10)/10;
+      for (let i=0;i<lineBounds.length-1;i++){
+        if (yr >= lineBounds[i] && yr < lineBounds[i+1]){ lines[i].push(it); break; }
       }
-      return "";
     }
-    function fieldAfter(label, block) {
-      const re = new RegExp(escapeRe(label) + "\\s+(.+)");
-      const m = block.match(re);
-      return m ? m[1].trim() : "";
+
+    let pageText = "";
+    for (const lineItems of lines){
+      const sorted = [...lineItems].sort((a,b)=>a.x-b.x);
+      let lineStr = "";
+      let lastEnd = null;
+      for (const it of sorted){
+        if (lastEnd !== null){
+          const gap = it.x - lastEnd;
+          lineStr += gap > 1.5 ? " " : "";
+        }
+        lineStr += it.text;
+        lastEnd = it.x + (it.text.length * 4.5); // rough width estimate for spacing decisions
+      }
+      pageText += lineStr + "\n";
     }
-    function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    fullText += pageText + "\f\n";
+  }
+  return fullText;
+}
 
-    function parseSparkText(text) {
-      const tan = (text.match(/Tax Deduction Account No\.\s+(\S+)/) || [, ''])[1];
-      const deductorPan = (text.match(/Permanent Account No\.\s+(\S+)/) || [, 'PANNOTREQD'])[1];
-      const fy = (text.match(/Financial year\s+([\d\-]+)/) || [, ''])[1];
-      const ay = (text.match(/Assesment year\s+([\d\-]+)/) || [, ''])[1];
+function grabAfterLabel(label, text){
+  const lines = text.split("\n");
+  for (const line of lines){
+    const idx = line.indexOf(label);
+    if (idx !== -1) return line.slice(idx + label.length).trim();
+  }
+  return "";
+}
+function fieldAfter(label, block){
+  const re = new RegExp(escapeRe(label) + "\\s+(.+)");
+  const m = block.match(re);
+  return m ? m[1].trim() : "";
+}
+function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-      // "...quarter ended June 2026" -> Q1 (Indian FY quarters: Q1 Apr-Jun,
-      // Q2 Jul-Sep, Q3 Oct-Dec, Q4 Jan-Mar).
-      const QUARTER_BY_END_MONTH = {
-        June: 'Q1', September: 'Q2', December: 'Q3', March: 'Q4'
+function parseSparkText(text){
+  const tan = (text.match(/Tax Deduction Account No\.\s+(\S+)/) || [,''])[1];
+  const deductorPan = (text.match(/Permanent Account No\.\s+(\S+)/) || [,'PANNOTREQD'])[1];
+  const fy = (text.match(/Financial year\s+([\d\-]+)/) || [,''])[1];
+  const ay = (text.match(/Assesment year\s+([\d\-]+)/) || [,''])[1];
+
+  // "...quarter ended June 2026" -> Q1 (Indian FY quarters: Q1 Apr-Jun,
+  // Q2 Jul-Sep, Q3 Oct-Dec, Q4 Jan-Mar).
+  const QUARTER_BY_END_MONTH = {
+    June:'Q1', September:'Q2', December:'Q3', March:'Q4'
+  };
+  const quarterMatch = text.match(/quarter ended (\w+) \d{4}/);
+  const quarter = quarterMatch ? (QUARTER_BY_END_MONTH[quarterMatch[1]] || '') : '';
+
+  const addrMatch = text.match(/\(d\)\s+Address\s+([\s\S]*?)3\.\s*Particulars/);
+  const addrBlock = addrMatch ? addrMatch[1] : "";
+  const deductorNameMatch = text.match(/\(d\)\s+Address\s+(.+)/);
+  const deductorName = deductorNameMatch ? deductorNameMatch[1].trim().toUpperCase() : "";
+  const road = fieldAfter("Road/street/lane", addrBlock);
+  const area = fieldAfter("Area/location", addrBlock);
+  const pincode = fieldAfter("Pin code", addrBlock);
+  const email = fieldAfter("E-mail", addrBlock).toUpperCase();
+
+  const respMatch = text.match(/3\.\s*Particulars of person responsible[\s\S]*?\n([\s\S]*?)4\.\s*Details of tax deducted/);
+  const respBlock = respMatch ? respMatch[1] : "";
+  const respNameMatch = respBlock.match(/\(a\)\s+Name\s+(.+)/);
+  const respName = respNameMatch ? respNameMatch[1].trim().toUpperCase() : "";
+  const respRoad = fieldAfter("Road/street/lane", respBlock);
+  const respArea = fieldAfter("Area/location", respBlock);
+  const respPincode = fieldAfter("Pin code", respBlock);
+  const respEmail = fieldAfter("E-mail", respBlock).toUpperCase();
+
+  const designationMatch = text.match(/I,\s+[A-Z\s]+,\s+([^,]+),/);
+  // Uppercased to match RPU convention. SPARK's verification line can carry
+  // an internal grade-code suffix like "(I HG)" that the actual filing
+  // drops — that part is a content edit left for the user to trim, not
+  // something safe to guess away automatically.
+  const designation = designationMatch ? designationMatch[1].trim().toUpperCase() : "";
+
+  // Annexure I
+  const annexMatch = text.match(/\(313\)([\s\S]*?)Verification/);
+  const annexBlock = annexMatch ? annexMatch[1] : "";
+  const PAN_RE = "[A-Z]{5}\\d{4}[A-Z]";
+  const DATE_RE = "\\d{2}/\\d{2}/\\d{4}";
+  const newEmpRe = new RegExp(`^\\s*(\\d+)\\s+(\\d+)\\s+(${PAN_RE})\\s+(.+?)\\s+(${DATE_RE})\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)`);
+  const contRe = new RegExp(`^\\s*(${DATE_RE})\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)`);
+
+  const employees = [];
+  let current = null;
+  for (const rawLine of annexBlock.split("\n")){
+    const line = rawLine;
+    if (!line.trim()) continue;
+    let m = line.match(newEmpRe);
+    if (m){
+      current = {
+        pan: m[3], name: m[4].trim(),
+        entries: [{ date_payment: m[5], taxable: parseFloat(m[6]), tds: parseFloat(m[7]) }]
       };
-      const quarterMatch = text.match(/quarter ended (\w+) \d{4}/);
-      const quarter = quarterMatch ? (QUARTER_BY_END_MONTH[quarterMatch[1]] || '') : '';
-
-      const addrMatch = text.match(/\(d\)\s+Address\s+([\s\S]*?)3\.\s*Particulars/);
-      const addrBlock = addrMatch ? addrMatch[1] : "";
-      const deductorNameMatch = text.match(/\(d\)\s+Address\s+(.+)/);
-      const deductorName = deductorNameMatch ? deductorNameMatch[1].trim().toUpperCase() : "";
-      const road = fieldAfter("Road/street/lane", addrBlock);
-      const area = fieldAfter("Area/location", addrBlock);
-      const pincode = fieldAfter("Pin code", addrBlock);
-      const email = fieldAfter("E-mail", addrBlock).toUpperCase();
-
-      const respMatch = text.match(/3\.\s*Particulars of person responsible[\s\S]*?\n([\s\S]*?)4\.\s*Details of tax deducted/);
-      const respBlock = respMatch ? respMatch[1] : "";
-      const respNameMatch = respBlock.match(/\(a\)\s+Name\s+(.+)/);
-      const respName = respNameMatch ? respNameMatch[1].trim().toUpperCase() : "";
-      const respRoad = fieldAfter("Road/street/lane", respBlock);
-      const respArea = fieldAfter("Area/location", respBlock);
-      const respPincode = fieldAfter("Pin code", respBlock);
-      const respEmail = fieldAfter("E-mail", respBlock).toUpperCase();
-
-      const designationMatch = text.match(/I,\s+[A-Z\s]+,\s+([^,]+),/);
-      // Uppercased to match RPU convention. SPARK's verification line can carry
-      // an internal grade-code suffix like "(I HG)" that the actual filing
-      // drops — that part is a content edit left for the user to trim, not
-      // something safe to guess away automatically.
-      const designation = designationMatch ? designationMatch[1].trim().toUpperCase() : "";
-
-      // Annexure I
-      const annexMatch = text.match(/\(313\)([\s\S]*?)Verification/);
-      const annexBlock = annexMatch ? annexMatch[1] : "";
-      const PAN_RE = "[A-Z]{5}\\d{4}[A-Z]";
-      const DATE_RE = "\\d{2}/\\d{2}/\\d{4}";
-      const newEmpRe = new RegExp(`^\\s*(\\d+)\\s+(\\d+)\\s+(${PAN_RE})\\s+(.+?)\\s+(${DATE_RE})\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)`);
-      const contRe = new RegExp(`^\\s*(${DATE_RE})\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)`);
-
-      const employees = [];
-      let current = null;
-      for (const rawLine of annexBlock.split("\n")) {
-        const line = rawLine;
-        if (!line.trim()) continue;
-        let m = line.match(newEmpRe);
-        if (m) {
-          current = {
-            pan: m[3], name: m[4].trim(),
-            entries: [{ date_payment: m[5], taxable: parseFloat(m[6]), tds: parseFloat(m[7]) }]
-          };
-          employees.push(current);
-          continue;
-        }
-        m = line.match(contRe);
-        if (m && current) {
-          current.entries.push({ date_payment: m[1], taxable: parseFloat(m[2]), tds: parseFloat(m[3]) });
-        }
-      }
-
-      return {
-        deductor: {
-          tan, deductor_pan: deductorPan, fy_hyphen: fy, ay_hyphen: ay, quarter,
-          deductor_name: deductorName, road, area, pincode, email,
-          resp_name: respName, resp_designation: designation,
-          resp_road: respRoad, resp_area: respArea, resp_pincode: respPincode, resp_email: respEmail,
-        },
-        employees
-      };
+      employees.push(current);
+      continue;
     }
+    m = line.match(contRe);
+    if (m && current){
+      current.entries.push({ date_payment: m[1], taxable: parseFloat(m[2]), tds: parseFloat(m[3]) });
+    }
+  }
 
-    // ============================================================
-    // RECONCILIATION
-    // ============================================================
-    function reconcile(bin, employees) {
-      const monthDeductees = {};   // mk -> [{pan,name,taxable,tds}]
-      const monthSparkTotal = {};  // mk -> total
-      for (const emp of employees) {
-        for (const entry of emp.entries) {
-          const mk = monthKey(entry.date_payment);
-          monthSparkTotal[mk] = (monthSparkTotal[mk] || 0) + entry.tds;
-          if (entry.tds > 0) {
-            (monthDeductees[mk] = monthDeductees[mk] || []).push({
-              pan: emp.pan, name: emp.name.toUpperCase(), taxable: entry.taxable, tds: entry.tds
-            });
-          }
-        }
-      }
+  return {
+    deductor: {
+      tan, deductor_pan: deductorPan, fy_hyphen: fy, ay_hyphen: ay, quarter,
+      deductor_name: deductorName, road, area, pincode, email,
+      resp_name: respName, resp_designation: designation,
+      resp_road: respRoad, resp_area: respArea, resp_pincode: respPincode, resp_email: respEmail,
+    },
+    employees
+  };
+}
 
-      const result = [];
-      const warnings = [];
-      const matchedMonths = new Set();
-
-      for (const b of bin) {
-        const mk = monthKey(b.tv_date);
-        matchedMonths.add(mk);
-        const deductees = (monthDeductees[mk] || []).slice().sort((a, b) => a.name.localeCompare(b.name));
-        const sparkTotal = monthSparkTotal[mk];
-        if (sparkTotal === undefined) {
-          warnings.push(`BIN receipt ${b.receipt_no} (${b.tv_date}): no matching SPARK month found for ${mk}.`);
-        } else if (Math.abs(sparkTotal - b.tv_amount) > 0.01) {
-          warnings.push(`BIN receipt ${b.receipt_no} (${b.tv_date}): SPARK total for ${mk} is ${fmtAmt(sparkTotal)} but BIN amount is ${fmtAmt(b.tv_amount)}.`);
-        }
-        const [d, m, y] = b.tv_date.split('/');
-        result.push({
-          receipt_no: b.receipt_no, ddo_serial: b.ddo_serial,
-          tv_date_slash: b.tv_date, tv_date_ddmmyyyy: d + m + y,
-          tv_amount: b.tv_amount, deductees
+// ============================================================
+// RECONCILIATION
+// ============================================================
+function reconcile(bin, employees){
+  const monthDeductees = {};   // mk -> [{pan,name,taxable,tds}]
+  const monthSparkTotal = {};  // mk -> total
+  for (const emp of employees){
+    for (const entry of emp.entries){
+      const mk = monthKey(entry.date_payment);
+      monthSparkTotal[mk] = (monthSparkTotal[mk] || 0) + entry.tds;
+      if (entry.tds > 0){
+        (monthDeductees[mk] = monthDeductees[mk] || []).push({
+          pan: emp.pan, name: emp.name.toUpperCase(), taxable: entry.taxable, tds: entry.tds
         });
       }
-      for (const mk in monthSparkTotal) {
-        if (monthSparkTotal[mk] > 0 && !matchedMonths.has(mk)) {
-          warnings.push(`SPARK shows TDS of ${fmtAmt(monthSparkTotal[mk])} for ${mk} but no matching BIN entry was found.`);
-        }
-      }
-      return { challans: result, warnings };
     }
+  }
 
-    // ============================================================
-    // GENERATORS  (field maps validated against real RPU output samples)
-    // ============================================================
-    function buildRow(length, values) {
-      const arr = new Array(length).fill('');
-      for (const i in values) arr[i] = String(values[i]);
-      return arr.join('^');
+  const result = [];
+  const warnings = [];
+  const matchedMonths = new Set();
+
+  for (const b of bin){
+    const mk = monthKey(b.tv_date);
+    matchedMonths.add(mk);
+    const deductees = (monthDeductees[mk] || []).slice().sort((a,b)=>a.name.localeCompare(b.name));
+    const sparkTotal = monthSparkTotal[mk];
+    if (sparkTotal === undefined){
+      warnings.push(`BIN receipt ${b.receipt_no} (${b.tv_date}): no matching SPARK month found for ${mk}.`);
+    } else if (Math.abs(sparkTotal - b.tv_amount) > 0.01){
+      warnings.push(`BIN receipt ${b.receipt_no} (${b.tv_date}): SPARK total for ${mk} is ${fmtAmt(sparkTotal)} but BIN amount is ${fmtAmt(b.tv_amount)}.`);
     }
+    const [d,m,y] = b.tv_date.split('/');
+    result.push({
+      receipt_no: b.receipt_no, ddo_serial: b.ddo_serial,
+      tv_date_slash: b.tv_date, tv_date_ddmmyyyy: d+m+y,
+      tv_amount: b.tv_amount, deductees
+    });
+  }
+  for (const mk in monthSparkTotal){
+    if (monthSparkTotal[mk] > 0 && !matchedMonths.has(mk)){
+      warnings.push(`SPARK shows TDS of ${fmtAmt(monthSparkTotal[mk])} for ${mk} but no matching BIN entry was found.`);
+    }
+  }
+  return { challans: result, warnings };
+}
 
-    function genFormatA(d, challans, genDateDdmmyyyy) {
-      const lines = [];
-      let seq = 1;
-      lines.push(buildRow(18, { 0: seq, 1: 'FH', 2: 'SL1', 3: 'R', 4: genDateDdmmyyyy, 5: '1', 6: 'D', 7: d.tan, 8: '1', 9: 'Protean RPU 1.1' }));
+// ============================================================
+// GENERATORS  (field maps validated against real RPU output samples)
+// ============================================================
+function buildRow(length, values){
+  const arr = new Array(length).fill('');
+  for (const i in values) arr[i] = String(values[i]);
+  return arr.join('^');
+}
+
+function genFormatA(d, challans, genDateDdmmyyyy){
+  const lines = [];
+  let seq = 1;
+  lines.push(buildRow(18, {0:seq,1:'FH',2:'SL1',3:'R',4:genDateDdmmyyyy,5:'1',6:'D',7:d.tan,8:'1',9:'Protean RPU 1.1'}));
+  seq++;
+  const totalTds = challans.reduce((s,c)=>s+c.tv_amount,0);
+  lines.push(buildRow(72, {
+    0:seq,1:'BH',2:'1',3:challans.length,4:'138',
+    8:d.provisional_receipt_no||'',
+    12:d.tan,14:d.deductor_pan||'PANNOTREQD',
+    15:d.ay_nosep,16:d.fy_nosep,17:d.quarter,
+    18:d.deductor_name,19:'INDIA',20:'1',
+    21:d.road,22:d.area,23:d.locality_extra,24:d.district,25:d.state_code,26:d.pincode,
+    27:d.email,28:d.std_code,29:d.phone,
+    31:'S',
+    32:d.resp_name,33:d.resp_designation,34:'1',
+    35:d.resp_road,36:d.resp_area,37:d.resp_locality_extra,38:d.resp_district,
+    39:d.resp_state_code,40:d.resp_pincode,41:d.resp_email,42:'INDIA',43:d.resp_std_code,44:d.resp_phone,
+    46:fmtAmt(totalTds),
+    48:'0',51:'Y',53:d.state_code,
+    58:d.resp_pan,67:d.ain,
+  }));
+
+  let challanIdx = 0;
+  for (const ch of challans){
+    challanIdx++; seq++;
+    lines.push(buildRow(30, {
+      0:seq,1:'CD',2:'1',3:challanIdx,4:ch.deductees.length,5:'N',
+      7:fmtAmt(ch.tv_amount),8:'0.00',9:'0.00',10:'0.00',11:fmtAmt(ch.tv_amount),
+      12:'B',14:ch.receipt_no,16:pad5(ch.ddo_serial),18:ch.tv_date_ddmmyyyy,
+      20:fmtAmt(ch.tv_amount),21:fmtAmt(ch.tv_amount),
+    }));
+    ch.deductees.forEach((p, i) => {
       seq++;
-      const totalTds = challans.reduce((s, c) => s + c.tv_amount, 0);
-      lines.push(buildRow(72, {
-        0: seq, 1: 'BH', 2: '1', 3: challans.length, 4: '138',
-        8: d.provisional_receipt_no || '',
-        12: d.tan, 14: d.deductor_pan || 'PANNOTREQD',
-        15: d.ay_nosep, 16: d.fy_nosep, 17: d.quarter,
-        18: d.deductor_name, 19: 'INDIA', 20: '1',
-        21: d.road, 22: d.area, 23: d.locality_extra, 24: d.district, 25: d.state_code, 26: d.pincode,
-        27: d.email, 28: d.std_code, 29: d.phone,
-        31: 'S',
-        32: d.resp_name, 33: d.resp_designation, 34: '1',
-        35: d.resp_road, 36: d.resp_area, 37: d.resp_locality_extra, 38: d.resp_district,
-        39: d.resp_state_code, 40: d.resp_pincode, 41: d.resp_email, 42: 'INDIA', 43: d.resp_std_code, 44: d.resp_phone,
-        46: fmtAmt(totalTds),
-        48: '0', 51: 'Y', 53: d.state_code,
-        58: d.resp_pan, 67: d.ain,
+      lines.push(buildRow(45, {
+        0:seq,1:'DD',2:'1',3:i+1,4:challanIdx,5:'O',
+        7:p.pan,8:p.name,14:'1001',
+        17:'Y',18:ch.tv_date_ddmmyyyy,19:fmtAmt(p.taxable),
+        23:fmtAmt(p.tds),24:fmtAmt(p.tds),
+        26:ch.tv_date_ddmmyyyy,28:ch.tv_date_ddmmyyyy,
       }));
+    });
+  }
+  return lines.join('\r\n') + '\r\n';
+}
 
-      let challanIdx = 0;
-      for (const ch of challans) {
-        challanIdx++; seq++;
-        lines.push(buildRow(30, {
-          0: seq, 1: 'CD', 2: '1', 3: challanIdx, 4: ch.deductees.length, 5: 'N',
-          7: fmtAmt(ch.tv_amount), 8: '0.00', 9: '0.00', 10: '0.00', 11: fmtAmt(ch.tv_amount),
-          12: 'B', 14: ch.receipt_no, 16: pad5(ch.ddo_serial), 18: ch.tv_date_ddmmyyyy,
-          20: fmtAmt(ch.tv_amount), 21: fmtAmt(ch.tv_amount),
-        }));
-        ch.deductees.forEach((p, i) => {
-          seq++;
-          lines.push(buildRow(45, {
-            0: seq, 1: 'DD', 2: '1', 3: i + 1, 4: challanIdx, 5: 'O',
-            7: p.pan, 8: p.name, 14: '1001',
-            17: 'Y', 18: ch.tv_date_ddmmyyyy, 19: fmtAmt(p.taxable),
-            23: fmtAmt(p.tds), 24: fmtAmt(p.tds),
-            26: ch.tv_date_ddmmyyyy, 28: ch.tv_date_ddmmyyyy,
-          }));
-        });
-      }
-      return lines.join('\r\n') + '\r\n';
-    }
+function genFormatB(d, challans){
+  const lines = [];
+  let seq = 1;
+  lines.push(buildRow(64, {
+    0:'0',1:seq,2:'BH',3:'1',4:'138',5:d.quarter,6:'A',
+    9:d.tan,11:d.deductor_pan||'PANNOTREQD',13:'0',
+    14:d.fy_hyphen,15:d.ay_hyphen,16:'2',
+    18:d.deductor_name,20:d.state_code,22:'1',
+    23:d.locality_extra,24:d.area,25:'INDIA',26:d.pincode,27:d.std_code,28:d.phone,
+    29:d.ain,30:'0',
+    34:d.resp_pan,35:d.road,36:d.district,37:d.state_code,38:d.email,
+    39:d.resp_name,40:d.resp_designation,41:'1',
+    42:d.resp_road,43:d.resp_area,44:'INDIA',45:d.resp_std_code,46:d.resp_phone,
+    49:d.provisional_receipt_no||'',
+    50:d.locality_extra,51:d.district,52:d.state_code,53:d.pincode,54:d.resp_email,
+    57:'1',63:'LineHash',
+  }));
 
-    function genFormatB(d, challans) {
-      const lines = [];
-      let seq = 1;
-      lines.push(buildRow(64, {
-        0: '0', 1: seq, 2: 'BH', 3: '1', 4: '138', 5: d.quarter, 6: 'A',
-        9: d.tan, 11: d.deductor_pan || 'PANNOTREQD', 13: '0',
-        14: d.fy_hyphen, 15: d.ay_hyphen, 16: '2',
-        18: d.deductor_name, 20: d.state_code, 22: '1',
-        23: d.locality_extra, 24: d.area, 25: 'INDIA', 26: d.pincode, 27: d.std_code, 28: d.phone,
-        29: d.ain, 30: '0',
-        34: d.resp_pan, 35: d.road, 36: d.district, 37: d.state_code, 38: d.email,
-        39: d.resp_name, 40: d.resp_designation, 41: '1',
-        42: d.resp_road, 43: d.resp_area, 44: 'INDIA', 45: d.resp_std_code, 46: d.resp_phone,
-        49: d.provisional_receipt_no || '',
-        50: d.locality_extra, 51: d.district, 52: d.state_code, 53: d.pincode, 54: d.resp_email,
-        57: '1', 63: 'LineHash',
+  for (const ch of challans){
+    seq++;
+    lines.push(buildRow(22, {
+      0:'0',1:seq,2:'CD',3:'1',4:'--Select--',
+      5:fmtAmt(ch.tv_amount),6:'0.00',7:'0.00',8:'0.00',10:fmtAmt(ch.tv_amount),
+      13:ch.receipt_no,15:ch.tv_date_slash,17:pad5(ch.ddo_serial),18:'B',19:'--Select--',21:'LineHash',
+    }));
+  }
+
+  let challanIdx = 0;
+  for (const ch of challans){
+    challanIdx++;
+    ch.deductees.forEach((p, i) => {
+      seq++;
+      lines.push(buildRow(31, {
+        0:'0',1:seq,2:'DD',3:'1',4:challanIdx,5:'--Select--',
+        6:ch.receipt_no,7:ch.tv_date_slash,8:pad5(ch.ddo_serial),9:fmtAmt(ch.tv_amount),
+        10:i+1,12:p.pan,13:p.name,14:i+1,15:'1001',
+        16:ch.tv_date_slash,17:ch.tv_date_slash,18:fmtAmt(p.taxable),
+        19:fmtAmt(p.tds),21:fmtAmt(p.tds),
+        23:ch.tv_date_slash,24:'--Select--',26:'Yes',30:'LineHash',
       }));
-
-      for (const ch of challans) {
-        seq++;
-        lines.push(buildRow(22, {
-          0: '0', 1: seq, 2: 'CD', 3: '1', 4: '--Select--',
-          5: fmtAmt(ch.tv_amount), 6: '0.00', 7: '0.00', 8: '0.00', 10: fmtAmt(ch.tv_amount),
-          13: ch.receipt_no, 15: ch.tv_date_slash, 17: pad5(ch.ddo_serial), 18: 'B', 19: '--Select--', 21: 'LineHash',
-        }));
-      }
-
-      let challanIdx = 0;
-      for (const ch of challans) {
-        challanIdx++;
-        ch.deductees.forEach((p, i) => {
-          seq++;
-          lines.push(buildRow(31, {
-            0: '0', 1: seq, 2: 'DD', 3: '1', 4: challanIdx, 5: '--Select--',
-            6: ch.receipt_no, 7: ch.tv_date_slash, 8: pad5(ch.ddo_serial), 9: fmtAmt(ch.tv_amount),
-            10: i + 1, 12: p.pan, 13: p.name, 14: i + 1, 15: '1001',
-            16: ch.tv_date_slash, 17: ch.tv_date_slash, 18: fmtAmt(p.taxable),
-            19: fmtAmt(p.tds), 21: fmtAmt(p.tds),
-            23: ch.tv_date_slash, 24: '--Select--', 26: 'Yes', 30: 'LineHash',
-          }));
-        });
-      }
-      return lines.join('\r\n') + '\r\n';
-    }
-
-    // ============================================================
-    // UI WIRING
-    // ============================================================
-    function enableStep(n) { el('step' + n).classList.remove('disabled'); }
-
-    el('binFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      setStatus('binStatus', 'Reading…');
-      try {
-        const ext = file.name.split('.').pop().toLowerCase();
-        if (ext === 'csv') {
-          const text = await file.text();
-          binEntries = parseBinCSVText(text);
-        } else if (ext === 'xlsx') {
-          const buf = await file.arrayBuffer();
-          binEntries = parseBinXLSXBuffer(buf);
-        } else if (ext === 'pdf') {
-          const buf = await file.arrayBuffer();
-          binEntries = await parseBinPDFBuffer(buf);
-        } else {
-          throw new Error('Unsupported file type: ' + ext);
-        }
-        if (!binEntries.length) throw new Error('No BIN rows recognised in this file.');
-        setStatus('binStatus', `Read ${binEntries.length} transfer voucher${binEntries.length > 1 ? 's' : ''}: ` +
-          binEntries.map(b => `${b.receipt_no} (₹${fmtAmt(b.tv_amount)}, ${b.tv_date})`).join('; '), 'ok');
-        maybeProceed();
-      } catch (err) {
-        binEntries = null;
-        setStatus('binStatus', 'Could not read this file — ' + err.message, 'err');
-      }
     });
+  }
+  return lines.join('\r\n') + '\r\n';
+}
 
-    el('sparkFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      setStatus('sparkStatus', 'Reading…');
-      try {
-        const buf = await file.arrayBuffer();
-        const layoutText = await extractLayoutText(buf);
-        sparkData = parseSparkText(layoutText);
-        if (!sparkData.deductor.tan) throw new Error('Could not find a TAN in this PDF — is it the right file?');
-        if (!sparkData.employees.length) throw new Error('Could not find Annexure I deductee rows in this PDF.');
-        setStatus('sparkStatus', `Read ${sparkData.employees.length} employees for TAN ${sparkData.deductor.tan}, ${sparkData.deductor.fy_hyphen} ${sparkData.deductor.quarter || ''}.`, 'ok');
-        fillDeductorForm(sparkData.deductor);
-        enableStep(3);
-        maybeProceed();
-      } catch (err) {
-        sparkData = null;
-        setStatus('sparkStatus', 'Could not read this PDF — ' + err.message, 'err');
-      }
-    });
+// ============================================================
+// UI WIRING
+// ============================================================
+function enableStep(n){ el('step'+n).classList.remove('disabled'); }
 
-    function fillDeductorForm(dd) {
-      el('f_tan').value = dd.tan || '';
-      el('f_deductor_pan').value = dd.deductor_pan || 'PANNOTREQD';
-      el('f_deductor_name').value = dd.deductor_name || '';
-      el('f_road').value = dd.road || '';
-      el('f_area').value = dd.area || '';
-      el('f_locality_extra').value = '';
-      el('f_district').value = '';
-      el('f_state_code').value = '16';
-      el('f_pincode').value = dd.pincode || '';
-      el('f_std_code').value = '';
-      el('f_phone').value = '';
-      el('f_email').value = dd.email || '';
-      el('f_ain').value = '';
-
-      el('f_resp_name').value = dd.resp_name || '';
-      el('f_resp_designation').value = dd.resp_designation || '';
-      el('f_resp_pan').value = '';
-      el('f_resp_road').value = dd.resp_road || '';
-      el('f_resp_area').value = dd.resp_area || '';
-      el('f_resp_locality_extra').value = '';
-      el('f_resp_district').value = '';
-      el('f_resp_state_code').value = '16';
-      el('f_resp_pincode').value = dd.resp_pincode || '';
-      el('f_resp_std_code').value = '';
-      el('f_resp_phone').value = '';
-      el('f_resp_email').value = dd.resp_email || '';
-
-      el('f_fy_hyphen').value = dd.fy_hyphen || '';
-      const ayGuess = dd.fy_hyphen ? (parseInt(dd.fy_hyphen.split('-')[0]) + 1) + '-' + (parseInt(dd.fy_hyphen.split('-')[1]) + 1) : '';
-      el('f_ay_hyphen').value = dd.ay_hyphen || ayGuess;
-      el('f_quarter').value = dd.quarter || '';
-      el('f_provisional_receipt_no').value = '';
+el('binFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setStatus('binStatus', 'Reading…');
+  try{
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'csv'){
+      const text = await file.text();
+      binEntries = parseBinCSVText(text);
+    } else if (ext === 'xlsx'){
+      const buf = await file.arrayBuffer();
+      binEntries = parseBinXLSXBuffer(buf);
+    } else if (ext === 'pdf'){
+      const buf = await file.arrayBuffer();
+      binEntries = await parseBinPDFBuffer(buf);
+    } else {
+      throw new Error('Unsupported file type: ' + ext);
     }
+    if (!binEntries.length) throw new Error('No BIN rows recognised in this file.');
+    setStatus('binStatus', `Read ${binEntries.length} transfer voucher${binEntries.length>1?'s':''}: ` +
+      binEntries.map(b=>`${b.receipt_no} (₹${fmtAmt(b.tv_amount)}, ${b.tv_date})`).join('; '), 'ok');
+    maybeProceed();
+  } catch(err){
+    binEntries = null;
+    setStatus('binStatus', 'Could not read this file — ' + err.message, 'err');
+  }
+});
 
-    function maybeProceed() {
-      if (binEntries && sparkData) {
-        runReconciliation();
-      }
-    }
+el('sparkFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setStatus('sparkStatus', 'Reading…');
+  try{
+    const buf = await file.arrayBuffer();
+    const layoutText = await extractLayoutText(buf);
+    sparkData = parseSparkText(layoutText);
+    if (!sparkData.deductor.tan) throw new Error('Could not find a TAN in this PDF — is it the right file?');
+    if (!sparkData.employees.length) throw new Error('Could not find Annexure I deductee rows in this PDF.');
+    setStatus('sparkStatus', `Read ${sparkData.employees.length} employees for TAN ${sparkData.deductor.tan}, ${sparkData.deductor.fy_hyphen} ${sparkData.deductor.quarter||''}.`, 'ok');
+    fillDeductorForm(sparkData.deductor);
+    enableStep(3);
+    maybeProceed();
+  } catch(err){
+    sparkData = null;
+    setStatus('sparkStatus', 'Could not read this PDF — ' + err.message, 'err');
+  }
+});
 
-    function noSepYearRange(hyphenated) {
-      // "2026-2027" -> "202627" (full first year + last two digits of second
-      // year) — validated against real RPU output, NOT simply the hyphen
-      // stripped out (which would wrongly give an 8-digit "20262027").
-      const parts = hyphenated.split('-');
-      if (parts.length !== 2 || parts[0].length !== 4) return hyphenated.replace('-', '');
-      return parts[0] + parts[1].slice(2);
-    }
+function fillDeductorForm(dd){
+  el('f_tan').value = dd.tan || '';
+  el('f_deductor_pan').value = dd.deductor_pan || 'PANNOTREQD';
+  el('f_deductor_name').value = dd.deductor_name || '';
+  el('f_road').value = dd.road || '';
+  el('f_area').value = dd.area || '';
+  el('f_locality_extra').value = '';
+  el('f_district').value = '';
+  el('f_state_code').value = '16';
+  el('f_pincode').value = dd.pincode || '';
+  el('f_std_code').value = '';
+  el('f_phone').value = '';
+  el('f_email').value = dd.email || '';
+  el('f_ain').value = '';
 
-    function readDeductorForm() {
-      const fy = el('f_fy_hyphen').value.trim();
-      const ay = el('f_ay_hyphen').value.trim();
-      return {
-        tan: el('f_tan').value.trim(),
-        deductor_pan: el('f_deductor_pan').value.trim() || 'PANNOTREQD',
-        deductor_name: el('f_deductor_name').value.trim(),
-        road: el('f_road').value.trim(), area: el('f_area').value.trim(),
-        locality_extra: el('f_locality_extra').value.trim(), district: el('f_district').value.trim(),
-        state_code: el('f_state_code').value.trim(), pincode: el('f_pincode').value.trim(),
-        std_code: el('f_std_code').value.trim(), phone: el('f_phone').value.trim(),
-        email: el('f_email').value.trim(), ain: el('f_ain').value.trim(),
-        resp_name: el('f_resp_name').value.trim(), resp_designation: el('f_resp_designation').value.trim(),
-        resp_pan: el('f_resp_pan').value.trim(),
-        resp_road: el('f_resp_road').value.trim(), resp_area: el('f_resp_area').value.trim(),
-        resp_locality_extra: el('f_resp_locality_extra').value.trim(), resp_district: el('f_resp_district').value.trim(),
-        resp_state_code: el('f_resp_state_code').value.trim(), resp_pincode: el('f_resp_pincode').value.trim(),
-        resp_std_code: el('f_resp_std_code').value.trim(), resp_phone: el('f_resp_phone').value.trim(),
-        resp_email: el('f_resp_email').value.trim(),
-        fy_hyphen: fy, ay_hyphen: ay,
-        fy_nosep: noSepYearRange(fy), ay_nosep: noSepYearRange(ay),
-        quarter: el('f_quarter').value.trim(),
-        provisional_receipt_no: el('f_provisional_receipt_no').value.trim(),
-      };
-    }
+  el('f_resp_name').value = dd.resp_name || '';
+  el('f_resp_designation').value = dd.resp_designation || '';
+  el('f_resp_pan').value = '';
+  el('f_resp_road').value = dd.resp_road || '';
+  el('f_resp_area').value = dd.resp_area || '';
+  el('f_resp_locality_extra').value = '';
+  el('f_resp_district').value = '';
+  el('f_resp_state_code').value = '16';
+  el('f_resp_pincode').value = dd.resp_pincode || '';
+  el('f_resp_std_code').value = '';
+  el('f_resp_phone').value = '';
+  el('f_resp_email').value = dd.resp_email || '';
 
-    function runReconciliation() {
-      const { challans: rec, warnings } = reconcile(binEntries, sparkData.employees);
-      challans = rec;
-      enableStep(4);
+  el('f_fy_hyphen').value = dd.fy_hyphen || '';
+  const ayGuess = dd.fy_hyphen ? (parseInt(dd.fy_hyphen.split('-')[0])+1) + '-' + (parseInt(dd.fy_hyphen.split('-')[1])+1) : '';
+  el('f_ay_hyphen').value = dd.ay_hyphen || ayGuess;
+  el('f_quarter').value = dd.quarter || '';
+  el('f_provisional_receipt_no').value = '';
+}
 
-      const msgBox = el('reconMsgs');
-      if (warnings.length) {
-        msgBox.innerHTML = '<div class="warn-box"><b>Check these before generating:</b><br>' +
-          warnings.map(w => '• ' + w).join('<br>') + '</div>';
-      } else {
-        msgBox.innerHTML = '<div class="ok-box">All BIN transfer vouchers match SPARK\'s Annexure I totals for their month — no mismatches found.</div>';
-      }
+function maybeProceed(){
+  if (binEntries && sparkData){
+    runReconciliation();
+  }
+}
 
-      const tblWrap = el('reconTables');
-      tblWrap.innerHTML = '';
-      challans.forEach((ch, ci) => {
-        const block = document.createElement('div');
-        block.className = 'challan-block';
-        const sum = ch.deductees.reduce((s, p) => s + p.tds, 0);
-        block.innerHTML = `
+function noSepYearRange(hyphenated){
+  // "2026-2027" -> "202627" (full first year + last two digits of second
+  // year) — validated against real RPU output, NOT simply the hyphen
+  // stripped out (which would wrongly give an 8-digit "20262027").
+  const parts = hyphenated.split('-');
+  if (parts.length !== 2 || parts[0].length !== 4) return hyphenated.replace('-', '');
+  return parts[0] + parts[1].slice(2);
+}
+
+function readDeductorForm(){
+  const fy = el('f_fy_hyphen').value.trim();
+  const ay = el('f_ay_hyphen').value.trim();
+  return {
+    tan: el('f_tan').value.trim(),
+    deductor_pan: el('f_deductor_pan').value.trim() || 'PANNOTREQD',
+    deductor_name: el('f_deductor_name').value.trim(),
+    road: el('f_road').value.trim(), area: el('f_area').value.trim(),
+    locality_extra: el('f_locality_extra').value.trim(), district: el('f_district').value.trim(),
+    state_code: el('f_state_code').value.trim(), pincode: el('f_pincode').value.trim(),
+    std_code: el('f_std_code').value.trim(), phone: el('f_phone').value.trim(),
+    email: el('f_email').value.trim(), ain: el('f_ain').value.trim(),
+    resp_name: el('f_resp_name').value.trim(), resp_designation: el('f_resp_designation').value.trim(),
+    resp_pan: el('f_resp_pan').value.trim(),
+    resp_road: el('f_resp_road').value.trim(), resp_area: el('f_resp_area').value.trim(),
+    resp_locality_extra: el('f_resp_locality_extra').value.trim(), resp_district: el('f_resp_district').value.trim(),
+    resp_state_code: el('f_resp_state_code').value.trim(), resp_pincode: el('f_resp_pincode').value.trim(),
+    resp_std_code: el('f_resp_std_code').value.trim(), resp_phone: el('f_resp_phone').value.trim(),
+    resp_email: el('f_resp_email').value.trim(),
+    fy_hyphen: fy, ay_hyphen: ay,
+    fy_nosep: noSepYearRange(fy), ay_nosep: noSepYearRange(ay),
+    quarter: el('f_quarter').value.trim(),
+    provisional_receipt_no: el('f_provisional_receipt_no').value.trim(),
+  };
+}
+
+function runReconciliation(){
+  const { challans: rec, warnings } = reconcile(binEntries, sparkData.employees);
+  challans = rec;
+  enableStep(4);
+
+  const msgBox = el('reconMsgs');
+  if (warnings.length){
+    msgBox.innerHTML = '<div class="warn-box"><b>Check these before generating:</b><br>' +
+      warnings.map(w => '• ' + w).join('<br>') + '</div>';
+  } else {
+    msgBox.innerHTML = '<div class="ok-box">All BIN transfer vouchers match SPARK\'s Annexure I totals for their month — no mismatches found.</div>';
+  }
+
+  const tblWrap = el('reconTables');
+  tblWrap.innerHTML = '';
+  challans.forEach((ch, ci) => {
+    const block = document.createElement('div');
+    block.className = 'challan-block';
+    const sum = ch.deductees.reduce((s,p)=>s+p.tds,0);
+    block.innerHTML = `
       <div class="challan-head">
         <span>Receipt <b>${ch.receipt_no}</b> · DDO Sl. ${ch.ddo_serial} · ${ch.tv_date_slash}</span>
         <span>TV amount <b>₹${fmtAmt(ch.tv_amount)}</b> · deductee total ₹${fmtAmt(sum)}</span>
       </div>
       <table class="recon">
         <tr><th>PAN</th><th>Name</th><th>Taxable amount</th><th>TDS</th></tr>
-        ${ch.deductees.map((p, pi) => `
+        ${ch.deductees.map((p,pi)=>`
           <tr>
             <td><input data-ch="${ci}" data-p="${pi}" data-f="pan" value="${p.pan}"></td>
             <td><input data-ch="${ci}" data-p="${pi}" data-f="name" value="${p.name}"></td>
@@ -1107,52 +858,68 @@
             <td><input data-ch="${ci}" data-p="${pi}" data-f="tds" value="${fmtAmt(p.tds)}"></td>
           </tr>`).join('')}
       </table>`;
-        tblWrap.appendChild(block);
-      });
+    tblWrap.appendChild(block);
+  });
 
-      tblWrap.querySelectorAll('input').forEach(inp => {
-        inp.addEventListener('change', () => {
-          const ch = challans[inp.dataset.ch];
-          const p = ch.deductees[inp.dataset.p];
-          if (inp.dataset.f === 'taxable' || inp.dataset.f === 'tds') p[inp.dataset.f] = parseFloat(inp.value) || 0;
-          else p[inp.dataset.f] = inp.value;
-        });
-      });
-
-      el('btnGenerate').disabled = false;
-    }
-
-    el('btnGenerate').addEventListener('click', () => {
-      const d = readDeductorForm();
-      const today = new Date();
-      const genDate = String(today.getDate()).padStart(2, '0') + String(today.getMonth() + 1).padStart(2, '0') + today.getFullYear();
-
-      const outA = genFormatA(d, challans, genDate);
-      const outB = genFormatB(d, challans);
-
-      const fnameAFinal = `138R${d.quarter}.txt`;
-      const fnameBFinal = `${d.tan}_138_${d.fy_nosep}_${d.quarter}`;
-
-      el('fnameA').textContent = fnameAFinal;
-      el('fnameB').textContent = fnameBFinal;
-      el('previewA').textContent = outA.slice(0, 600) + (outA.length > 600 ? '\n…' : '');
-      el('previewB').textContent = outB.slice(0, 600) + (outB.length > 600 ? '\n…' : '');
-
-      el('dlA').onclick = () => downloadText(fnameAFinal, outA);
-      el('dlB').onclick = () => downloadText(fnameBFinal, outB);
-
-      enableStep(5);
+  tblWrap.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const ch = challans[inp.dataset.ch];
+      const p = ch.deductees[inp.dataset.p];
+      if (inp.dataset.f === 'taxable' || inp.dataset.f === 'tds') p[inp.dataset.f] = parseFloat(inp.value) || 0;
+      else p[inp.dataset.f] = inp.value;
     });
+  });
 
-    function downloadText(filename, content) {
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-  </script>
+  el('btnGenerate').disabled = false;
+}
+
+el('btnGenerate').addEventListener('click', () => {
+  const d = readDeductorForm();
+  const today = new Date();
+  const genDate = String(today.getDate()).padStart(2,'0') + String(today.getMonth()+1).padStart(2,'0') + today.getFullYear();
+
+  // Format validation for the two hand-entered PAN fields — a wrong PAN
+  // here won't break generation, but the filing software will reject the
+  // file on import, so flag it clearly before that happens.
+  const genWarnings = [];
+  if (d.resp_pan && !looksLikePan(d.resp_pan)){
+    genWarnings.push(`"${d.resp_pan}" doesn't look like a valid PAN for the responsible person (expected format: AAAAA9999A). This will likely be rejected on import.`);
+  }
+  if (!d.resp_pan){
+    genWarnings.push('Responsible person PAN is blank — this field is required and will likely be rejected on import.');
+  }
+  if (d.deductor_pan && d.deductor_pan !== 'PANNOTREQD' && !looksLikePan(d.deductor_pan)){
+    genWarnings.push(`"${d.deductor_pan}" doesn't look like a valid deductor PAN. Use PANNOTREQD if the deductor genuinely has no PAN, or check the value.`);
+  }
+  el('genWarnings').innerHTML = genWarnings.length
+    ? '<div class="warn-box"><b>Check before filing:</b><br>' + genWarnings.map(w => '• ' + w).join('<br>') + '</div>'
+    : '';
+
+  const outA = genFormatA(d, challans, genDate);
+  const outB = genFormatB(d, challans);
+
+  const fnameAFinal = `138R${d.quarter}.txt`;
+  const fnameBFinal = `${d.tan}_138_${d.fy_nosep}_${d.quarter}`;
+
+  el('fnameA').textContent = fnameAFinal;
+  el('fnameB').textContent = fnameBFinal;
+  el('previewA').textContent = outA.slice(0, 600) + (outA.length>600 ? '\n…' : '');
+  el('previewB').textContent = outB.slice(0, 600) + (outB.length>600 ? '\n…' : '');
+
+  el('dlA').onclick = () => downloadText(fnameAFinal, outA);
+  el('dlB').onclick = () => downloadText(fnameBFinal, outB);
+
+  enableStep(5);
+});
+
+function downloadText(filename, content){
+  const blob = new Blob([content], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
 </body>
-
 </html>
