@@ -891,6 +891,11 @@ el('btnGenerate').addEventListener('click', () => {
   if (d.deductor_pan && d.deductor_pan !== 'PANNOTREQD' && !looksLikePan(d.deductor_pan)){
     genWarnings.push(`"${d.deductor_pan}" doesn't look like a valid deductor PAN. Use PANNOTREQD if the deductor genuinely has no PAN, or check the value.`);
   }
+  if (!d.ain){
+    genWarnings.push('AIN is blank — this is required, and the exact registered number for the office (not a placeholder) is checked on import.');
+  } else if (!/^\d{7}$/.test(d.ain.trim())){
+    genWarnings.push(`"${d.ain}" doesn't look like a typical AIN (usually 7 digits) — double-check it's the office's actual registered number.`);
+  }
   el('genWarnings').innerHTML = genWarnings.length
     ? '<div class="warn-box"><b>Check before filing:</b><br>' + genWarnings.map(w => '• ' + w).join('<br>') + '</div>'
     : '';
@@ -913,7 +918,12 @@ el('btnGenerate').addEventListener('click', () => {
 });
 
 function downloadText(filename, content){
-  const blob = new Blob([content], {type:'text/plain'});
+  // application/octet-stream, not text/plain — Chrome (and other Chromium
+  // browsers) infers an extension from the MIME type when the requested
+  // filename has none, silently appending ".txt" to an extension-less
+  // name like the Format B file. octet-stream has no implied extension,
+  // so the filename downloads exactly as given either way.
+  const blob = new Blob([content], {type:'application/octet-stream'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = filename;
