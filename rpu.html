@@ -174,6 +174,9 @@
         <div><label class="field-label">Name</label><input id="f_resp_name"></div>
         <div><label class="field-label">Designation</label><input id="f_resp_designation"></div>
         <div><label class="field-label">PAN</label><input id="f_resp_pan" placeholder="needs manual entry"></div>
+        <label style="grid-column:1/-1; display:flex; align-items:center; gap:6px; font-size:.82rem; color:var(--ink-soft); margin:-2px 0 2px;">
+          <input type="checkbox" id="f_resp_same_address" style="width:auto;"> Same address as deductor (road, area, locality, district, state, pincode)
+        </label>
         <div><label class="field-label">Road / street</label><input id="f_resp_road"></div>
         <div><label class="field-label">Area / locality</label><input id="f_resp_area"></div>
         <div><label class="field-label">Additional locality</label><input id="f_resp_locality_extra" placeholder="needs manual entry"></div>
@@ -247,6 +250,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs
 let binEntries = null;     // [{receipt_no, ddo_serial, tv_date(DD/MM/YYYY), nature, tv_amount, status}]
 let sparkData = null;      // {deductor:{...}, employees:[{pan,name,entries:[{date_payment,taxable,tds}]}]}
 let challans = null;       // reconciled, editable in the DOM
+const DEDUCTOR_ADDRESS_IDS = ['f_road','f_area','f_locality_extra','f_district','f_state_code','f_pincode'];
+const RESP_ADDRESS_IDS = ['f_resp_road','f_resp_area','f_resp_locality_extra','f_resp_district','f_resp_state_code','f_resp_pincode'];
 
 // ============================================================
 // HELPERS
@@ -262,6 +267,13 @@ function fmtAmt(n){ return (Math.round(n * 100) / 100).toFixed(2); }
 function ddmmyyyyFromSlash(s){ return s.split('/').join(''); } // "30/04/2026" -> "30042026"
 function monthKey(dateSlash){ const p = dateSlash.split('/'); return p[2] + '-' + p[1]; } // YYYY-MM
 function looksLikePan(v){ return /^[A-Z]{5}[0-9]{4}[A-Z]$/i.test((v||'').trim()); }
+function sanitizeFreeText(v){
+  // RPU import rejects special characters in name/address-type fields —
+  // keep only letters, digits, and spaces, collapsing any resulting
+  // double spaces left behind (e.g. stripping the brackets out of
+  // "MEDICAL OFFICER (I HG)" leaves "MEDICAL OFFICER I HG").
+  return (v || '').replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+}
 
 // ============================================================
 // BIN PARSERS
@@ -495,7 +507,7 @@ function parseSparkText(text){
   const addrMatch = text.match(/\(d\)\s+Address\s+([\s\S]*?)3\.\s*Particulars/);
   const addrBlock = addrMatch ? addrMatch[1] : "";
   const deductorNameMatch = text.match(/\(d\)\s+Address\s+(.+)/);
-  const deductorName = deductorNameMatch ? deductorNameMatch[1].trim().toUpperCase() : "";
+  const deductorName = deductorNameMatch ? sanitizeFreeText(deductorNameMatch[1]).toUpperCase() : "";
   const road = fieldAfter("Road/street/lane", addrBlock);
   const area = fieldAfter("Area/location", addrBlock);
   const pincode = fieldAfter("Pin code", addrBlock);
@@ -504,7 +516,7 @@ function parseSparkText(text){
   const respMatch = text.match(/3\.\s*Particulars of person responsible[\s\S]*?\n([\s\S]*?)4\.\s*Details of tax deducted/);
   const respBlock = respMatch ? respMatch[1] : "";
   const respNameMatch = respBlock.match(/\(a\)\s+Name\s+(.+)/);
-  const respName = respNameMatch ? respNameMatch[1].trim().toUpperCase() : "";
+  const respName = respNameMatch ? sanitizeFreeText(respNameMatch[1]).toUpperCase() : "";
   const respRoad = fieldAfter("Road/street/lane", respBlock);
   const respArea = fieldAfter("Area/location", respBlock);
   const respPincode = fieldAfter("Pin code", respBlock);
@@ -515,7 +527,7 @@ function parseSparkText(text){
   // an internal grade-code suffix like "(I HG)" that the actual filing
   // drops — that part is a content edit left for the user to trim, not
   // something safe to guess away automatically.
-  const designation = designationMatch ? designationMatch[1].trim().toUpperCase() : "";
+  const designation = designationMatch ? sanitizeFreeText(designationMatch[1]).toUpperCase() : "";
 
   // Annexure I
   const annexMatch = text.match(/\(313\)([\s\S]*?)Verification/);
@@ -568,7 +580,7 @@ function reconcile(bin, employees){
       monthSparkTotal[mk] = (monthSparkTotal[mk] || 0) + entry.tds;
       if (entry.tds > 0){
         (monthDeductees[mk] = monthDeductees[mk] || []).push({
-          pan: emp.pan, name: emp.name.toUpperCase(), taxable: entry.taxable, tds: entry.tds
+          pan: emp.pan, name: sanitizeFreeText(emp.name).toUpperCase(), taxable: entry.taxable, tds: entry.tds
         });
       }
     }
@@ -632,7 +644,7 @@ function genFormatA(d, challans, genDateDdmmyyyy){
     35:d.resp_road,36:d.resp_area,37:d.resp_locality_extra,38:d.resp_district,
     39:d.resp_state_code,40:d.resp_pincode,41:d.resp_email,42:'INDIA',43:d.resp_std_code,44:d.resp_phone,
     46:fmtAmt(totalTds),
-    48:'0',51:'Y',53:d.state_code,
+    48:'0',51:(d.provisional_receipt_no ? 'Y' : 'N'),53:d.state_code,
     58:d.resp_pan,67:d.ain,
   }));
 
@@ -708,6 +720,16 @@ function genFormatB(d, challans){
 // UI WIRING
 // ============================================================
 function enableStep(n){ el('step'+n).classList.remove('disabled'); }
+
+el('f_resp_same_address').addEventListener('change', (e) => {
+  setRespAddressEditable(!e.target.checked);
+  if (e.target.checked) syncRespAddressFromDeductor();
+});
+DEDUCTOR_ADDRESS_IDS.forEach(id => {
+  el(id).addEventListener('input', () => {
+    if (el('f_resp_same_address').checked) syncRespAddressFromDeductor();
+  });
+});
 
 el('binFile').addEventListener('change', async (e) => {
   const file = e.target.files[0];
@@ -791,6 +813,14 @@ function fillDeductorForm(dd){
   el('f_quarter').value = dd.quarter || '';
   el('f_filed_earlier').value = dd.filed_earlier || 'No';
   el('f_provisional_receipt_no').value = '';
+  if (el('f_resp_same_address').checked) syncRespAddressFromDeductor();
+}
+
+function syncRespAddressFromDeductor(){
+  DEDUCTOR_ADDRESS_IDS.forEach((id, i) => { el(RESP_ADDRESS_IDS[i]).value = el(id).value; });
+}
+function setRespAddressEditable(editable){
+  RESP_ADDRESS_IDS.forEach(id => { el(id).disabled = !editable; });
 }
 
 function maybeProceed(){
@@ -814,16 +844,16 @@ function readDeductorForm(){
   return {
     tan: el('f_tan').value.trim(),
     deductor_pan: el('f_deductor_pan').value.trim() || 'PANNOTREQD',
-    deductor_name: el('f_deductor_name').value.trim(),
-    road: el('f_road').value.trim(), area: el('f_area').value.trim(),
-    locality_extra: el('f_locality_extra').value.trim(), district: el('f_district').value.trim(),
+    deductor_name: sanitizeFreeText(el('f_deductor_name').value),
+    road: sanitizeFreeText(el('f_road').value), area: sanitizeFreeText(el('f_area').value),
+    locality_extra: sanitizeFreeText(el('f_locality_extra').value), district: sanitizeFreeText(el('f_district').value),
     state_code: el('f_state_code').value.trim(), pincode: el('f_pincode').value.trim(),
     std_code: el('f_std_code').value.trim(), phone: el('f_phone').value.trim(),
     email: el('f_email').value.trim(), ain: el('f_ain').value.trim(),
-    resp_name: el('f_resp_name').value.trim(), resp_designation: el('f_resp_designation').value.trim(),
+    resp_name: sanitizeFreeText(el('f_resp_name').value), resp_designation: sanitizeFreeText(el('f_resp_designation').value),
     resp_pan: el('f_resp_pan').value.trim(),
-    resp_road: el('f_resp_road').value.trim(), resp_area: el('f_resp_area').value.trim(),
-    resp_locality_extra: el('f_resp_locality_extra').value.trim(), resp_district: el('f_resp_district').value.trim(),
+    resp_road: sanitizeFreeText(el('f_resp_road').value), resp_area: sanitizeFreeText(el('f_resp_area').value),
+    resp_locality_extra: sanitizeFreeText(el('f_resp_locality_extra').value), resp_district: sanitizeFreeText(el('f_resp_district').value),
     resp_state_code: el('f_resp_state_code').value.trim(), resp_pincode: el('f_resp_pincode').value.trim(),
     resp_std_code: el('f_resp_std_code').value.trim(), resp_phone: el('f_resp_phone').value.trim(),
     resp_email: el('f_resp_email').value.trim(),
