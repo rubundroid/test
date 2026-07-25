@@ -686,7 +686,7 @@ function genFormatB(d, challans){
     42:d.resp_road,43:d.resp_area,44:'INDIA',45:d.resp_std_code,46:d.resp_phone,
     49:d.provisional_receipt_no||'',
     50:d.locality_extra,51:d.district,52:d.state_code,53:d.pincode,54:d.resp_email,
-    57:'1',63:'LineHash',
+    57:(d.provisional_receipt_no ? '1' : '2'),63:'LineHash',
   }));
 
   for (const ch of challans){
