@@ -273,6 +273,27 @@ function fmtAmt(n){ return (Math.round(n * 100) / 100).toFixed(2); }
 function ddmmyyyyFromSlash(s){ return s.split('/').join(''); } // "30/04/2026" -> "30042026"
 function monthKey(dateSlash){ const p = dateSlash.split('/'); return p[2] + '-' + p[1]; } // YYYY-MM
 function looksLikePan(v){ return /^[A-Z]{5}[0-9]{4}[A-Z]$/i.test((v||'').trim()); }
+function normalizeYearRange(hyphenated){
+  // People very commonly write financial years as "2026-27" rather than
+  // "2026-2027" — both need to end up meaning the same thing. Always
+  // return the full "YYYY-YYYY" form so downstream code (Format B's
+  // direct fy/ay fields, and the nosep conversion below) never has to
+  // guess which style it was given.
+  const parts = (hyphenated || '').split('-');
+  if (parts.length !== 2 || !/^\d{4}$/.test(parts[0])) return hyphenated;
+  if (/^\d{4}$/.test(parts[1])) return hyphenated; // already full form
+  if (/^\d{2}$/.test(parts[1])) return parts[0] + '-' + parts[0].slice(0,2) + parts[1];
+  return hyphenated;
+}
+function noSepYearRange(hyphenated){
+  // "2026-2027" -> "202627" (full first year + last two digits of second
+  // year) — validated against real RPU output, NOT simply the hyphen
+  // stripped out (which would wrongly give an 8-digit "20262027").
+  const full = normalizeYearRange(hyphenated);
+  const parts = full.split('-');
+  if (parts.length !== 2 || parts[0].length !== 4) return full.replace('-', '');
+  return parts[0] + parts[1].slice(2);
+}
 function sanitizeFreeText(v){
   // RPU import rejects special characters in name/address-type fields —
   // keep only letters, digits, and spaces, collapsing any resulting
@@ -933,14 +954,6 @@ function maybeProceed(){
   }
 }
 
-function noSepYearRange(hyphenated){
-  // "2026-2027" -> "202627" (full first year + last two digits of second
-  // year) — validated against real RPU output, NOT simply the hyphen
-  // stripped out (which would wrongly give an 8-digit "20262027").
-  const parts = hyphenated.split('-');
-  if (parts.length !== 2 || parts[0].length !== 4) return hyphenated.replace('-', '');
-  return parts[0] + parts[1].slice(2);
-}
 
 function readDeductorForm(){
   const fy = el('f_fy_hyphen').value.trim();
@@ -961,7 +974,7 @@ function readDeductorForm(){
     resp_state_code: el('f_resp_state_code').value.trim(), resp_pincode: el('f_resp_pincode').value.trim(),
     resp_std_code: el('f_resp_std_code').value.trim(), resp_phone: el('f_resp_phone').value.trim(),
     resp_email: el('f_resp_email').value.trim(),
-    fy_hyphen: fy, ay_hyphen: ay,
+    fy_hyphen: normalizeYearRange(fy), ay_hyphen: normalizeYearRange(ay),
     fy_nosep: noSepYearRange(fy), ay_nosep: noSepYearRange(ay),
     quarter: el('f_quarter').value.trim(),
     filed_earlier: el('f_filed_earlier').value,
