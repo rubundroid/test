@@ -149,6 +149,12 @@
     <h2><span class="num">3</span> Deductor &amp; responsible person details</h2>
     <p class="hint">Pulled from the SPARK PDF where possible. SPARK's own address fields don't always match what your TDS filing needs (e.g. district vs. town) — check and correct before generating.</p>
 
+    <div style="background:var(--accent-soft); border-radius:8px; padding:10px 13px; margin-bottom:14px;">
+      <label class="field-label" style="margin-bottom:6px;">Optional: fill this section from a previous quarter's RPU output file instead</label>
+      <input type="file" id="oldFile" accept=".txt" style="font-size:.83rem;">
+      <div class="status-line" id="oldFileStatus"></div>
+    </div>
+
     <fieldset>
       <legend>Deductor</legend>
       <div class="field-grid">
@@ -569,8 +575,85 @@ function parseSparkText(text){
 }
 
 // ============================================================
-// RECONCILIATION
+// OLD-FILE IMPORT — reuse deductor/responsible-person details from
+// a previously generated RPU output file, since SPARK often doesn't
+// have this filled in even though it rarely changes quarter to quarter.
+// Supports both form-number eras (24Q and 138) and both output styles
+// (old FH/BH/CD/DD, and the newer no-FH LineHash style). Field maps
+// below are positional, derived the same way as the generators' maps,
+// but — unlike the generators — this is a convenience pre-fill, not a
+// compliance-critical output, so best-effort accuracy on the address
+// sub-fields is acceptable; the review form is still there to correct
+// anything unclear, same as with SPARK-sourced data.
 // ============================================================
+function detectOldFileVariant(text){
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (!lines.length) return null;
+  const first = lines[0].split('^');
+  if (first[1] === 'FH'){
+    const bh = (lines[1] || '').split('^');
+    if (bh[4] === '138') return {variant:'138_fh', bhLine: lines[1]};
+    if (bh[4] === '24Q') return {variant:'24q_fh', bhLine: lines[1]};
+    return null;
+  }
+  if (first[2] === 'BH'){
+    if (first[4] === '138') return {variant:'138_new', bhLine: lines[0]};
+    if (first[4] === '24Q') return {variant:'24q_new', bhLine: lines[0]};
+    return null;
+  }
+  return null;
+}
+
+function pick(fields, idx){ return (fields[idx] || '').trim(); }
+
+function extractOldFileFields(bhLine, variant){
+  const f = bhLine.split('^');
+  const maps = {
+    // Confirmed against real generated output during this project.
+    '138_fh': {tan:12,deductor_pan:14,deductor_name:18,road:21,area:22,locality_extra:23,district:24,
+      state_code:25,pincode:26,email:27,std_code:28,phone:29,resp_name:32,resp_designation:33,
+      resp_road:35,resp_area:36,resp_locality_extra:37,resp_district:38,resp_state_code:39,resp_pincode:40,
+      resp_email:41,resp_std_code:43,resp_phone:44,resp_pan:58,ain:67},
+    '138_new': {tan:9,deductor_pan:11,deductor_name:18,state_code:20,locality_extra:23,area:24,pincode:26,
+      std_code:27,phone:28,ain:29,resp_pan:34,road:35,district:36,email:38,resp_name:39,resp_designation:40,
+      resp_road:42,resp_area:43,resp_std_code:45,resp_phone:46,resp_locality_extra:50,resp_district:51,
+      resp_state_code:52,resp_pincode:53,resp_email:54},
+    // Best-effort — old 24Q-era layout, derived from one real sample per
+    // style rather than diffed against multiple examples like the maps
+    // above, so double-check address fields in particular.
+    '24q_fh': {tan:12,deductor_pan:14,deductor_name:18,road:21,area:22,district:24,state_code:25,pincode:26,
+      email:27,resp_name:32,resp_designation:33,resp_road:36,resp_area:35,resp_district:38,resp_state_code:39,
+      resp_pincode:40,resp_email:41,resp_phone:42,resp_pan:58,ain:67},
+    '24q_new': {tan:9,deductor_pan:11,deductor_name:18,area:24,district:38,state_code:20,pincode:26,email:40,
+      road:37,ain:31,resp_pan:36,resp_name:43,resp_designation:44,resp_road:47,resp_area:46,resp_district:55,
+      resp_state_code:56,resp_pincode:57,resp_email:58,resp_phone:60},
+  };
+  const m = maps[variant];
+  if (!m) return null;
+  const out = {};
+  for (const key in m) out[key] = pick(f, m[key]);
+  out.deductor_name = sanitizeFreeText(out.deductor_name || '');
+  if (out.resp_name) out.resp_name = sanitizeFreeText(out.resp_name);
+  if (out.resp_designation) out.resp_designation = sanitizeFreeText(out.resp_designation);
+  if (out.road) out.road = sanitizeFreeText(out.road);
+  if (out.area) out.area = sanitizeFreeText(out.area);
+  if (out.district) out.district = sanitizeFreeText(out.district);
+  if (out.resp_road) out.resp_road = sanitizeFreeText(out.resp_road);
+  if (out.resp_area) out.resp_area = sanitizeFreeText(out.resp_area);
+  if (out.resp_district) out.resp_district = sanitizeFreeText(out.resp_district);
+  // Sanity check: a mis-detected variant would very likely fail this.
+  if (out.tan && !/^[A-Z]{4}\d{5}[A-Z]$/.test(out.tan)) return null;
+  return out;
+}
+
+function parseOldRpuFile(text){
+  const detected = detectOldFileVariant(text);
+  if (!detected) return null;
+  const fields = extractOldFileFields(detected.bhLine, detected.variant);
+  return fields ? { variant: detected.variant, fields } : null;
+}
+
+
 function reconcile(bin, employees){
   const monthDeductees = {};   // mk -> [{pan,name,taxable,tds}]
   const monthSparkTotal = {};  // mk -> total
@@ -729,6 +812,27 @@ DEDUCTOR_ADDRESS_IDS.forEach(id => {
   el(id).addEventListener('input', () => {
     if (el('f_resp_same_address').checked) syncRespAddressFromDeductor();
   });
+});
+
+el('oldFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setStatus('oldFileStatus', 'Reading…');
+  try{
+    const text = await file.text();
+    const result = parseOldRpuFile(text);
+    if (!result) throw new Error("Doesn't look like a recognised RPU output file (checked FH/BH-style and old 24Q/current 138 layouts).");
+    let filled = 0;
+    for (const key in result.fields){
+      const val = result.fields[key];
+      const target = el('f_' + key);
+      if (val && target){ target.value = val; filled++; }
+    }
+    if (el('f_resp_same_address').checked) syncRespAddressFromDeductor();
+    setStatus('oldFileStatus', `Filled ${filled} field${filled===1?'':'s'} from this file (${result.variant.replace('_',' ')} layout). Review below — address sub-fields are best-effort for the older layouts.`, 'ok');
+  } catch(err){
+    setStatus('oldFileStatus', 'Could not read this file — ' + err.message, 'err');
+  }
 });
 
 el('binFile').addEventListener('change', async (e) => {
