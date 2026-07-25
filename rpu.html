@@ -62,6 +62,10 @@
   }
   .field-grid input:focus, .field-grid select:focus{outline:2px solid var(--accent); outline-offset:1px;}
   .field-grid input::placeholder{color:var(--warn); font-style:italic;}
+  .field-grid input[readonly]{background:var(--line-soft); color:var(--ink-soft);}
+  .needs-input{position:relative; padding-left:9px; border-left:3px solid var(--warn);}
+  .needs-input .field-label{color:var(--warn);}
+  .section-note{font-size:.74rem; color:var(--ink-soft); margin:-4px 0 10px;}
   fieldset{border:1px solid var(--line-soft); border-radius:8px; padding:12px 14px 14px; margin:0 0 14px;}
   legend{font-size:.8rem; font-weight:650; color:var(--accent); padding:0 6px;}
   table.recon{width:100%; border-collapse:collapse; font-size:.83rem; margin-top:4px;}
@@ -147,7 +151,7 @@
   <!-- STEP 3: Deductor details (editable, prefilled from SPARK) -->
   <div class="step disabled" id="step3">
     <h2><span class="num">3</span> Deductor &amp; responsible person details</h2>
-    <p class="hint">Pulled from the SPARK PDF where possible. SPARK's own address fields don't always match what your TDS filing needs (e.g. district vs. town) — check and correct before generating.</p>
+    <p class="hint">Matches the RPU utility's own Form page layout and labels. Pulled from SPARK where possible — fields outlined in amber reliably need your input, since SPARK doesn't provide them.</p>
 
     <div style="background:var(--accent-soft); border-radius:8px; padding:10px 13px; margin-bottom:14px;">
       <label class="field-label" style="margin-bottom:6px;">Optional: fill this section from a previous quarter's RPU output file instead</label>
@@ -156,55 +160,57 @@
     </div>
 
     <fieldset>
-      <legend>Deductor</legend>
+      <legend>1. Part A</legend>
       <div class="field-grid">
         <div><label class="field-label">TAN</label><input id="f_tan"></div>
-        <div><label class="field-label">Deductor PAN</label><input id="f_deductor_pan"></div>
-        <div><label class="field-label">Office / deductor name</label><input id="f_deductor_name"></div>
-        <div><label class="field-label">Road / street</label><input id="f_road"></div>
-        <div><label class="field-label">Area / locality</label><input id="f_area"></div>
-        <div><label class="field-label">Additional locality</label><input id="f_locality_extra" placeholder="needs manual entry"></div>
-        <div><label class="field-label">District</label><input id="f_district" placeholder="needs manual entry"></div>
-        <div><label class="field-label">State code</label><input id="f_state_code"></div>
-        <div><label class="field-label">Pincode</label><input id="f_pincode"></div>
-        <div><label class="field-label">STD code</label><input id="f_std_code" placeholder="needs manual entry"></div>
-        <div><label class="field-label">Phone</label><input id="f_phone" placeholder="needs manual entry"></div>
-        <div><label class="field-label">E-mail</label><input id="f_email"></div>
-        <div><label class="field-label">AIN</label><input id="f_ain" placeholder="needs manual entry — 7 digit AIN"></div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Person responsible for deduction</legend>
-      <div class="field-grid">
-        <div><label class="field-label">Name</label><input id="f_resp_name"></div>
-        <div><label class="field-label">Designation</label><input id="f_resp_designation"></div>
-        <div><label class="field-label">PAN</label><input id="f_resp_pan" placeholder="needs manual entry"></div>
-        <label style="grid-column:1/-1; display:flex; align-items:center; gap:6px; font-size:.82rem; color:var(--ink-soft); margin:-2px 0 2px;">
-          <input type="checkbox" id="f_resp_same_address" style="width:auto;"> Same address as deductor (road, area, locality, district, state, pincode)
-        </label>
-        <div><label class="field-label">Road / street</label><input id="f_resp_road"></div>
-        <div><label class="field-label">Area / locality</label><input id="f_resp_area"></div>
-        <div><label class="field-label">Additional locality</label><input id="f_resp_locality_extra" placeholder="needs manual entry"></div>
-        <div><label class="field-label">District</label><input id="f_resp_district" placeholder="needs manual entry"></div>
-        <div><label class="field-label">State code</label><input id="f_resp_state_code"></div>
-        <div><label class="field-label">Pincode</label><input id="f_resp_pincode"></div>
-        <div><label class="field-label">STD code</label><input id="f_resp_std_code" placeholder="needs manual entry"></div>
-        <div><label class="field-label">Phone</label><input id="f_resp_phone" placeholder="needs manual entry"></div>
-        <div><label class="field-label">E-mail</label><input id="f_resp_email"></div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Filing</legend>
-      <div class="field-grid">
-        <div><label class="field-label">Financial year (e.g. 2026-2027)</label><input id="f_fy_hyphen"></div>
-        <div><label class="field-label">Assessment year (e.g. 2027-2028)</label><input id="f_ay_hyphen"></div>
+        <div><label class="field-label">Permanent Account Number</label><input id="f_deductor_pan"></div>
+        <div><label class="field-label">Tax Year (e.g. 2026-2027)</label><input id="f_fy_hyphen"></div>
+        <div><label class="field-label">Assessment Year (auto)</label><input id="f_ay_hyphen" readonly></div>
         <div><label class="field-label">Quarter</label><input id="f_quarter"></div>
-        <div><label class="field-label">Has the statement been filed earlier for this quarter?</label>
+        <div class="needs-input"><label class="field-label">Filed earlier for this quarter?</label>
           <select id="f_filed_earlier"><option value="No">No</option><option value="Yes">Yes</option></select>
         </div>
-        <div><label class="field-label">Receipt no. of original return (only if filed earlier = Yes)</label><input id="f_provisional_receipt_no" placeholder="blank = original filing"></div>
+        <div class="needs-input"><label class="field-label">Receipt no. of original return</label><input id="f_provisional_receipt_no" placeholder="blank = original filing"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Particulars of the Deductor (Employer)</legend>
+      <div class="field-grid">
+        <div><label class="field-label">Name</label><input id="f_deductor_name"></div>
+        <div><label class="field-label">Flat / Door / Block Number</label><input id="f_flat_no" placeholder="1"></div>
+        <div><label class="field-label">Post Office</label><input id="f_road"></div>
+        <div><label class="field-label">Road / Street / Block / Sector</label><input id="f_area"></div>
+        <div class="needs-input"><label class="field-label">Area / locality</label><input id="f_locality_extra" placeholder="needs manual entry"></div>
+        <div class="needs-input"><label class="field-label">District</label><input id="f_district" placeholder="needs manual entry"></div>
+        <div><label class="field-label">PIN / ZIP Code</label><input id="f_pincode"></div>
+        <div><label class="field-label">State</label><input id="f_state_code"></div>
+        <div class="needs-input"><label class="field-label">STD code</label><input id="f_std_code" placeholder="needs manual entry"></div>
+        <div class="needs-input"><label class="field-label">Contact number</label><input id="f_phone" placeholder="needs manual entry"></div>
+        <div><label class="field-label">E-mail Id</label><input id="f_email"></div>
+        <div class="needs-input"><label class="field-label">AIN (of PAO/TO/CDDO)</label><input id="f_ain" placeholder="needs manual entry — 7 digit AIN"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. Particulars of the Person Responsible for Deduction of Tax</legend>
+      <div class="field-grid">
+        <div><label class="field-label">Name</label><input id="f_resp_name"></div>
+        <div class="needs-input"><label class="field-label">Permanent Account Number</label><input id="f_resp_pan" placeholder="needs manual entry"></div>
+        <div><label class="field-label">Designation</label><input id="f_resp_designation"></div>
+        <label style="grid-column:1/-1; display:flex; align-items:center; gap:6px; font-size:.82rem; color:var(--ink-soft); margin:-2px 0 2px;">
+          <input type="checkbox" id="f_resp_same_address" style="width:auto;"> Same as above (address fields below)
+        </label>
+        <div><label class="field-label">Flat / Door / Block Number</label><input id="f_resp_flat_no" placeholder="1"></div>
+        <div><label class="field-label">Post Office</label><input id="f_resp_road"></div>
+        <div><label class="field-label">Road / Street / Block / Sector</label><input id="f_resp_area"></div>
+        <div class="needs-input"><label class="field-label">Area / locality</label><input id="f_resp_locality_extra" placeholder="needs manual entry"></div>
+        <div class="needs-input"><label class="field-label">District</label><input id="f_resp_district" placeholder="needs manual entry"></div>
+        <div><label class="field-label">PIN / ZIP Code</label><input id="f_resp_pincode"></div>
+        <div><label class="field-label">State</label><input id="f_resp_state_code"></div>
+        <div class="needs-input"><label class="field-label">STD code</label><input id="f_resp_std_code" placeholder="needs manual entry"></div>
+        <div class="needs-input"><label class="field-label">Contact number</label><input id="f_resp_phone" placeholder="needs manual entry"></div>
+        <div><label class="field-label">E-mail Id</label><input id="f_resp_email"></div>
       </div>
     </fieldset>
   </div>
@@ -256,8 +262,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs
 let binEntries = null;     // [{receipt_no, ddo_serial, tv_date(DD/MM/YYYY), nature, tv_amount, status}]
 let sparkData = null;      // {deductor:{...}, employees:[{pan,name,entries:[{date_payment,taxable,tds}]}]}
 let challans = null;       // reconciled, editable in the DOM
-const DEDUCTOR_ADDRESS_IDS = ['f_road','f_area','f_locality_extra','f_district','f_state_code','f_pincode'];
-const RESP_ADDRESS_IDS = ['f_resp_road','f_resp_area','f_resp_locality_extra','f_resp_district','f_resp_state_code','f_resp_pincode'];
+const DEDUCTOR_ADDRESS_IDS = ['f_flat_no','f_road','f_area','f_locality_extra','f_district','f_state_code','f_pincode'];
+const RESP_ADDRESS_IDS = ['f_resp_flat_no','f_resp_road','f_resp_area','f_resp_locality_extra','f_resp_district','f_resp_state_code','f_resp_pincode'];
 
 // ============================================================
 // HELPERS
@@ -740,11 +746,11 @@ function genFormatA(d, challans, genDateDdmmyyyy){
     8:d.provisional_receipt_no||'',
     12:d.tan,14:d.deductor_pan||'PANNOTREQD',
     15:d.ay_nosep,16:d.fy_nosep,17:d.quarter,
-    18:d.deductor_name,19:'INDIA',20:'1',
+    18:d.deductor_name,19:'INDIA',20:(d.flat_no||'1'),
     21:d.road,22:d.area,23:d.locality_extra,24:d.district,25:d.state_code,26:d.pincode,
     27:d.email,28:d.std_code,29:d.phone,
     31:'S',
-    32:d.resp_name,33:d.resp_designation,34:'1',
+    32:d.resp_name,33:d.resp_designation,34:(d.resp_flat_no||'1'),
     35:d.resp_road,36:d.resp_area,37:d.resp_locality_extra,38:d.resp_district,
     39:d.resp_state_code,40:d.resp_pincode,41:d.resp_email,42:'INDIA',43:d.resp_std_code,44:d.resp_phone,
     46:fmtAmt(totalTds),
@@ -782,11 +788,11 @@ function genFormatB(d, challans){
     0:'0',1:seq,2:'BH',3:'1',4:'138',5:d.quarter,6:'A',
     9:d.tan,11:d.deductor_pan||'PANNOTREQD',13:'0',
     14:d.fy_hyphen,15:d.ay_hyphen,16:'2',
-    18:d.deductor_name,20:d.state_code,22:'1',
+    18:d.deductor_name,20:d.state_code,22:(d.flat_no||'1'),
     23:d.locality_extra,24:d.area,25:'INDIA',26:d.pincode,27:d.std_code,28:d.phone,
     29:d.ain,30:'0',
     34:d.resp_pan,35:d.road,36:d.district,37:d.state_code,38:d.email,
-    39:d.resp_name,40:d.resp_designation,41:'1',
+    39:d.resp_name,40:d.resp_designation,41:(d.resp_flat_no||'1'),
     42:d.resp_road,43:d.resp_area,44:'INDIA',45:d.resp_std_code,46:d.resp_phone,
     49:d.provisional_receipt_no||'',
     50:d.locality_extra,51:d.district,52:d.state_code,53:d.pincode,54:d.resp_email,
@@ -824,6 +830,10 @@ function genFormatB(d, challans){
 // UI WIRING
 // ============================================================
 function enableStep(n){ el('step'+n).classList.remove('disabled'); }
+
+el('f_fy_hyphen').addEventListener('input', () => {
+  el('f_ay_hyphen').value = computeAY(el('f_fy_hyphen').value);
+});
 
 el('f_resp_same_address').addEventListener('change', (e) => {
   setRespAddressEditable(!e.target.checked);
@@ -904,10 +914,18 @@ el('sparkFile').addEventListener('change', async (e) => {
   }
 });
 
+function computeAY(fyHyphen){
+  const full = normalizeYearRange(fyHyphen || '');
+  const parts = full.split('-');
+  if (parts.length !== 2 || !/^\d{4}$/.test(parts[0]) || !/^\d{4}$/.test(parts[1])) return '';
+  return (parseInt(parts[0])+1) + '-' + (parseInt(parts[1])+1);
+}
+
 function fillDeductorForm(dd){
   el('f_tan').value = dd.tan || '';
   el('f_deductor_pan').value = dd.deductor_pan || 'PANNOTREQD';
   el('f_deductor_name').value = dd.deductor_name || '';
+  el('f_flat_no').value = '1';
   el('f_road').value = dd.road || '';
   el('f_area').value = dd.area || '';
   el('f_locality_extra').value = '';
@@ -922,6 +940,7 @@ function fillDeductorForm(dd){
   el('f_resp_name').value = dd.resp_name || '';
   el('f_resp_designation').value = dd.resp_designation || '';
   el('f_resp_pan').value = '';
+  el('f_resp_flat_no').value = '1';
   el('f_resp_road').value = dd.resp_road || '';
   el('f_resp_area').value = dd.resp_area || '';
   el('f_resp_locality_extra').value = '';
@@ -933,8 +952,7 @@ function fillDeductorForm(dd){
   el('f_resp_email').value = dd.resp_email || '';
 
   el('f_fy_hyphen').value = dd.fy_hyphen || '';
-  const ayGuess = dd.fy_hyphen ? (parseInt(dd.fy_hyphen.split('-')[0])+1) + '-' + (parseInt(dd.fy_hyphen.split('-')[1])+1) : '';
-  el('f_ay_hyphen').value = dd.ay_hyphen || ayGuess;
+  el('f_ay_hyphen').value = dd.ay_hyphen || computeAY(dd.fy_hyphen) || '';
   el('f_quarter').value = dd.quarter || '';
   el('f_filed_earlier').value = dd.filed_earlier || 'No';
   el('f_provisional_receipt_no').value = '';
@@ -962,6 +980,7 @@ function readDeductorForm(){
     tan: el('f_tan').value.trim(),
     deductor_pan: el('f_deductor_pan').value.trim() || 'PANNOTREQD',
     deductor_name: sanitizeFreeText(el('f_deductor_name').value),
+    flat_no: sanitizeFreeText(el('f_flat_no').value) || '1',
     road: sanitizeFreeText(el('f_road').value), area: sanitizeFreeText(el('f_area').value),
     locality_extra: sanitizeFreeText(el('f_locality_extra').value), district: sanitizeFreeText(el('f_district').value),
     state_code: el('f_state_code').value.trim(), pincode: el('f_pincode').value.trim(),
@@ -969,6 +988,7 @@ function readDeductorForm(){
     email: el('f_email').value.trim(), ain: el('f_ain').value.trim(),
     resp_name: sanitizeFreeText(el('f_resp_name').value), resp_designation: sanitizeFreeText(el('f_resp_designation').value),
     resp_pan: el('f_resp_pan').value.trim(),
+    resp_flat_no: sanitizeFreeText(el('f_resp_flat_no').value) || '1',
     resp_road: sanitizeFreeText(el('f_resp_road').value), resp_area: sanitizeFreeText(el('f_resp_area').value),
     resp_locality_extra: sanitizeFreeText(el('f_resp_locality_extra').value), resp_district: sanitizeFreeText(el('f_resp_district').value),
     resp_state_code: el('f_resp_state_code').value.trim(), resp_pincode: el('f_resp_pincode').value.trim(),
