@@ -56,11 +56,11 @@
     display:block; margin-bottom:3px;
   }
   .field-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:11px 14px;}
-  .field-grid input{
+  .field-grid input, .field-grid select{
     width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px;
     font-size:.86rem; font-family:var(--sans); color:var(--ink); background:#fff;
   }
-  .field-grid input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .field-grid input:focus, .field-grid select:focus{outline:2px solid var(--accent); outline-offset:1px;}
   .field-grid input::placeholder{color:var(--warn); font-style:italic;}
   fieldset{border:1px solid var(--line-soft); border-radius:8px; padding:12px 14px 14px; margin:0 0 14px;}
   legend{font-size:.8rem; font-weight:650; color:var(--accent); padding:0 6px;}
@@ -192,7 +192,10 @@
         <div><label class="field-label">Financial year (e.g. 2026-2027)</label><input id="f_fy_hyphen"></div>
         <div><label class="field-label">Assessment year (e.g. 2027-2028)</label><input id="f_ay_hyphen"></div>
         <div><label class="field-label">Quarter</label><input id="f_quarter"></div>
-        <div><label class="field-label">Original / correction receipt no. (leave blank if this is an original filing)</label><input id="f_provisional_receipt_no" placeholder="blank = original filing"></div>
+        <div><label class="field-label">Has the statement been filed earlier for this quarter?</label>
+          <select id="f_filed_earlier"><option value="No">No</option><option value="Yes">Yes</option></select>
+        </div>
+        <div><label class="field-label">Receipt no. of original return (only if filed earlier = Yes)</label><input id="f_provisional_receipt_no" placeholder="blank = original filing"></div>
       </div>
     </fieldset>
   </div>
@@ -484,6 +487,11 @@ function parseSparkText(text){
   const quarterMatch = text.match(/quarter ended (\w+) \d{4}/);
   const quarter = quarterMatch ? (QUARTER_BY_END_MONTH[quarterMatch[1]] || '') : '';
 
+  // SPARK's own Form 138 prints this exact Yes/No answer (matches the RPU
+  // data-entry screen's "Has the statement been filed earlier..." field).
+  const filedEarlierMatch = text.match(/Has any statement been filed earlier for this\s+(Yes|No)/i);
+  const filedEarlier = filedEarlierMatch ? filedEarlierMatch[1] : 'No';
+
   const addrMatch = text.match(/\(d\)\s+Address\s+([\s\S]*?)3\.\s*Particulars/);
   const addrBlock = addrMatch ? addrMatch[1] : "";
   const deductorNameMatch = text.match(/\(d\)\s+Address\s+(.+)/);
@@ -539,7 +547,7 @@ function parseSparkText(text){
 
   return {
     deductor: {
-      tan, deductor_pan: deductorPan, fy_hyphen: fy, ay_hyphen: ay, quarter,
+      tan, deductor_pan: deductorPan, fy_hyphen: fy, ay_hyphen: ay, quarter, filed_earlier: filedEarlier,
       deductor_name: deductorName, road, area, pincode, email,
       resp_name: respName, resp_designation: designation,
       resp_road: respRoad, resp_area: respArea, resp_pincode: respPincode, resp_email: respEmail,
@@ -607,7 +615,8 @@ function buildRow(length, values){
 function genFormatA(d, challans, genDateDdmmyyyy){
   const lines = [];
   let seq = 1;
-  lines.push(buildRow(18, {0:seq,1:'FH',2:'SL1',3:'R',4:genDateDdmmyyyy,5:'1',6:'D',7:d.tan,8:'1',9:'Protean RPU 1.1'}));
+  const regularOrCorrection = d.filed_earlier === 'Yes' ? 'C' : 'R';
+  lines.push(buildRow(18, {0:seq,1:'FH',2:'SL1',3:regularOrCorrection,4:genDateDdmmyyyy,5:'1',6:'D',7:d.tan,8:'1',9:'Protean RPU 1.1'}));
   seq++;
   const totalTds = challans.reduce((s,c)=>s+c.tv_amount,0);
   lines.push(buildRow(72, {
@@ -780,6 +789,7 @@ function fillDeductorForm(dd){
   const ayGuess = dd.fy_hyphen ? (parseInt(dd.fy_hyphen.split('-')[0])+1) + '-' + (parseInt(dd.fy_hyphen.split('-')[1])+1) : '';
   el('f_ay_hyphen').value = dd.ay_hyphen || ayGuess;
   el('f_quarter').value = dd.quarter || '';
+  el('f_filed_earlier').value = dd.filed_earlier || 'No';
   el('f_provisional_receipt_no').value = '';
 }
 
@@ -820,6 +830,7 @@ function readDeductorForm(){
     fy_hyphen: fy, ay_hyphen: ay,
     fy_nosep: noSepYearRange(fy), ay_nosep: noSepYearRange(ay),
     quarter: el('f_quarter').value.trim(),
+    filed_earlier: el('f_filed_earlier').value,
     provisional_receipt_no: el('f_provisional_receipt_no').value.trim(),
   };
 }
@@ -895,6 +906,12 @@ el('btnGenerate').addEventListener('click', () => {
     genWarnings.push('AIN is blank — this is required, and the exact registered number for the office (not a placeholder) is checked on import.');
   } else if (!/^\d{7}$/.test(d.ain.trim())){
     genWarnings.push(`"${d.ain}" doesn't look like a typical AIN (usually 7 digits) — double-check it's the office's actual registered number.`);
+  }
+  if (d.filed_earlier === 'Yes' && !d.provisional_receipt_no){
+    genWarnings.push('"Filed earlier" is Yes, but no receipt no. of original return is entered.');
+  }
+  if (d.filed_earlier === 'No' && d.provisional_receipt_no){
+    genWarnings.push('A receipt no. of original return is entered, but "Filed earlier" is set to No — check which is correct.');
   }
   el('genWarnings').innerHTML = genWarnings.length
     ? '<div class="warn-box"><b>Check before filing:</b><br>' + genWarnings.map(w => '• ' + w).join('<br>') + '</div>'
