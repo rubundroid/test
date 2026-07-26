@@ -82,9 +82,21 @@
   .challan-block{margin-bottom:14px; border:1px solid var(--line-soft); border-radius:8px; overflow:hidden;}
   .challan-head{
     background:var(--line-soft); padding:8px 12px; font-size:.82rem; display:flex;
-    justify-content:space-between; flex-wrap:wrap; gap:6px 16px;
+    justify-content:space-between; flex-wrap:wrap; gap:6px 16px; align-items:center;
   }
   .challan-head b{color:var(--accent);}
+  .challan-head input{
+    border:1px solid var(--line); background:#fff; border-radius:5px; padding:3px 6px;
+    font-size:.82rem; font-family:var(--mono); width:112px;
+  }
+  .challan-head .ch-field-label{color:var(--ink-soft); font-size:.72rem; margin-right:3px;}
+  .amt-mismatch{color:#a3302f; font-weight:600;}
+  .link-btn{
+    background:none; border:none; color:var(--accent); font-size:.78rem; font-weight:600;
+    cursor:pointer; padding:2px 4px; font-family:var(--sans);
+  }
+  .link-btn.danger{color:#a3302f;}
+  .add-row-btn{margin:6px 0 14px;}
   .warn-box{
     background:var(--warn-bg); color:var(--warn); border:1px solid #ecd3ad; border-radius:8px;
     padding:10px 13px; font-size:.83rem; margin-bottom:12px;
@@ -136,6 +148,7 @@
       <span class="filetag" id="binTag"></span>
     </div>
     <div class="status-line" id="binStatus"></div>
+    <div class="small-btn-row"><button type="button" class="secondary" id="skipBin">No file — I'll enter challans manually</button></div>
   </div>
 
   <!-- STEP 2: SPARK upload -->
@@ -146,6 +159,7 @@
       <input type="file" id="sparkFile" accept=".pdf">
     </div>
     <div class="status-line" id="sparkStatus"></div>
+    <div class="small-btn-row"><button type="button" class="secondary" id="skipSpark">No file — I'll fill deductor &amp; deductee details manually</button></div>
   </div>
 
   <!-- STEP 3: Deductor details (editable, prefilled from SPARK) -->
@@ -221,6 +235,9 @@
     <p class="hint">Each BIN transfer voucher matched against SPARK's Annexure I totals for that month. Edit any cell if something looks off, then generate.</p>
     <div id="reconMsgs"></div>
     <div id="reconTables"></div>
+    <div class="small-btn-row add-row-btn">
+      <button type="button" class="secondary" id="btnAddChallan">+ Add challan</button>
+    </div>
     <div class="small-btn-row">
       <button id="btnGenerate" disabled>Generate output files</button>
     </div>
@@ -914,6 +931,28 @@ el('sparkFile').addEventListener('change', async (e) => {
   }
 });
 
+el('skipBin').addEventListener('click', () => {
+  binEntries = [];
+  setStatus('binStatus', "No BIN file — add challans manually in step 4 once you're past step 3.", 'ok');
+  maybeProceed();
+});
+
+el('skipSpark').addEventListener('click', () => {
+  sparkData = { deductor: {}, employees: [] };
+  setStatus('sparkStatus', 'No SPARK PDF — fill in deductor details below and add deductees manually in step 4.', 'ok');
+  fillDeductorForm(sparkData.deductor);
+  enableStep(3);
+  maybeProceed();
+});
+
+el('btnAddChallan').addEventListener('click', () => {
+  if (!challans) challans = [];
+  challans.push(blankChallan());
+  enableStep(4);
+  el('reconMsgs').innerHTML = '';
+  renderChallanTable();
+});
+
 function computeAY(fyHyphen){
   const full = normalizeYearRange(fyHyphen || '');
   const parts = full.split('-');
@@ -1011,44 +1050,100 @@ function runReconciliation(){
   if (warnings.length){
     msgBox.innerHTML = '<div class="warn-box"><b>Check these before generating:</b><br>' +
       warnings.map(w => '• ' + w).join('<br>') + '</div>';
-  } else {
+  } else if (challans.length){
     msgBox.innerHTML = '<div class="ok-box">All BIN transfer vouchers match SPARK\'s Annexure I totals for their month — no mismatches found.</div>';
+  } else {
+    msgBox.innerHTML = '';
   }
+  renderChallanTable();
+}
 
+function blankChallan(){
+  return { receipt_no:'', ddo_serial:'', tv_date_slash:'', tv_date_ddmmyyyy:'', tv_amount:0, deductees:[] };
+}
+function blankDeductee(){
+  return { pan:'', name:'', taxable:0, tds:0 };
+}
+
+function renderChallanTable(){
   const tblWrap = el('reconTables');
   tblWrap.innerHTML = '';
   challans.forEach((ch, ci) => {
     const block = document.createElement('div');
     block.className = 'challan-block';
     const sum = ch.deductees.reduce((s,p)=>s+p.tds,0);
+    const mismatch = Math.abs(sum - ch.tv_amount) > 0.01;
     block.innerHTML = `
       <div class="challan-head">
-        <span>Receipt <b>${ch.receipt_no}</b> · DDO Sl. ${ch.ddo_serial} · ${ch.tv_date_slash}</span>
-        <span>TV amount <b>₹${fmtAmt(ch.tv_amount)}</b> · deductee total ₹${fmtAmt(sum)}</span>
+        <span>
+          <span class="ch-field-label">Receipt</span><input data-ch="${ci}" data-f="receipt_no" value="${ch.receipt_no}" style="width:78px;">
+          <span class="ch-field-label">DDO Sl.</span><input data-ch="${ci}" data-f="ddo_serial" value="${ch.ddo_serial}" style="width:54px;">
+          <span class="ch-field-label">TV date</span><input data-ch="${ci}" data-f="tv_date_slash" value="${ch.tv_date_slash}" placeholder="DD/MM/YYYY" style="width:92px;">
+        </span>
+        <span>
+          <span class="ch-field-label">TV amount ₹</span><input data-ch="${ci}" data-f="tv_amount" value="${fmtAmt(ch.tv_amount)}" style="width:76px;">
+          <span class="${mismatch?'amt-mismatch':''}">· deductee total ₹${fmtAmt(sum)}${mismatch?' ⚠':''}</span>
+          <button type="button" class="link-btn danger" data-remove-challan="${ci}">✕ Remove challan</button>
+        </span>
       </div>
       <table class="recon">
-        <tr><th>PAN</th><th>Name</th><th>Taxable amount</th><th>TDS</th></tr>
+        <tr><th>PAN</th><th>Name</th><th>Taxable amount</th><th>TDS</th><th></th></tr>
         ${ch.deductees.map((p,pi)=>`
           <tr>
             <td><input data-ch="${ci}" data-p="${pi}" data-f="pan" value="${p.pan}"></td>
             <td><input data-ch="${ci}" data-p="${pi}" data-f="name" value="${p.name}"></td>
             <td><input data-ch="${ci}" data-p="${pi}" data-f="taxable" value="${fmtAmt(p.taxable)}"></td>
             <td><input data-ch="${ci}" data-p="${pi}" data-f="tds" value="${fmtAmt(p.tds)}"></td>
+            <td><button type="button" class="link-btn danger" data-remove-deductee="${ci}:${pi}">✕</button></td>
           </tr>`).join('')}
-      </table>`;
+      </table>
+      <div class="small-btn-row" style="margin:8px 0 0;">
+        <button type="button" class="link-btn" data-add-deductee="${ci}">+ Add deductee</button>
+      </div>`;
     tblWrap.appendChild(block);
   });
 
-  tblWrap.querySelectorAll('input').forEach(inp => {
+  tblWrap.querySelectorAll('table.recon input').forEach(inp => {
     inp.addEventListener('change', () => {
       const ch = challans[inp.dataset.ch];
       const p = ch.deductees[inp.dataset.p];
       if (inp.dataset.f === 'taxable' || inp.dataset.f === 'tds') p[inp.dataset.f] = parseFloat(inp.value) || 0;
-      else p[inp.dataset.f] = inp.value;
+      else p[inp.dataset.f] = inp.value.toUpperCase();
+      renderChallanTable();
+    });
+  });
+  tblWrap.querySelectorAll('.challan-head input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const ch = challans[inp.dataset.ch];
+      if (inp.dataset.f === 'tv_amount') ch.tv_amount = parseFloat(inp.value) || 0;
+      else if (inp.dataset.f === 'tv_date_slash'){
+        ch.tv_date_slash = inp.value.trim();
+        ch.tv_date_ddmmyyyy = ddmmyyyyFromSlash(ch.tv_date_slash);
+      } else ch[inp.dataset.f] = inp.value.trim();
+      renderChallanTable();
+    });
+  });
+  tblWrap.querySelectorAll('[data-remove-deductee]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const [ci, pi] = btn.dataset.removeDeductee.split(':');
+      challans[ci].deductees.splice(pi, 1);
+      renderChallanTable();
+    });
+  });
+  tblWrap.querySelectorAll('[data-add-deductee]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      challans[btn.dataset.addDeductee].deductees.push(blankDeductee());
+      renderChallanTable();
+    });
+  });
+  tblWrap.querySelectorAll('[data-remove-challan]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      challans.splice(btn.dataset.removeChallan, 1);
+      renderChallanTable();
     });
   });
 
-  el('btnGenerate').disabled = false;
+  el('btnGenerate').disabled = challans.length === 0;
 }
 
 el('btnGenerate').addEventListener('click', () => {
