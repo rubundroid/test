@@ -1437,7 +1437,7 @@
         <!-- ══ never pushed out of view by a growing file list below.  ══ -->
         <p id="advanced-key-toggle" onclick="toggleAdvancedKey()"
           style="margin:0; font-size:0.76rem; color:#8b6508; cursor:pointer; user-select:none; display:flex; align-items:center; gap:4px; width:fit-content;">
-          🔑 Personal API Key (recommended for 3+ page PDFs — faster, no daily limit)
+          ⚠️ Personal API Key (STRONGLY recommended for 3+ page PDFs — server pool often fails on these)
           <span id="advanced-key-arrow"
             style="font-size:0.65rem; display:inline-block; transition:transform 0.3s ease; transform:rotate(0deg);">▼</span>
         </p>
@@ -1485,6 +1485,10 @@
           <textarea id="ai-draft-hints" rows="5"
             style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; resize:vertical; outline:none; transition:border-color 0.15s;"
             placeholder="e.g.&#10;- Reply is approved&#10;- Forward to District Office by 15th&#10;- Attach originals&#10;(Leave blank to let AI decide)"></textarea>
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:#333; margin-top:8px;">
+            <input type="checkbox" id="ai-draft-english" style="cursor:pointer; accent-color:#c9a227;" />
+            🌐 Reply in English (ഇംഗ്ലീഷിൽ മറുപടി വേണമെങ്കിൽ ടിക്ക് ചെയ്യുക)
+          </label>
         </div>
 
       </div>
@@ -3659,7 +3663,18 @@
       function escapeHtml(s) {
         return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
-      function buildReplyHtml(fields, todayDate) {
+      function buildReplyHtml(fields, todayDate, lang) {
+        const isEn = lang === 'en';
+        const L = isEn
+          ? { number: 'No:', date: 'Date:', from: 'From', to: 'To', sir: 'Sir/Madam,',
+              subject: 'Subject', reference: 'Reference', colon: ':', closing: 'Yours faithfully,',
+              enclosures: 'Enclosures', none: /^none$/i,
+              font: `'Times New Roman',Arial,sans-serif`, size: '12pt', lh: '1.5' }
+          : { number: 'നമ്പർ:-', date: 'തീയതി:-', from: 'പ്രേഷകൻ', to: 'സ്വീകർത്താവ്', sir: 'സർ,',
+              subject: 'വിഷയം', reference: 'സൂചന', colon: ':-', closing: 'വിശ്വാസപൂർവ്വം,',
+              enclosures: 'ഉള്ളടക്കം', none: /^(none|ഇല്ല)$/i,
+              font: `'Mandaram','Times New Roman','Manjari',serif`, size: '16pt', lh: '1.6' };
+
         const bodyParas = fields.BODY
           .split(/\n{2,}/)
           .map(p => p.trim().replace(/\n/g, ' '))
@@ -3678,24 +3693,26 @@
         };
 
         const sigNameLine = fields.SIGNATURE_NAME ? `${escapeHtml(fields.SIGNATURE_NAME)}<br>` : '';
-        const enclosuresHtml = (fields.ENCLOSURES && !/^(none|ഇല്ല)$/i.test(fields.ENCLOSURES))
-          ? `\n<div style="text-align:left;font-style:italic;">ഉള്ളടക്കം: ${escapeHtml(fields.ENCLOSURES)}</div>`
+        const enclosuresHtml = (fields.ENCLOSURES && !L.none.test(fields.ENCLOSURES))
+          ? `\n<div style="text-align:left;font-style:italic;">${L.enclosures}: ${escapeHtml(fields.ENCLOSURES)}</div>`
           : '';
+        const bhashaHeader = isEn ? '' :
+          `<div style="text-align:center;"><strong>"ഭരണഭാഷ – മാതൃഭാഷ"</strong></div>\n\n`;
 
         return (
-          `<div style="font-family:'Mandaram','Times New Roman','Manjari',serif;font-size:16pt;line-height:1.6;color:#000;">\n` +
-          `<div style="text-align:center;"><strong>"ഭരണഭാഷ – മാതൃഭാഷ"</strong></div>\n\n` +
-          `<div style="text-align:left;">നമ്പർ:- <strong style="color:#0000FF;">${escapeHtml(fields.NUMBER)}</strong></div>\n` +
-          `<div style="text-align:right;">തീയതി:- <strong style="color:#0000FF;">${escapeHtml(todayDate)}</strong></div>\n\n` +
-          addrBlock('പ്രേഷകൻ', senderLines) + '\n' +
-          addrBlock('സ്വീകർത്താവ്', recipientLines) + '\n\n' +
-          `<div style="text-align:left;">സർ,</div>\n\n` +
-          `<table width="100%" cellpadding="2" cellspacing="0" border="0" style="margin:8px 0;font-family:'Mandaram','Times New Roman','Manjari',serif;font-size:16pt;line-height:1.6;">\n` +
-          `<tr><td width="85" style="vertical-align:top;white-space:nowrap;"><strong>വിഷയം</strong></td><td width="15" style="vertical-align:top;"><strong>:-</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.SUBJECT)}</td></tr>\n` +
-          `<tr><td style="vertical-align:top;white-space:nowrap;"><strong>സൂചന</strong></td><td style="vertical-align:top;"><strong>:-</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.REFERENCE)}</td></tr>\n` +
+          `<div style="font-family:${L.font};font-size:${L.size};line-height:${L.lh};color:#000;">\n` +
+          bhashaHeader +
+          `<div style="text-align:left;">${L.number} <strong style="color:#0000FF;">${escapeHtml(fields.NUMBER)}</strong></div>\n` +
+          `<div style="text-align:right;">${L.date} <strong style="color:#0000FF;">${escapeHtml(todayDate)}</strong></div>\n\n` +
+          addrBlock(L.from, senderLines) + '\n' +
+          addrBlock(L.to, recipientLines) + '\n\n' +
+          `<div style="text-align:left;">${L.sir}</div>\n\n` +
+          `<table width="100%" cellpadding="2" cellspacing="0" border="0" style="margin:8px 0;font-family:${L.font};font-size:${L.size};line-height:${L.lh};">\n` +
+          `<tr><td width="85" style="vertical-align:top;white-space:nowrap;"><strong>${L.subject}</strong></td><td width="15" style="vertical-align:top;"><strong>${L.colon}</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.SUBJECT)}</td></tr>\n` +
+          `<tr><td style="vertical-align:top;white-space:nowrap;"><strong>${L.reference}</strong></td><td style="vertical-align:top;"><strong>${L.colon}</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.REFERENCE)}</td></tr>\n` +
           `</table>\n\n` +
           bodyParas + '\n\n' +
-          `<div style="text-align:right;margin-top:10px;">വിശ്വാസപൂർവ്വം,</div>\n\n` +
+          `<div style="text-align:right;margin-top:10px;">${L.closing}</div>\n\n` +
           `<div style="text-align:right;margin-top:30px;">${sigNameLine}${escapeHtml(fields.SIGNATURE_DESIGNATION)}<br>${escapeHtml(fields.SIGNATURE_INSTITUTION)}</div>` +
           enclosuresHtml +
           `\n</div>`
@@ -3772,6 +3789,7 @@
         ];
         const workerBase = WORKERS[Math.floor(Math.random() * WORKERS.length)];
         const hints = document.getElementById('ai-draft-hints').value.trim();
+        const isReplyEnglish = document.getElementById('ai-draft-english').checked;
         const fileInp = document.getElementById('ai-draft-pdf-input');
         const files = Array.from(fileInp.files);
 
@@ -3976,10 +3994,60 @@
           );
         } else {
           // ════════════════════════════════════════════════════════
-          // REPLY SCENARIO — ONE unified prompt (was 3: ultralite/plain/rich)
+          // REPLY SCENARIO — ONE unified prompt per language now.
           // AI outputs plain-text field VALUES only; buildReplyHtml() below
           // assembles the fixed letter template around them.
           // ════════════════════════════════════════════════════════
+          if (isReplyEnglish) {
+            promptText =
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
+              'Read the attached main (⭐) PDF letter carefully. Also read any reference (📎) PDFs for context.\n\n' +
+              'Draft a formal reply in English. Output ONLY plain text values for the fields below — ' +
+              'NO HTML tags, NO markdown, NO asterisks, NO bullet symbols. The app builds the final formatted ' +
+              'letter from these values, so exact structure matters more than prose style.\n\n' +
+              'Output EXACTLY these markers, each alone on its own line, followed by the value on the next ' +
+              'line(s) (leave the line blank immediately after a marker if that field is not determinable):\n\n' +
+              '###NUMBER###\n' +
+              '[Construct a logical reply letter number from the reference series]\n\n' +
+              '###SENDER###\n' +
+              '[Designation of Reply Sender — the original RECIPIENT becomes the sender. If a personal name is ' +
+              'present, write "Name / Designation" on this same line]\n' +
+              '[Institution]\n' +
+              '[Place, if determinable]\n\n' +
+              '###RECIPIENT###\n' +
+              '[Designation of Reply Recipient — the original SENDER becomes the recipient. If a personal name ' +
+              'is present, write "Name / Designation" on this same line]\n' +
+              '[Institution]\n' +
+              '[Full address with PIN, if determinable]\n\n' +
+              '###SUBJECT###\n' +
+              '[One concise formal English sentence clearly stating the subject of this reply]\n\n' +
+              '###REFERENCE###\n' +
+              '[Cite the incoming letter precisely — e.g. "No.684/2026-G1 dated 01-06-2026"]\n\n' +
+              '###BODY###\n' +
+              '[Body Paragraph 1: Open formally, e.g. "With reference to the letter cited above..." — link the ' +
+              'subject and the reference letter in one or two sentences.]\n\n' +
+              '[Additional paragraphs as needed based on the hints below, EACH separated from the previous one ' +
+              'by exactly one blank line. Plain prose only — no bullet points inside a paragraph.]\n\n' +
+              '###SIGNATURE_NAME###\n' +
+              '[Full name of the reply sender, ONLY if explicitly present in the PDF — leave this line BLANK ' +
+              'otherwise. Never invent a name.]\n\n' +
+              '###SIGNATURE_DESIGNATION###\n' +
+              '[Designation of the reply sender]\n\n' +
+              '###SIGNATURE_INSTITUTION###\n' +
+              '[Institution of the reply sender]\n\n' +
+              '###ENCLOSURES###\n' +
+              '[Comma-separated list, only if the reply is sending something back — write NONE if there is nothing to enclose]\n\n' +
+              'STRICT RULES:\n' +
+              '1. Output the markers EXACTLY as shown (###NAME###), each alone on its own line — nothing else on that line.\n' +
+              '2. PLAIN TEXT ONLY under every marker — no HTML tags, no markdown, no bullet symbols, no asterisks.\n' +
+              '3. Do NOT invent names — leave SIGNATURE_NAME blank if the sender\'s name is not explicitly in the PDF.\n' +
+              '4. Do NOT hallucinate any facts, figures, or names not present in the PDF or hints.\n' +
+              '5. Minimum 3 substantive body paragraphs unless the hints clearly call for fewer.\n' +
+              '6. Formal bureaucratic English (Kerala Govt style) throughout.\n\n' +
+              'CRITICAL — You MUST incorporate EVERY point listed below into the body exactly as stated. Do NOT ignore any hint. Do NOT add names, figures, or content NOT present in the PDF or hints.\n' +
+              'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
+              (hints || 'No hints provided. Draft a COMPLETE and DETAILED reply body with:\n  • Para 1: Formally acknowledge the reference letter\n  • Para 2: State action taken / current status clearly\n  • Para 3: Additional details or formal closing request\n  Each paragraph must be substantive and specific to the letter content.');
+          } else {
           promptText =
             'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
             'Read the attached main (⭐) PDF letter carefully. Also read any reference (📎) PDFs for context.\n\n' +
@@ -4028,6 +4096,7 @@
             'CRITICAL — You MUST incorporate EVERY point listed below into the body exactly as stated. Do NOT ignore any hint. Do NOT add names, figures, or content NOT present in the PDF or hints.\n' +
             'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
             (hints || 'No hints provided. Draft a COMPLETE and DETAILED reply body with:\n  • Para 1: Formally acknowledge the reference letter\n  • Para 2: State action taken / current status clearly\n  • Para 3: Additional details or formal closing request\n  Each paragraph must be substantive and specific to the letter content.');
+          }
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -4222,7 +4291,7 @@
             // REPLY — single unified path (was 3 draftModes, now always this):
             // parse the AI's marker-based plain text, build the fixed HTML.
             const fields = parseReplyFields(responseText);
-            ed.setContent(buildReplyHtml(fields, todayDate));
+            ed.setContent(buildReplyHtml(fields, todayDate, isReplyEnglish ? 'en' : 'ml'));
           } else {
             // TRANSFORMATION — always rich HTML now; indent/table DOM pass below always runs.
             ed.setContent(responseText.trim());
