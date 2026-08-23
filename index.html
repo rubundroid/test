@@ -1444,6 +1444,10 @@
         <div id="advanced-key-section"
           style="max-height:0; overflow:hidden; transition:max-height 0.35s ease;">
           <div style="padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
+            <div id="byok-fail-notice" style="display:none; margin-bottom:8px; padding:8px 10px; background:#fdecea; border:1px solid #d93025; border-radius:4px; font-size:0.78rem; color:#a50e0e; line-height:1.4;">
+              <strong>⚠️ സെർവർ തിരക്കിലാണ് / പരാജയപ്പെട്ടു.</strong> ഈ Personal Key ഉപയോഗിച്ച് വീണ്ടും "Generate Reply" ചെയ്യൂ.
+              <span onclick="document.getElementById('byok-fail-notice').style.display='none';" style="float:right; cursor:pointer; font-weight:700;">✕</span>
+            </div>
             <p
               style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
               🔑 Want faster drafts for Large Files? <span style="font-weight:900; color:#999;">(Required for 3+
@@ -1481,31 +1485,6 @@
           <textarea id="ai-draft-hints" rows="5"
             style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; resize:vertical; outline:none; transition:border-color 0.15s;"
             placeholder="e.g.&#10;- Reply is approved&#10;- Forward to District Office by 15th&#10;- Attach originals&#10;(Leave blank to let AI decide)"></textarea>
-        </div>
-        <div style="margin-top:4px; padding:8px 12px; background:#f7f8fc; border:1px solid #dde3f0; border-radius:6px;">
-          <p
-            style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#888;">
-            ⚙️ Output Mode
-          </p>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:#333;">
-            <input type="radio" name="draftMode" id="draftModePlain" value="plain"
-              style="accent-color:#c9a227; cursor:pointer;" />
-            ⚡ Plain Text Mode
-            <span style="color:#999; font-size:0.72rem;">(Faster, fewer API limits)</span>
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:#333;">
-            <input type="radio" name="draftMode" id="draftModeRich" value="rich" checked
-              style="accent-color:#c9a227; cursor:pointer;" />
-            🏛️ e-Office Ready / Rich Official Format
-            <span style="color:#999; font-size:0.72rem;">(Strict HTML layout, more tokens)</span>
-          </label>
-          <label
-            style="display:flex; align-items:center; gap:8px; margin-bottom:5px; cursor:pointer; font-size:0.82rem; color:#333;">
-            <input type="radio" name="draftMode" id="draftModeUltraLite" value="ultralite"
-              style="accent-color:#107c10; cursor:pointer;" />
-            🚀 Ultra Lite
-            <span style="color:#999; font-size:0.72rem;">(Only Subject, Ref &amp; Body. No addresses/signatures)</span>
-          </label>
         </div>
 
       </div>
@@ -3405,6 +3384,7 @@
       document.getElementById('btn-ai-draft').addEventListener('click', () => {
         document.getElementById('ai-draft-pdf-input').value = '';
         document.getElementById('ai-draft-file-list').innerHTML = '';
+        document.getElementById('byok-fail-notice').style.display = 'none';
         // Don't clear hints — user may want to re-use them
         // ── BYOK: Restore saved Gemini API key from LocalStorage ──
         const savedKey = localStorage.getItem('edraft_user_gemini_key');
@@ -3651,18 +3631,9 @@
           return `<p style="${pStyle}">${html}</p>`;
         }).join('\n');
       }
-      function plainTextToEditorHtml(text) {
-        // Converts Gemini plain-text response → editor-safe HTML.
-        // Double newlines → <p> breaks; single \n → <br> within a paragraph.
-        return text
-          .trim()
-          .split(/\n{2,}/)
-          .map(para => para.trim())
-          .filter(para => para.length > 0)
-          .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
-          .join('\n');
-      }
-
+      // (plainTextToEditorHtml removed — no longer needed now that both
+      // Reply and Transformation produce HTML directly; nothing calls
+      // this anymore since the plain/ultralite modes are gone.)
       // ── Reply scenario: parse the marker-based plain-text response ──────
       // Companion to the single unified Reply prompt above. Splits on
       // ###MARKER### lines; each field's value is everything up to the
@@ -3719,9 +3690,9 @@
           addrBlock('പ്രേഷകൻ', senderLines) + '\n' +
           addrBlock('സ്വീകർത്താവ്', recipientLines) + '\n\n' +
           `<div style="text-align:left;">സർ,</div>\n\n` +
-          `<table width="100%" cellpadding="2" cellspacing="0" border="0" style="margin:8px 0;font-size:16pt;line-height:1.6;">\n` +
-          `<tr><td width="65" style="vertical-align:top;"><strong>വിഷയം</strong></td><td width="15" style="vertical-align:top;"><strong>:-</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.SUBJECT)}</td></tr>\n` +
-          `<tr><td style="vertical-align:top;"><strong>സൂചന</strong></td><td style="vertical-align:top;"><strong>:-</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.REFERENCE)}</td></tr>\n` +
+          `<table width="100%" cellpadding="2" cellspacing="0" border="0" style="margin:8px 0;font-family:'Mandaram','Times New Roman','Manjari',serif;font-size:16pt;line-height:1.6;">\n` +
+          `<tr><td width="85" style="vertical-align:top;white-space:nowrap;"><strong>വിഷയം</strong></td><td width="15" style="vertical-align:top;"><strong>:-</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.SUBJECT)}</td></tr>\n` +
+          `<tr><td style="vertical-align:top;white-space:nowrap;"><strong>സൂചന</strong></td><td style="vertical-align:top;"><strong>:-</strong></td><td style="vertical-align:top;text-align:justify;">${escapeHtml(fields.REFERENCE)}</td></tr>\n` +
           `</table>\n\n` +
           bodyParas + '\n\n' +
           `<div style="text-align:right;margin-top:10px;">വിശ്വാസപൂർവ്വം,</div>\n\n` +
@@ -3801,7 +3772,6 @@
         ];
         const workerBase = WORKERS[Math.floor(Math.random() * WORKERS.length)];
         const hints = document.getElementById('ai-draft-hints').value.trim();
-        const draftMode = document.querySelector('input[name="draftMode"]:checked')?.value ?? 'plain';
         const fileInp = document.getElementById('ai-draft-pdf-input');
         const files = Array.from(fileInp.files);
 
@@ -3871,108 +3841,12 @@
 
         if (isTransformation) {
           // ════════════════════════════════════════════════════════
-          // TRANSFORMATION SCENARIO — unchanged, still 3 modes.
-          // Arbitrary document types (letter/order/memo/table) don't
-          // map onto the fixed Reply template used below, so this
-          // scenario keeps its own draftMode-based prompts as-is.
+          // TRANSFORMATION SCENARIO — single prompt now (rich/HTML
+          // output only; ultralite/plain removed along with the mode
+          // selector — arbitrary document types still need raw HTML,
+          // unlike the fixed-template Reply scenario below).
           // ════════════════════════════════════════════════════════
-          if (draftMode === 'ultralite') {
-            // Scenario B — Smart Transformation (ultra lite output)
-            promptText =
-              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
-              'Read the attached PDF document carefully. Also read any reference (📎) PDFs for context.\n\n' +
-
-              '════ STEP 1 — DETECT DOCUMENT TYPE ════\n' +
-              'Classify the main document as ONE of:\n' +
-              '  [A] Standard Letter  — has a clear Sender, Recipient, and salutation ("സർ," / "Dear Sir")\n' +
-              '  [B] Proceeding / G.O. / Order  — starts with "നടപടി", "G.O.", or "ഉത്തരവ്"\n' +
-              '  [C] Office Memo / Internal Note  — has "MEMO", "കുറിപ്പ്", or similar header\n' +
-              '  [D] Table / Salary Statement / Calculation Sheet  — primarily rows of figures, amounts, dates\n' +
-              '  [E] Other official document\n\n' +
-
-              '════ STEP 2 — SMART MATHEMATICAL CALCULATION (apply if requested) ════\n' +
-              'If the user\'s request mentions a NEW date range (e.g., "April 8 to 30"), act as a smart clerk:\n' +
-              '  (a) Count the new number of days INCLUSIVE. Example: April 8–30 = 23 days.\n' +
-              '  (b) Identify the ORIGINAL number of days and ORIGINAL Salary/Gross/Net amounts from the document.\n' +
-              '  (c) Calculate: New Amount = (Original Amount ÷ Original Days) × New Days.\n' +
-              '      Round every monetary result to the nearest whole number (integer). Do not use decimal places for amounts.\n' +
-              '  (d) Update ALL affected figures in the output (Gross Pay, Deductions, Net Pay, etc.).\n\n' +
-
-              '════ STEP 3 — OUTPUT RULES BY DOCUMENT TYPE ════\n\n' +
-
-              '▶ If document is [A] Standard LETTER:\n' +
-              'IMPORTANT: This output is for e-Office, which auto-generates Sender, Recipient, Date,\n' +
-              'Number, and Salutation. DO NOT include those elements.\n' +
-              'Output ONLY these elements as PLAIN TEXT, separated by ONE blank line:\n' +
-              '  1. വിഷയം: [Subject — update dates/months as requested; else keep EXACTLY as original]\n' +
-              '  2. സൂചന: [Reference — EXACTLY as original; OMIT this line if absent in original]\n' +
-              '  3. [Body paragraphs — EXACTLY as original, with ONLY requested changes applied.\n' +
-              '     Each paragraph separated by ONE blank line.]\n\n' +
-
-              '▶ If document is [B] Proceeding / Order, [C] Memo, [D] Table, or [E] Other:\n' +
-              'DO NOT use the Letter format above. DO NOT add "പ്രേഷകൻ / സ്വീകർത്താവ് / സർ,".\n' +
-              'Reproduce the COMPLETE original document structure as PLAIN TEXT:\n' +
-              '  • Preserve all headings, clause numbers, section labels exactly.\n' +
-              '  • For tables: reproduce each row with values separated by spaces or | character.\n' +
-              '  • Replace ONLY the values requested — dates, month names, day counts, amounts.\n' +
-              '  • Insert newly calculated figures from Step 2 in their exact positions.\n\n' +
-
-              'STRICT RULES:\n' +
-              '- PLAIN TEXT ONLY. Absolutely NO HTML tags, NO markdown, NO asterisks, NO bold symbols.\n' +
-              '- TRANSFORMATION ONLY: Do NOT add new sentences or invent content.\n' +
-              '- Use ഭരണഭാഷ official Malayalam (or English if the original is in English) throughout.\n' +
-              '- Do NOT hallucinate any names, figures, or amounts not in the original.\n\n' +
-
-              'USER TRANSFORMATION REQUEST:\n' + hints;
-          } else if (draftMode === 'plain') {
-            // Scenario B — Smart Transformation (plain output)
-            promptText =
-              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
-              'Read the attached PDF document carefully. Also read any reference (📎) PDFs for context.\n\n' +
-
-              '════ STEP 1 — DETECT DOCUMENT TYPE ════\n' +
-              'Classify the main document as ONE of:\n' +
-              '  [A] Standard Letter  — has Sender, Recipient, and salutation ("സർ," / "Dear Sir")\n' +
-              '  [B] Proceeding / G.O. / Order  — starts with "നടപടി", "G.O.", or "ഉത്തരവ്"\n' +
-              '  [C] Office Memo / Internal Note  — has "MEMO" or "കുറിപ്പ്" header\n' +
-              '  [D] Table / Salary Statement / Calculation Sheet  — primarily rows of figures and amounts\n' +
-              '  [E] Other official document\n\n' +
-
-              '════ STEP 2 — SMART MATHEMATICAL CALCULATION (apply if requested) ════\n' +
-              'If the user\'s request mentions a NEW date range (e.g., "April 8 to 30"), act as a smart clerk:\n' +
-              '  (a) Count the new number of days INCLUSIVE. Example: April 8–30 = 23 days.\n' +
-              '  (b) Find the ORIGINAL number of days and ORIGINAL Salary/Gross/Net amounts from the PDF.\n' +
-              '  (c) Calculate: New Amount = (Original Amount ÷ Original Days) × New Days.\n' +
-              '      Round every monetary result to the nearest whole number (integer). Do not use decimal places for amounts.\n' +
-              '  (d) Update ALL affected figures (Gross Pay, Deductions, Net Pay, etc.) in the output.\n\n' +
-
-              '════ STEP 3 — PRODUCE TRANSFORMED OUTPUT ════\n' +
-              'Apply ONLY the requested substitutions and calculated values. Clone all other content EXACTLY.\n\n' +
-
-              '▶ If document is [A] Standard LETTER:\n' +
-              'Output the full transformed letter as PLAIN TEXT with ONE blank line between each section:\n' +
-              '  നമ്പർ / തീയതി → Sender block → Recipient block → സർ, → വിഷയം → സൂചന → Body → Closing/Signature.\n' +
-              '  Update month names, date references, and calculated amounts as requested.\n\n' +
-
-              '▶ If document is [B] Proceeding / Order, [C] Memo, [D] Table, or [E] Other:\n' +
-              'DO NOT use Letter format. DO NOT add "പ്രേഷകൻ / സ്വീകർത്താവ് / സർ,".\n' +
-              'Reproduce the COMPLETE original document structure as PLAIN TEXT:\n' +
-              '  • Preserve all headings, clause numbers, and section labels exactly.\n' +
-              '  • For tables: reproduce each row with column values separated by spaces or | character.\n' +
-              '  • Replace ONLY the values requested — dates, month names, day counts, amounts.\n' +
-              '  • Place newly calculated figures from Step 2 in their exact positions.\n\n' +
-
-              'STRICT RULES:\n' +
-              '- PLAIN TEXT ONLY. Absolutely NO HTML tags, NO markdown, NO asterisks.\n' +
-              '- TRANSFORMATION ONLY: Do NOT add new sentences or invent content.\n' +
-              '- Separate structural sections with ONE blank line.\n' +
-              '- Use ഭരണഭാഷ official Malayalam (or English if the original is in English) throughout.\n' +
-              '- Do NOT hallucinate any names, figures, or amounts not present in the original PDF.\n' +
-              '- Today\'s date: ' + todayDate + '\n\n' +
-
-              'USER TRANSFORMATION REQUEST:\n' + hints;
-          } else {
-            promptText = (
+          promptText = (
               'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government. Your ONLY task is to output a ' +
               'TRANSFORMED version of the attached document in ഔദ്യോഗിക മലയാളം as raw HTML directly insertable into a ' +
               'rich-text editor. Output the HTML body ONLY — no preamble, no commentary, ' +
@@ -4099,14 +3973,12 @@
               '11. Update the document DATE (തീയതി) to today: ' + todayDate + ' — for Letter type only.\n\n' +
 
               'USER TRANSFORMATION REQUEST:\n' + hints
-            );
-          }
+          );
         } else {
           // ════════════════════════════════════════════════════════
           // REPLY SCENARIO — ONE unified prompt (was 3: ultralite/plain/rich)
           // AI outputs plain-text field VALUES only; buildReplyHtml() below
-          // assembles the fixed letter template around them. draftMode no
-          // longer affects Reply output — see discussion note in chat.
+          // assembles the fixed letter template around them.
           // ════════════════════════════════════════════════════════
           promptText =
             'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
@@ -4308,11 +4180,10 @@
         } catch (err) {
           // ── Unified error handler for both paths ─────────────────
           const errMsg = err.message || '';
-          if (errMsg.startsWith('PDF_ERROR:')) {
-            showToast('📄 ' + errMsg.replace('PDF_ERROR:', ''), 10000);
-          } else if (errMsg.startsWith('GEMINI_BUSY:')) {
-            // Worker: server busy/timeout — show message + auto-expand BYOK
-            showToast('⚠️ ' + errMsg.replace('GEMINI_BUSY:', ''), 8000);
+          const showByokFailNotice = () => {
+            // Persistent notice (unlike the toast below, this does NOT
+            // auto-hide) — the toast alone was easy to miss during a long
+            // generate-wait, leaving the user unsure why nothing happened.
             const sec = document.getElementById('advanced-key-section');
             const arr = document.getElementById('advanced-key-arrow');
             const isOpen = sec.style.maxHeight !== '' && sec.style.maxHeight !== '0px';
@@ -4320,12 +4191,20 @@
               sec.style.maxHeight = '500px';
               arr.style.transform = 'rotate(180deg)';
             }
+            document.getElementById('byok-fail-notice').style.display = 'block';
             setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+          };
+          if (errMsg.startsWith('PDF_ERROR:')) {
+            showToast('📄 ' + errMsg.replace('PDF_ERROR:', ''), 10000);
+          } else if (errMsg.startsWith('GEMINI_BUSY:')) {
+            showToast('⚠️ ' + errMsg.replace('GEMINI_BUSY:', ''), 8000);
+            showByokFailNotice();
           } else if (
             errMsg.includes('429') || errMsg.includes('503') ||
             errMsg.includes('exhausted') || errMsg.includes('quota') || errMsg.includes('failed')
           ) {
             showToast('⚠️ സിസ്റ്റത്തിൽ ആളുകൾ കൂടുതലാണ് (Heavy Traffic). ദയവായി Personal API Key ഉപയോഗിക്കുക, അല്ലെങ്കിൽ ഒരു മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.', 6000);
+            showByokFailNotice();
           } else {
             showToast('❌ AI Error: ' + errMsg, 6000);
           }
@@ -4340,17 +4219,14 @@
         const ed = getEditor();
         if (ed) {
           if (!isTransformation) {
-            // REPLY — single unified path regardless of draftMode:
+            // REPLY — single unified path (was 3 draftModes, now always this):
             // parse the AI's marker-based plain text, build the fixed HTML.
             const fields = parseReplyFields(responseText);
             ed.setContent(buildReplyHtml(fields, todayDate));
           } else {
-            // TRANSFORMATION — unchanged, still draftMode-dependent.
-            const htmlContent = (draftMode === 'plain' || draftMode === 'ultralite')
-              ? plainTextToEditorHtml(responseText)          // plain/ultralite
-              : responseText.trim();                         // rich: indent via DOM below
-            ed.setContent(htmlContent);
-            if (draftMode !== 'plain' && draftMode !== 'ultralite') {
+            // TRANSFORMATION — always rich HTML now; indent/table DOM pass below always runs.
+            ed.setContent(responseText.trim());
+            {
               let inAddr = false;
               Array.from(ed.getBody().children).forEach(el => {
                 if (!/^(DIV|P)$/.test(el.tagName)) return;
