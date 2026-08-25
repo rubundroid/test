@@ -494,6 +494,8 @@
     .modal-body {
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       padding: 16px;
     }
 
@@ -1433,36 +1435,24 @@
       </div>
       <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
 
-        <!-- ══ BYOK: Bring Your Own Gemini API Key — now FIRST, so it's ══ -->
-        <!-- ══ never pushed out of view by a growing file list below.  ══ -->
-        <p id="advanced-key-toggle" onclick="toggleAdvancedKey()"
-          style="margin:0; font-size:0.76rem; color:#8b6508; cursor:pointer; user-select:none; display:flex; align-items:center; gap:4px; width:fit-content;">
-          ⚠️ Personal API Key (STRONGLY recommended for 3+ page PDFs — server pool often fails on these)
-          <span id="advanced-key-arrow"
-            style="font-size:0.65rem; display:inline-block; transition:transform 0.3s ease; transform:rotate(0deg);">▼</span>
-        </p>
-        <div id="advanced-key-section"
-          style="max-height:0; overflow:hidden; transition:max-height 0.35s ease;">
-          <div style="padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
-            <div id="byok-fail-notice" style="display:none; margin-bottom:8px; padding:8px 10px; background:#fdecea; border:1px solid #d93025; border-radius:4px; font-size:0.78rem; color:#a50e0e; line-height:1.4;">
-              <strong>⚠️ സെർവർ തിരക്കിലാണ് / പരാജയപ്പെട്ടു.</strong> ഈ Personal Key ഉപയോഗിച്ച് വീണ്ടും "Generate Reply" ചെയ്യൂ.
-              <span onclick="document.getElementById('byok-fail-notice').style.display='none';" style="float:right; cursor:pointer; font-weight:700;">✕</span>
-            </div>
-            <p
-              style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
-              🔑 Want faster drafts for Large Files? <span style="font-weight:900; color:#999;">(Required for 3+
-                Pages)</span>
-            </p>
-            <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
-              style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
-            <p style="margin:6px 0 0; font-size:0.72rem; color:#777; line-height:1.5;">
-              This is a one-time setup. The key will be saved securely in your own browser's LocalStorage.<br>
-              <a href="https://aistudio.google.com/app/apikey" target="_blank"
-                style="color:#8b6508; font-weight:600; text-decoration:underline;">
-                Click here to get a FREE Gemini API Key from Google AI Studio
-              </a>
-            </p>
+        <!-- ══ BYOK: Bring Your Own Gemini API Key — ALWAYS visible now. ══ -->
+        <!-- ══ (Previously collapsible; that pattern kept breaking across ══ -->
+        <!-- ══ 3 rounds of fixes as new fields got added above/below it — ══ -->
+        <!-- ══ removing the toggle/scroll entirely is the robust fix.)    ══ -->
+        <div style="padding:8px 10px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
+          <div id="byok-fail-notice" style="display:none; margin-bottom:8px; padding:8px 10px; background:#fdecea; border:1px solid #d93025; border-radius:4px; font-size:0.78rem; color:#a50e0e; line-height:1.4;">
+            <strong>⚠️ സെർവർ തിരക്കിലാണ് / പരാജയപ്പെട്ടു.</strong> ഈ Personal Key ഉപയോഗിച്ച് വീണ്ടും "Generate Reply" ചെയ്യൂ.
+            <span onclick="document.getElementById('byok-fail-notice').style.display='none';" style="float:right; cursor:pointer; font-weight:700;">✕</span>
           </div>
+          <label style="display:block; font-size:0.72rem; font-weight:700; color:#8b6508; margin-bottom:5px;">
+            ⚠️ Personal API Key <span style="font-weight:600; color:#999;">(strongly recommended for 3+ page PDFs — server pool often fails on these)</span>
+          </label>
+          <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here (optional)..."
+            style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
+          <p style="margin:5px 0 0; font-size:0.7rem; color:#777; line-height:1.4;">
+            One-time setup, saved in your browser only. <a href="https://aistudio.google.com/app/apikey" target="_blank"
+              style="color:#8b6508; font-weight:600; text-decoration:underline;">Get a FREE key here</a>
+          </p>
         </div>
 
         <!-- ══ Reply vs Fresh Letter mode switch ══ -->
@@ -3405,21 +3395,8 @@
       }
 
     })();
-    // ── BYOK Advanced Key Toggle ──────────────────────────────────
-    function toggleAdvancedKey() {
-      const section = document.getElementById('advanced-key-section');
-      const arrow = document.getElementById('advanced-key-arrow');
-      const isOpen = section.style.maxHeight !== '' && section.style.maxHeight !== '0px';
-      // Fixed generous max-height instead of section.scrollHeight — the old
-      // scrollHeight snapshot was taken once at toggle time, so it went stale
-      // (and clipped the box) once the file list above grew taller, e.g.
-      // after adding 3+ PDFs. 500px comfortably fits this section's content.
-      section.style.maxHeight = isOpen ? '0px' : '500px';
-      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-      if (!isOpen) {
-        setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 360);
-      }
-    }
+    // (toggleAdvancedKey removed — BYOK box is always visible now, no
+    // collapse/expand/scroll-to-find needed. See HTML comment above the box.)
     /* ══════════════════════════════════════
        AI DRAFT – GEMINI 1.5 FLASH INTEGRATION
     ══════════════════════════════════════ */
@@ -3438,13 +3415,6 @@
         freshSec.style.display = 'flex';
         replyBtn.style.cssText = 'flex:1; padding:8px; ' + inactive;
         freshBtn.style.cssText = 'flex:1; padding:8px; ' + active;
-        // Fresh Letter is new/less-tested — keep the API-key box visibly
-        // open here even if a key is already saved (was reported hard to
-        // notice once collapsed, with 3 extra fields now above it).
-        const s = document.getElementById('advanced-key-section');
-        const a = document.getElementById('advanced-key-arrow');
-        s.style.maxHeight = '500px';
-        a.style.transform = 'rotate(180deg)';
       } else {
         replySec.style.display = 'block';
         freshSec.style.display = 'none';
@@ -3472,18 +3442,7 @@
         // Don't clear hints — user may want to re-use them
         // ── BYOK: Restore saved Gemini API key from LocalStorage ──
         const savedKey = localStorage.getItem('edraft_user_gemini_key');
-        const _s = document.getElementById('advanced-key-section');
-        const _a = document.getElementById('advanced-key-arrow');
-        if (savedKey) {
-          document.getElementById('ai-user-api-key').value = savedKey;
-          // Already set up — keep it collapsed, it's working quietly in the background
-          _s.style.maxHeight = '0px';
-          _a.style.transform = 'rotate(0deg)';
-        } else {
-          // No key yet — open by default so new users notice the option
-          _s.style.maxHeight = '500px';
-          _a.style.transform = 'rotate(180deg)';
-        }
+        if (savedKey) document.getElementById('ai-user-api-key').value = savedKey;
         modal.classList.add('open');
       });
 
@@ -4426,15 +4385,8 @@
             // Persistent notice (unlike the toast below, this does NOT
             // auto-hide) — the toast alone was easy to miss during a long
             // generate-wait, leaving the user unsure why nothing happened.
-            const sec = document.getElementById('advanced-key-section');
-            const arr = document.getElementById('advanced-key-arrow');
-            const isOpen = sec.style.maxHeight !== '' && sec.style.maxHeight !== '0px';
-            if (!isOpen) {
-              sec.style.maxHeight = '500px';
-              arr.style.transform = 'rotate(180deg)';
-            }
             document.getElementById('byok-fail-notice').style.display = 'block';
-            setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+            document.getElementById('ai-user-api-key').scrollIntoView({ behavior: 'smooth', block: 'center' });
           };
           if (errMsg.startsWith('PDF_ERROR:')) {
             showToast('📄 ' + errMsg.replace('PDF_ERROR:', ''), 10000);
@@ -4523,17 +4475,10 @@
 
       // ── Size Limit Alert: OK Button Handler ────────────────────
       document.getElementById('sla-ok-btn').addEventListener('click', () => {
-        // 1. Hide the popup
         document.getElementById('size-limit-alert').classList.remove('active');
-
-        // 2. Expand the Advanced Key section (reuse existing toggle;
-        //    guard against calling it when already open)
-        const section = document.getElementById('advanced-key-section');
-        const isOpen = section.style.maxHeight !== '' && section.style.maxHeight !== '0px';
-        if (!isOpen) toggleAdvancedKey();
-
-        // 3. Focus after the 0.35s CSS transition finishes
-        setTimeout(() => document.getElementById('ai-user-api-key').focus(), 400);
+        const keyInput = document.getElementById('ai-user-api-key');
+        keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => keyInput.focus(), 300);
       });
 
     })();          // ← closes the outer IIFE
