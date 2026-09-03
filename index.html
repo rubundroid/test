@@ -494,6 +494,8 @@
     .modal-body {
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       padding: 16px;
     }
 
@@ -1433,38 +1435,39 @@
       </div>
       <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
 
-        <!-- ══ BYOK: Bring Your Own Gemini API Key — now FIRST, so it's ══ -->
-        <!-- ══ never pushed out of view by a growing file list below.  ══ -->
-        <p id="advanced-key-toggle" onclick="toggleAdvancedKey()"
-          style="margin:0; font-size:0.76rem; color:#8b6508; cursor:pointer; user-select:none; display:flex; align-items:center; gap:4px; width:fit-content;">
-          ⚠️ Personal API Key (STRONGLY recommended for 3+ page PDFs — server pool often fails on these)
-          <span id="advanced-key-arrow"
-            style="font-size:0.65rem; display:inline-block; transition:transform 0.3s ease; transform:rotate(0deg);">▼</span>
-        </p>
-        <div id="advanced-key-section"
-          style="max-height:0; overflow:hidden; transition:max-height 0.35s ease;">
-          <div style="padding:10px 12px 12px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
-            <div id="byok-fail-notice" style="display:none; margin-bottom:8px; padding:8px 10px; background:#fdecea; border:1px solid #d93025; border-radius:4px; font-size:0.78rem; color:#a50e0e; line-height:1.4;">
-              <strong>⚠️ സെർവർ തിരക്കിലാണ് / പരാജയപ്പെട്ടു.</strong> ഈ Personal Key ഉപയോഗിച്ച് വീണ്ടും "Generate Reply" ചെയ്യൂ.
-              <span onclick="document.getElementById('byok-fail-notice').style.display='none';" style="float:right; cursor:pointer; font-weight:700;">✕</span>
-            </div>
-            <p
-              style="margin:0 0 7px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b6508;">
-              🔑 Want faster drafts for Large Files? <span style="font-weight:900; color:#999;">(Required for 3+
-                Pages)</span>
-            </p>
-            <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here..."
-              style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
-            <p style="margin:6px 0 0; font-size:0.72rem; color:#777; line-height:1.5;">
-              This is a one-time setup. The key will be saved securely in your own browser's LocalStorage.<br>
-              <a href="https://aistudio.google.com/app/apikey" target="_blank"
-                style="color:#8b6508; font-weight:600; text-decoration:underline;">
-                Click here to get a FREE Gemini API Key from Google AI Studio
-              </a>
-            </p>
+        <!-- ══ BYOK: Bring Your Own Gemini API Key — ALWAYS visible now. ══ -->
+        <!-- ══ (Previously collapsible; that pattern kept breaking across ══ -->
+        <!-- ══ 3 rounds of fixes as new fields got added above/below it — ══ -->
+        <!-- ══ removing the toggle/scroll entirely is the robust fix.)    ══ -->
+        <div style="padding:8px 10px; background:#fffdf0; border:1px solid #d4a017; border-radius:6px;">
+          <div id="byok-fail-notice" style="display:none; margin-bottom:8px; padding:8px 10px; background:#fdecea; border:1px solid #d93025; border-radius:4px; font-size:0.78rem; color:#a50e0e; line-height:1.4;">
+            <span id="byok-fail-notice-text"></span>
+            <span onclick="document.getElementById('byok-fail-notice').style.display='none';" style="float:right; cursor:pointer; font-weight:700;">✕</span>
           </div>
+          <label style="display:block; font-size:0.72rem; font-weight:700; color:#8b6508; margin-bottom:5px;">
+            ⚠️ Personal API Key <span style="font-weight:600; color:#999;">(strongly recommended for 3+ page PDFs — server pool often fails on these)</span>
+          </label>
+          <input type="password" id="ai-user-api-key" placeholder="Paste your Gemini API Key here (optional)..."
+            style="width:100%; border:1px solid #d4a017; border-radius:4px; padding:7px 10px; font-size:0.83rem; outline:none; transition:border-color 0.15s; background:#fff;" />
+          <p style="margin:5px 0 0; font-size:0.7rem; color:#777; line-height:1.4;">
+            One-time setup, saved in your browser only. <a href="https://aistudio.google.com/app/apikey" target="_blank"
+              style="color:#8b6508; font-weight:600; text-decoration:underline;">Get a FREE key here</a>
+          </p>
         </div>
 
+        <!-- ══ Reply vs Fresh Letter mode switch ══ -->
+        <div style="display:flex; gap:8px;">
+          <button type="button" id="mode-btn-reply" onclick="setDraftFlowMode('reply')"
+            style="flex:1; padding:8px; border:2px solid #c9a227; border-radius:6px; background:#c9a227; color:#fff; font-weight:700; font-size:0.82rem; cursor:pointer;">
+            📨 Reply to a Letter
+          </button>
+          <button type="button" id="mode-btn-fresh" onclick="setDraftFlowMode('fresh')"
+            style="flex:1; padding:8px; border:2px solid #ddd; border-radius:6px; background:#fff; color:#555; font-weight:700; font-size:0.82rem; cursor:pointer;">
+            ✨ Fresh Letter
+          </button>
+        </div>
+
+        <div id="reply-mode-section">
         <div>
           <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
             📄 Incoming Letter + Reference PDFs
@@ -1477,6 +1480,35 @@
           </div>
           <ul id="ai-draft-file-list"
             style="list-style:none; margin-top:8px; padding:0; display:flex; flex-direction:column; gap:5px;"></ul>
+        </div>
+        </div>
+
+        <div id="fresh-mode-section" style="display:none; flex-direction:column; gap:12px;">
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
+              📤 From (നിങ്ങളുടെ ഓഫീസ് — designation, institution, place)
+            </label>
+            <textarea id="fresh-from" rows="2"
+              style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; resize:vertical; outline:none;"
+              placeholder="e.g. Medical Officer&#10;Government Ayurveda Dispensary, Malappuram"></textarea>
+            <div style="font-size:0.68rem; color:#888; margin-top:3px;">ഇത് ബ്രൗസറിൽ save ആകും — അടുത്ത തവണ വീണ്ടും ടൈപ്പ് ചെയ്യേണ്ട.</div>
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
+              📥 To (സ്വീകർത്താവ് — designation, institution, place)
+            </label>
+            <textarea id="fresh-to" rows="2"
+              style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; resize:vertical; outline:none;"
+              placeholder="e.g. District Medical Officer&#10;Malappuram"></textarea>
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
+              📝 Subject
+            </label>
+            <input type="text" id="fresh-subject"
+              style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px 10px; font-size:0.85rem; font-family:'Noto Sans Malayalam','Manjari',sans-serif; outline:none;"
+              placeholder="e.g. അന്യസംസ്ഥാന യാത്രാ അനുമതി നൽകുന്നത് സംബന്ധിച്ച്" />
+          </div>
         </div>
         <div>
           <label style="display:block; font-weight:600; font-size:0.82rem; margin-bottom:5px; color:#333;">
@@ -3363,24 +3395,38 @@
       }
 
     })();
-    // ── BYOK Advanced Key Toggle ──────────────────────────────────
-    function toggleAdvancedKey() {
-      const section = document.getElementById('advanced-key-section');
-      const arrow = document.getElementById('advanced-key-arrow');
-      const isOpen = section.style.maxHeight !== '' && section.style.maxHeight !== '0px';
-      // Fixed generous max-height instead of section.scrollHeight — the old
-      // scrollHeight snapshot was taken once at toggle time, so it went stale
-      // (and clipped the box) once the file list above grew taller, e.g.
-      // after adding 3+ PDFs. 500px comfortably fits this section's content.
-      section.style.maxHeight = isOpen ? '0px' : '500px';
-      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-      if (!isOpen) {
-        setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 360);
-      }
-    }
+    // (toggleAdvancedKey removed — BYOK box is always visible now, no
+    // collapse/expand/scroll-to-find needed. See HTML comment above the box.)
     /* ══════════════════════════════════════
        AI DRAFT – GEMINI 1.5 FLASH INTEGRATION
     ══════════════════════════════════════ */
+    // ── Reply vs Fresh Letter mode switch ─────────────────────────
+    let currentDraftFlowMode = 'reply';
+    function setDraftFlowMode(mode) {
+      currentDraftFlowMode = mode;
+      const replyBtn = document.getElementById('mode-btn-reply');
+      const freshBtn = document.getElementById('mode-btn-fresh');
+      const replySec = document.getElementById('reply-mode-section');
+      const freshSec = document.getElementById('fresh-mode-section');
+      const active = 'border:2px solid #c9a227; border-radius:6px; background:#c9a227; color:#fff; font-weight:700; font-size:0.82rem; cursor:pointer;';
+      const inactive = 'border:2px solid #ddd; border-radius:6px; background:#fff; color:#555; font-weight:700; font-size:0.82rem; cursor:pointer;';
+      if (mode === 'fresh') {
+        replySec.style.display = 'none';
+        freshSec.style.display = 'flex';
+        replyBtn.style.cssText = 'flex:1; padding:8px; ' + inactive;
+        freshBtn.style.cssText = 'flex:1; padding:8px; ' + active;
+      } else {
+        replySec.style.display = 'block';
+        freshSec.style.display = 'none';
+        replyBtn.style.cssText = 'flex:1; padding:8px; ' + active;
+        freshBtn.style.cssText = 'flex:1; padding:8px; ' + inactive;
+      }
+    }
+    // Minimal valid 1-page blank PDF (200x200pt, no content) — auto-attached
+    // as the required "main" file in Fresh Letter mode, since the worker
+    // requires at least one PDF. Generated + round-trip validated in sandbox.
+    const BLANK_PDF_B64 = 'JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMSAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL0NvbnRlbnRzIDcgMCBSIC9NZWRpYUJveCBbIDAgMCAyMDAgMjAwIF0gL1BhcmVudCA2IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNiAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0F1dGhvciAoYW5vbnltb3VzKSAvQ3JlYXRpb25EYXRlIChEOjIwMjYwODI1MDcyNTE1KzAwJzAwJykgL0NyZWF0b3IgKGFub255bW91cykgL0tleXdvcmRzICgpIC9Nb2REYXRlIChEOjIwMjYwODI1MDcyNTE1KzAwJzAwJykgL1Byb2R1Y2VyIChSZXBvcnRMYWIgUERGIExpYnJhcnkgLSBcKG9wZW5zb3VyY2VcKSkgCiAgL1N1YmplY3QgKHVuc3BlY2lmaWVkKSAvVGl0bGUgKHVudGl0bGVkKSAvVHJhcHBlZCAvRmFsc2UKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL0NvdW50IDEgL0tpZHMgWyAzIDAgUiBdIC9UeXBlIC9QYWdlcwo+PgplbmRvYmoKNyAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCA1OQo+PgpzdHJlYW0KR2FwUWgwRT1GLDBVXEgzVFxwTllUXlFLaz90Yz5JUCw7VyNVMV4yM2loUEVNX1BQJE8hM14sQzVRfj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA4CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA2MSAwMDAwMCBuIAowMDAwMDAwMDkyIDAwMDAwIG4gCjAwMDAwMDAxOTkgMDAwMDAgbiAKMDAwMDAwMDM5MiAwMDAwMCBuIAowMDAwMDAwNDYwIDAwMDAwIG4gCjAwMDAwMDA3MjEgMDAwMDAgbiAKMDAwMDAwMDc4MCAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzw0NmUxNTkzNTI0YTU5M2U1MjJlNjczYjdlMzNmYTdlZT48NDZlMTU5MzUyNGE1OTNlNTIyZTY3M2I3ZTMzZmE3ZWU+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAob3BlbnNvdXJjZSkKCi9JbmZvIDUgMCBSCi9Sb290IDQgMCBSCi9TaXplIDgKPj4Kc3RhcnR4cmVmCjkyOAolJUVPRgo=';
+
     (function () {
       const modal = document.getElementById('ai-draft-modal');
 
@@ -3389,21 +3435,14 @@
         document.getElementById('ai-draft-pdf-input').value = '';
         document.getElementById('ai-draft-file-list').innerHTML = '';
         document.getElementById('byok-fail-notice').style.display = 'none';
+        setDraftFlowMode('reply');
+        // ── Fresh Letter: restore saved "From" office details ──
+        const savedFrom = localStorage.getItem('edraft_fresh_from');
+        if (savedFrom) document.getElementById('fresh-from').value = savedFrom;
         // Don't clear hints — user may want to re-use them
         // ── BYOK: Restore saved Gemini API key from LocalStorage ──
         const savedKey = localStorage.getItem('edraft_user_gemini_key');
-        const _s = document.getElementById('advanced-key-section');
-        const _a = document.getElementById('advanced-key-arrow');
-        if (savedKey) {
-          document.getElementById('ai-user-api-key').value = savedKey;
-          // Already set up — keep it collapsed, it's working quietly in the background
-          _s.style.maxHeight = '0px';
-          _a.style.transform = 'rotate(0deg)';
-        } else {
-          // No key yet — open by default so new users notice the option
-          _s.style.maxHeight = '500px';
-          _a.style.transform = 'rotate(180deg)';
-        }
+        if (savedKey) document.getElementById('ai-user-api-key').value = savedKey;
         modal.classList.add('open');
       });
 
@@ -3648,8 +3687,11 @@
         const fields = {};
         for (let i = 0; i < markers.length; i++) {
           const m = markers[i];
-          const rest = markers.slice(i + 1).join('|');
-          const re = new RegExp('###' + m + '###([\\s\\S]*?)(?=###(?:' + rest + ')###|$)');
+          // Stop at ANY other marker, not just ones later in this list —
+          // a prompt (like Fresh Letter's shorter one) may legitimately ask
+          // for markers in a different order than this canonical list.
+          const others = markers.filter((_, j) => j !== i).join('|');
+          const re = new RegExp('###' + m + '###([\\s\\S]*?)(?=###(?:' + others + ')###|$)');
           const match = text.match(re);
           fields[m] = match ? match[1].trim() : '';
         }
@@ -3793,6 +3835,11 @@
         const fileInp = document.getElementById('ai-draft-pdf-input');
         const files = Array.from(fileInp.files);
 
+        const isFreshLetter = currentDraftFlowMode === 'fresh';
+        const freshFrom = document.getElementById('fresh-from').value.trim();
+        const freshTo = document.getElementById('fresh-to').value.trim();
+        const freshSubject = document.getElementById('fresh-subject').value.trim();
+
         // ── BYOK: Read key → persist or remove from LocalStorage ──
         const userApiKeyVal = document.getElementById('ai-user-api-key').value.trim();
         if (userApiKeyVal) {
@@ -3802,13 +3849,18 @@
         }
 
         // ── Validation ──────────────────────────────────────────
-        if (!files.length) {
+        if (isFreshLetter) {
+          if (!freshFrom || !freshTo || !freshSubject) {
+            showToast('⚠️ From, To, Subject മൂന്നും നൽകൂ.'); return;
+          }
+          localStorage.setItem('edraft_fresh_from', freshFrom);
+        } else if (!files.length) {
           showToast('⚠️ Please select at least one PDF.'); return;
         }
 
         // ── File Size Limit Check (2.5 MB cap for shared backend) ──
         const totalSize = files.reduce((sum, f) => sum + f.size, 0);
-        if (totalSize > 4 * 1024 * 1024 && !userApiKeyVal) {
+        if (!isFreshLetter && totalSize > 4 * 1024 * 1024 && !userApiKeyVal) {
           document.getElementById('size-limit-alert').classList.add('active');
           return;
         }
@@ -3832,18 +3884,24 @@
         });
 
         let filesArray;
-        try {
-          filesArray = await Promise.all(
-            files.map(async (file, idx) => ({
-              name: file.name,
-              data: await toBase64(file),
-              role: idx === mainIdx ? 'main' : 'ref'
-            }))
-          );
-        } catch (err) {
-          showToast('❌ Could not read a PDF file.');
-          console.error(err);
-          return;
+        if (isFreshLetter) {
+          // No real PDF needed — the worker requires ≥1 file, so send the
+          // tiny embedded blank one as "main". AI drafts from the fields below.
+          filesArray = [{ name: 'blank.pdf', data: BLANK_PDF_B64, role: 'main' }];
+        } else {
+          try {
+            filesArray = await Promise.all(
+              files.map(async (file, idx) => ({
+                name: file.name,
+                data: await toBase64(file),
+                role: idx === mainIdx ? 'main' : 'ref'
+              }))
+            );
+          } catch (err) {
+            showToast('❌ Could not read a PDF file.');
+            console.error(err);
+            return;
+          }
         }
 
         // ── Build prompt ────────────────────────────────────────
@@ -3851,13 +3909,87 @@
           .toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
           .replace(/\//g, '-');                    // → "DD-MM-YYYY"
 
-        // ── Detect scenario: Transformation vs Reply ────────────
-        const isTransformation = hints &&
+        // ── Detect scenario: Transformation vs Reply (never for Fresh Letter) ──
+        const isTransformation = !isFreshLetter && hints &&
           /മാറ്റ|കൺവർട്ട്|അപ്ഡേറ്റ്|ആക്കി\s*മാറ്|change|convert|update|transform/i.test(hints);
 
         let promptText;
 
-        if (isTransformation) {
+        if (isFreshLetter) {
+          // ════════════════════════════════════════════════════════
+          // FRESH LETTER SCENARIO — user gives From/To/Subject as quick
+          // short-hand/abbreviated notes (same spirit as Hints); AI
+          // EXPANDS these into proper formal ഭരണഭാഷ, exactly like it
+          // already formalizes Hints into body prose. Facts only come
+          // from what's given — AI must not invent NEW people/places,
+          // but SHOULD resolve obvious abbreviations and fix grammar.
+          // ════════════════════════════════════════════════════════
+          if (isReplyEnglish) {
+            promptText =
+              'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
+              'Draft a fresh, original formal letter in English (this is NOT a reply to any specific incoming letter).\n\n' +
+              'Below are QUICK, SHORT-HAND notes for the sender, recipient, and subject — they may use abbreviations ' +
+              'or informal phrasing. EXPAND them into complete, formal English office designations/subject line, ' +
+              'the same way you would formalize casual hints into proper prose. Use ONLY the facts given below — ' +
+              'do NOT invent any additional office, person, or place not implied by these notes.\n\n' +
+              'FROM (sender, short-hand): ' + freshFrom + '\n' +
+              'TO (recipient, short-hand): ' + freshTo + '\n' +
+              'SUBJECT (short-hand): ' + freshSubject + '\n\n' +
+              'Output ONLY plain text values for the fields below — NO HTML, NO markdown, NO asterisks, NO bullets.\n\n' +
+              '###SENDER###\n[Expand FROM above into: Designation, Institution, Place — one per line]\n\n' +
+              '###RECIPIENT###\n[Expand TO above into: Designation, Institution, Place — one per line]\n\n' +
+              '###SUBJECT###\n[Expand SUBJECT above into one concise, formal English sentence]\n\n' +
+              '###NUMBER###\n[Construct a plausible office file/letter number]\n\n' +
+              '###BODY###\n[Draft the COMPLETE letter body based on the HINTS below. Formal bureaucratic English ' +
+              '(Kerala Govt style). Each paragraph separated by exactly one blank line. Plain prose only.]\n\n' +
+              '###SIGNATURE_NAME###\n[Leave BLANK unless the hints below explicitly give a signatory\'s name — never invent one]\n\n' +
+              '###SIGNATURE_DESIGNATION###\n[Same designation as SENDER above]\n\n' +
+              '###SIGNATURE_INSTITUTION###\n[Same institution as SENDER above]\n\n' +
+              '###REFERENCE###\n[Leave BLANK unless the hints below explicitly mention a G.O./circular/letter to cite]\n\n' +
+              '###ENCLOSURES###\n[Comma-separated list ONLY if hints mention enclosures — write NONE otherwise]\n\n' +
+              'STRICT RULES:\n' +
+              '1. Output the markers EXACTLY as shown (###NAME###), each alone on its own line.\n' +
+              '2. PLAIN TEXT ONLY — no HTML, no markdown, no bullet symbols, no asterisks.\n' +
+              '3. Expand/formalize the FROM/TO/SUBJECT short-hand — do NOT copy it verbatim, but do NOT invent facts beyond it either.\n' +
+              '4. Do NOT hallucinate any facts, figures, or names not present in the hints.\n' +
+              '5. Minimum 3 substantive body paragraphs unless the hints clearly call for fewer.\n\n' +
+              'CRITICAL — You MUST incorporate EVERY point listed below into the body exactly as stated. Do NOT ignore any hint. Do NOT add names, figures, or content NOT present in the hints.\n' +
+              'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
+              (hints || 'No hints provided. Draft a complete, formal letter body appropriate to the subject given above.');
+          } else {
+          promptText =
+            'You are a highly experienced Senior Clerk / Section Officer in the Kerala Government.\n' +
+            'Draft a fresh, original formal letter in ഔദ്യോഗിക മലയാളം (ഇത് ഒരു incoming letter-ന്റെ മറുപടി അല്ല).\n\n' +
+            'താഴെയുള്ളത് sender, recipient, subject എന്നിവയുടെ QUICK short-hand notes ആണ് — abbreviations/informal ' +
+            'ആയിരിക്കാം. Hints-ൽ നിന്ന് body prose ഉണ്ടാക്കുന്നത് പോലെ, ഇവയെ പൂർണ്ണമായ, ഔപചാരിക ഔദ്യോഗിക മലയാള ' +
+            'designation/subject ആയി EXPAND ചെയ്യൂ. താഴെ തന്നിരിക്കുന്ന facts മാത്രം ഉപയോഗിക്കുക — ഇവിടെ ' +
+            'സൂചിപ്പിക്കാത്ത പുതിയ ഓഫീസ്/വ്യക്തി/സ്ഥലം ഒന്നും കൂട്ടിച്ചേർക്കരുത്.\n\n' +
+            'FROM (sender, short-hand): ' + freshFrom + '\n' +
+            'TO (recipient, short-hand): ' + freshTo + '\n' +
+            'SUBJECT (short-hand): ' + freshSubject + '\n\n' +
+            'Output ONLY plain text values for the fields below — NO HTML, NO markdown, NO asterisks, NO bullets.\n\n' +
+            '###SENDER###\n[FROM മുകളിൽ ഉള്ളത് ഇങ്ങനെ expand ചെയ്യൂ: Designation, Institution, Place — ഓരോന്നും ഓരോ വരിയിൽ]\n\n' +
+            '###RECIPIENT###\n[TO മുകളിൽ ഉള്ളത് ഇങ്ങനെ expand ചെയ്യൂ: Designation, Institution, Place — ഓരോന്നും ഓരോ വരിയിൽ]\n\n' +
+            '###SUBJECT###\n[SUBJECT മുകളിൽ ഉള്ളത് ഒരു concise, ഔപചാരിക മലയാള വാക്യം ആയി expand ചെയ്യൂ]\n\n' +
+            '###NUMBER###\n[Construct a plausible office file/letter number]\n\n' +
+            '###BODY###\n[Draft the COMPLETE letter body based on the HINTS below. ഔദ്യോഗിക മലയാളം. Each paragraph ' +
+            'separated by exactly one blank line. Plain prose only.]\n\n' +
+            '###SIGNATURE_NAME###\n[Leave BLANK unless the hints below explicitly give a signatory\'s name — never invent one]\n\n' +
+            '###SIGNATURE_DESIGNATION###\n[SENDER-ന്റെ അതേ designation]\n\n' +
+            '###SIGNATURE_INSTITUTION###\n[SENDER-ന്റെ അതേ institution]\n\n' +
+            '###REFERENCE###\n[Leave BLANK unless the hints below explicitly mention a G.O./circular/letter to cite]\n\n' +
+            '###ENCLOSURES###\n[Comma-separated list ONLY if hints mention enclosures — write NONE otherwise]\n\n' +
+            'STRICT RULES:\n' +
+            '1. Output the markers EXACTLY as shown (###NAME###), each alone on its own line.\n' +
+            '2. PLAIN TEXT ONLY — no HTML, no markdown, no bullet symbols, no asterisks.\n' +
+            '3. FROM/TO/SUBJECT short-hand expand/formalize ചെയ്യുക — verbatim copy ചെയ്യരുത്, പക്ഷെ അതിനപ്പുറം facts കൂട്ടിച്ചേർക്കുകയും അരുത്.\n' +
+            '4. Do NOT hallucinate any facts, figures, or names not present in the hints.\n' +
+            '5. Minimum 3 substantive body paragraphs unless the hints clearly call for fewer.\n\n' +
+            'CRITICAL — You MUST incorporate EVERY point listed below into the body exactly as stated. Do NOT ignore any hint. Do NOT add names, figures, or content NOT present in the hints.\n' +
+            'HINTS / POINTS TO INCORPORATE INTO THE BODY:\n' +
+            (hints || 'No hints provided. Draft a complete, formal letter body appropriate to the subject given above.');
+          }
+        } else if (isTransformation) {
           // ════════════════════════════════════════════════════════
           // TRANSFORMATION SCENARIO — single prompt now (rich/HTML
           // output only; ultralite/plain removed along with the mode
@@ -4249,31 +4381,30 @@
         } catch (err) {
           // ── Unified error handler for both paths ─────────────────
           const errMsg = err.message || '';
-          const showByokFailNotice = () => {
+          const showByokFailNotice = (msg) => {
             // Persistent notice (unlike the toast below, this does NOT
             // auto-hide) — the toast alone was easy to miss during a long
             // generate-wait, leaving the user unsure why nothing happened.
-            const sec = document.getElementById('advanced-key-section');
-            const arr = document.getElementById('advanced-key-arrow');
-            const isOpen = sec.style.maxHeight !== '' && sec.style.maxHeight !== '0px';
-            if (!isOpen) {
-              sec.style.maxHeight = '500px';
-              arr.style.transform = 'rotate(180deg)';
-            }
+            // Shows the SAME text as the toast — these used to be two
+            // different messages (this one a generic hardcoded line, the
+            // toast the real one), which was confusing.
+            document.getElementById('byok-fail-notice-text').textContent = '⚠️ ' + msg;
             document.getElementById('byok-fail-notice').style.display = 'block';
-            setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+            document.getElementById('ai-user-api-key').scrollIntoView({ behavior: 'smooth', block: 'center' });
           };
           if (errMsg.startsWith('PDF_ERROR:')) {
             showToast('📄 ' + errMsg.replace('PDF_ERROR:', ''), 10000);
           } else if (errMsg.startsWith('GEMINI_BUSY:')) {
-            showToast('⚠️ ' + errMsg.replace('GEMINI_BUSY:', ''), 8000);
-            showByokFailNotice();
+            const busyMsg = errMsg.replace('GEMINI_BUSY:', '');
+            showToast('⚠️ ' + busyMsg, 8000);
+            showByokFailNotice(busyMsg);
           } else if (
             errMsg.includes('429') || errMsg.includes('503') ||
             errMsg.includes('exhausted') || errMsg.includes('quota') || errMsg.includes('failed')
           ) {
-            showToast('⚠️ സിസ്റ്റത്തിൽ ആളുകൾ കൂടുതലാണ് (Heavy Traffic). ദയവായി Personal API Key ഉപയോഗിക്കുക, അല്ലെങ്കിൽ ഒരു മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.', 6000);
-            showByokFailNotice();
+            const heavyMsg = 'സിസ്റ്റത്തിൽ ആളുകൾ കൂടുതലാണ് (Heavy Traffic). ദയവായി Personal API Key ഉപയോഗിക്കുക, അല്ലെങ്കിൽ ഒരു മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.';
+            showToast('⚠️ ' + heavyMsg, 6000);
+            showByokFailNotice(heavyMsg);
           } else {
             showToast('❌ AI Error: ' + errMsg, 6000);
           }
@@ -4288,8 +4419,10 @@
         const ed = getEditor();
         if (ed) {
           if (!isTransformation) {
-            // REPLY — single unified path (was 3 draftModes, now always this):
-            // parse the AI's marker-based plain text, build the fixed HTML.
+            // REPLY / FRESH LETTER — single unified path: parse the AI's
+            // marker-based plain text, build the fixed HTML. Fresh Letter's
+            // prompt now asks AI to expand/formalize the short-hand From/To/
+            // Subject itself (same spirit as Hints), so no override needed here.
             const fields = parseReplyFields(responseText);
             ed.setContent(buildReplyHtml(fields, todayDate, isReplyEnglish ? 'en' : 'ml'));
           } else {
@@ -4348,17 +4481,10 @@
 
       // ── Size Limit Alert: OK Button Handler ────────────────────
       document.getElementById('sla-ok-btn').addEventListener('click', () => {
-        // 1. Hide the popup
         document.getElementById('size-limit-alert').classList.remove('active');
-
-        // 2. Expand the Advanced Key section (reuse existing toggle;
-        //    guard against calling it when already open)
-        const section = document.getElementById('advanced-key-section');
-        const isOpen = section.style.maxHeight !== '' && section.style.maxHeight !== '0px';
-        if (!isOpen) toggleAdvancedKey();
-
-        // 3. Focus after the 0.35s CSS transition finishes
-        setTimeout(() => document.getElementById('ai-user-api-key').focus(), 400);
+        const keyInput = document.getElementById('ai-user-api-key');
+        keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => keyInput.focus(), 300);
       });
 
     })();          // ← closes the outer IIFE
